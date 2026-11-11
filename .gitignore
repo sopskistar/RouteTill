@@ -34,3 +34,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env.local
+
+# RouteTill private keys, local PostgreSQL data and generated captures
+/data/
+/test-results/
+/playwright-report/
+/artifacts/
+/video/output/
+/video/node_modules
+/docs/sources/*-raw.html
+
+# Retrieved third-party source snapshots (references are documented)
+/docs/sources/
+
+/video/public/captures/
+/video/public/evidence.json
+/video/public/*.woff2
+
+/.impeccable/hook.cache.json

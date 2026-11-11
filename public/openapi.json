@@ -1,0 +1,1159 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RouteTill Agent & Purchase API",
+    "version": "0.1.0",
+    "description": "Deterministic agent proposals with human approval, NEAR Intents payment instructions, and evidence-backed digital entitlements. Agent bearer tokens cannot approve purchases or sign transactions."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Local development; override to your actual origin"
+    }
+  ],
+  "paths": {
+    "/api/products": {
+      "get": {
+        "summary": "Discover digital products",
+        "operationId": "get_api_products",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "demo",
+                "live"
+              ],
+              "default": "demo"
+            }
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a merchant digital product",
+        "operationId": "post_api_products",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "demo",
+                "live"
+              ],
+              "default": "demo"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "string",
+                    "description": "Exact USDC decimal, up to six places"
+                  },
+                  "artifact": {
+                    "type": "string",
+                    "maxLength": 16000
+                  }
+                },
+                "required": [
+                  "title",
+                  "description",
+                  "price",
+                  "artifact"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/{id}": {
+      "get": {
+        "summary": "Read product terms and expected artifact digest",
+        "operationId": "get_api_products_id",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "demo",
+                "live"
+              ],
+              "default": "demo"
+            }
+          }
+        ]
+      }
+    },
+    "/api/assets": {
+      "get": {
+        "summary": "Discover live provider assets (execution supports Arbitrum USDC \u2192 Base USDC)",
+        "operationId": "get_api_assets",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ]
+      }
+    },
+    "/api/orders": {
+      "post": {
+        "summary": "Prepare a purchase proposal; grants no wallet permission",
+        "operationId": "post_api_orders",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": {
+                    "type": "string"
+                  },
+                  "maxSourceAmount": {
+                    "type": "string",
+                    "pattern": "^[1-9][0-9]{0,29}$",
+                    "description": "Source USDC atomic units"
+                  },
+                  "refundAddress": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{40}$"
+                  }
+                },
+                "required": [
+                  "productId",
+                  "maxSourceAmount",
+                  "refundAddress"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "summary": "Observe an authorized order, attempt, events and entitlement references",
+        "operationId": "get_api_orders_id",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/orders/{id}/approve": {
+      "post": {
+        "summary": "Human browser session only: approve the exact policy fingerprint",
+        "operationId": "post_api_orders_id_approve",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fingerprint": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fingerprint"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/quote": {
+      "post": {
+        "summary": "Authenticated live dry quote for the stored policy",
+        "operationId": "post_api_orders_id_quote",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/execute": {
+      "post": {
+        "summary": "Consume a single-use live approval and create deposit instructions",
+        "operationId": "post_api_orders_id_execute",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "policy": {
+                    "$ref": "#/components/schemas/PurchasePolicy"
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "policy",
+                  "idempotencyKey"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/deposit": {
+      "post": {
+        "summary": "Register a confirmed exact source-chain deposit",
+        "operationId": "post_api_orders_id_deposit",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "txHash": {
+                    "type": "string",
+                    "pattern": "^0x[0-9a-fA-F]{64}$"
+                  }
+                },
+                "required": [
+                  "txHash"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/reconcile": {
+      "post": {
+        "summary": "Re-read provider and destination-chain evidence; backoff enforced",
+        "operationId": "post_api_orders_id_reconcile",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/passports/{id}": {
+      "get": {
+        "summary": "Read an issued shareable Purchase Passport",
+        "operationId": "get_api_passports_id",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "demo",
+                "live"
+              ],
+              "default": "demo"
+            }
+          }
+        ]
+      }
+    },
+    "/api/entitlements/{id}": {
+      "get": {
+        "summary": "Download artifact only for an entitled buyer or merchant",
+        "operationId": "get_api_entitlements_id",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "text/markdown": {
+                "schema": {
+                  "type": "string",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/auth/api-key": {
+      "post": {
+        "summary": "Create a 12-hour limited agent token; human session only",
+        "operationId": "post_api_auth_api-key",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/prepare": {
+      "post": {
+        "summary": "Prepare an isolated protected synthetic judge order",
+        "operationId": "post_api_lab_prepare",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/challenge": {
+      "post": {
+        "summary": "Run real adversarial backend logic in the demo database only",
+        "operationId": "post_api_lab_challenge",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "attack": {
+                    "type": "string",
+                    "enum": [
+                      "merchant",
+                      "price",
+                      "reuse",
+                      "replay",
+                      "tamper"
+                    ]
+                  }
+                },
+                "required": [
+                  "orderId",
+                  "attack"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "routetill_session"
+      },
+      "agentToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Scoped rt_demo_ or rt_live_ token created by a human session"
+      }
+    },
+    "schemas": {
+      "PurchasePolicy": {
+        "type": "object",
+        "required": [
+          "version",
+          "authorizationId",
+          "merchantId",
+          "merchantName",
+          "recipient",
+          "productId",
+          "productName",
+          "artifactSha256",
+          "sourceAsset",
+          "destinationAsset",
+          "sourceChain",
+          "destinationChain",
+          "destinationToken",
+          "destinationAmount",
+          "maxSourceAmount",
+          "refundAddress",
+          "expiresAt",
+          "mode"
+        ],
+        "properties": {
+          "authorizationId": {
+            "type": "string"
+          },
+          "merchantId": {
+            "type": "string"
+          },
+          "merchantName": {
+            "type": "string"
+          },
+          "recipient": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "artifactSha256": {
+            "type": "string"
+          },
+          "sourceAsset": {
+            "type": "string"
+          },
+          "destinationAsset": {
+            "type": "string"
+          },
+          "destinationToken": {
+            "type": "string"
+          },
+          "destinationAmount": {
+            "type": "string"
+          },
+          "maxSourceAmount": {
+            "type": "string"
+          },
+          "refundAddress": {
+            "type": "string"
+          },
+          "version": {
+            "const": 1
+          },
+          "sourceChain": {
+            "const": 42161
+          },
+          "destinationChain": {
+            "const": 8453
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "demo",
+              "live"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

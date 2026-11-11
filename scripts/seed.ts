@@ -1,0 +1,16 @@
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {db} from '../src/db';
+import {prepareLab,runChallenge} from '../src/services/lab';
+import {seedMerchant} from '../src/services/catalog';
+import {publicKeyPem} from '../src/core/crypto';
+import {Actor} from '../src/core/types';
+const database=await db('demo');await seedMerchant(database);
+const actor:Actor={merchantId:'judge-preview',buyerId:'judge-preview-buyer',mode:'demo',sessionHash:'seed-only',role:'judge'};
+const order=await prepareLab(database,actor);const result=await runChallenge(database,actor,order.id,'replay');
+const entitlement=(await database.query('SELECT * FROM entitlements WHERE order_id=$1',[order.id])).rows[0];
+mkdirSync('artifacts/demo',{recursive:true});
+writeFileSync('artifacts/demo/passport.json',JSON.stringify(result.passport,null,2));
+writeFileSync('artifacts/demo/field-notes.md',entitlement.artifact);
+writeFileSync('artifacts/demo/public-key.pem',publicKeyPem());
+writeFileSync('artifacts/demo/manifest.json',JSON.stringify({mode:'SYNTHETIC',orderId:order.id,entitlementId:entitlement.id,storedEntitlements:result.storedEntitlements,deliveries:20,mainnetSettlement:'UNVERIFIED'},null,2));
+console.log(JSON.stringify({seeded:true,orderId:order.id,entitlements:result.storedEntitlements,storage:database.backend,mainnetSettlement:'UNVERIFIED'}));await database.close();

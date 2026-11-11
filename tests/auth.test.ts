@@ -1,0 +1,23 @@
+import {beforeAll,afterAll,describe,it,expect} from 'vitest';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {privateKeyToAccount,generatePrivateKey} from 'viem/accounts';
+import {createDatabase,Database,assertIsolatedStores} from '../src/db';
+import {Actor} from '../src/core/types';
+import {confirmWallet,newSession,rateLimit,walletChallenge} from '../src/services/auth';
+let database:Database,folder:string;
+const actor:Actor={merchantId:'ownership-merchant',buyerId:'buyer',mode:'live',role:'merchant',sessionHash:'test'};
+beforeAll(async()=>{folder=await mkdtemp(join(tmpdir(),'routetill-auth-'));database=await createDatabase(join(folder,'pg'));await database.query('INSERT INTO merchants(id,email,name) VALUES($1,$2,$3)',[actor.merchantId,'ownership@example.invalid','Ownership Studio']);});
+afterAll(async()=>{await database.close();await rm(folder,{recursive:true,force:true});});
+describe('wallet ownership and server credentials',()=>{
+ it('verifies a nonce-bound EIP-191 signature and rejects replay',async()=>{const account=privateKeyToAccount(generatePrivateKey());const c=await walletChallenge(database,actor,account.address,'https://routetill.example');const signature=await account.signMessage({message:c.message});expect(await confirmWallet(database,actor,c.id,signature)).toMatchObject({verified:true});await expect(confirmWallet(database,actor,c.id,signature)).rejects.toThrow('already used');});
+ it('rejects a signature from another wallet',async()=>{const a=privateKeyToAccount(generatePrivateKey()),b=privateKeyToAccount(generatePrivateKey());const c=await walletChallenge(database,actor,a.address,'https://routetill.example');await expect(confirmWallet(database,actor,c.id,await b.signMessage({message:c.message}))).rejects.toThrow('does not match');});
+ it('rejects an expired ownership challenge',async()=>{const a=privateKeyToAccount(generatePrivateKey());const c=await walletChallenge(database,actor,a.address,'https://routetill.example');await database.query("UPDATE wallet_challenges SET expires_at=now()-interval '1 minute' WHERE id=$1",[c.id]);await expect(confirmWallet(database,actor,c.id,await a.signMessage({message:c.message}))).rejects.toThrow('expired');});
+ it('binds ownership challenges to the merchant',async()=>{const a=privateKeyToAccount(generatePrivateKey());const c=await walletChallenge(database,actor,a.address,'https://routetill.example');await expect(confirmWallet(database,{...actor,merchantId:'other'},c.id,await a.signMessage({message:c.message}))).rejects.toThrow('challenge');});
+ it('stores only a hash of session credentials',async()=>{const s=await newSession(database,'live',actor.merchantId);const record=(await database.query('SELECT * FROM sessions WHERE token_hash=$1',[s.actor.sessionHash])).rows[0];expect(record.token_hash).not.toBe(s.token);expect(JSON.stringify(record)).not.toContain(s.token);});
+ it('enforces a durable rate limit under concurrency',async()=>{const r=await Promise.allSettled(Array.from({length:12},()=>rateLimit(database,'auth-limit',5,60)));expect(r.filter(x=>x.status==='fulfilled')).toHaveLength(5);});
+ it('blocks a second local PostgreSQL owner without corrupting the database',async()=>{await expect(createDatabase(join(folder,'pg'))).rejects.toThrow('already open');expect((await database.query('SELECT 1 AS n')).rows[0].n).toBe(1);});
+ it('rejects live/demo aliases that only change credentials or pooling',()=>{expect(()=>assertIsolatedStores('postgresql://user:example@ep-fixture.neon.tech/live','postgresql://other:example@ep-fixture-pooler.neon.tech/live?sslmode=require')).toThrow('separate PostgreSQL');});
+ it('permits distinct physical database names',()=>{expect(()=>assertIsolatedStores('postgresql://user:example@ep-fixture.neon.tech/live','postgresql://user:example@ep-fixture.neon.tech/judge')).not.toThrow();});
+});

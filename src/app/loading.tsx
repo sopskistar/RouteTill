@@ -1,0 +1,1 @@
+export default function Loading(){return <div className="container page" role="status"><div className="skeleton skeleton-title"/><div className="skeleton skeleton-panel"/><span className="sr-only">Loading RouteTill</span></div>;}

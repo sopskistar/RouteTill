@@ -1,0 +1,149 @@
+{
+  "payload": {
+    "mode": "demo",
+    "events": [
+      {
+        "id": "706467bc-168f-45db-9137-25cab1687dde",
+        "data": {
+          "scope": "single purchase; no wallet access",
+          "fingerprint": "270d67ad7cc3d2c61afbe60a1e9f3b1afe7c876979d6318e19b8017ad8ac7441"
+        },
+        "kind": "purchase.human-approved",
+        "created_at": "2026-11-11T12:35:03.516Z"
+      },
+      {
+        "id": "72575d21-5f9f-4065-b373-e95a0f46f25c",
+        "data": {
+          "attemptId": "97af01df-4645-43ff-98a3-0401e9dabe16"
+        },
+        "kind": "approval.consumed",
+        "created_at": "2026-11-11T12:35:03.658Z"
+      },
+      {
+        "id": "5f2a372c-bea9-453c-a516-55d919cb806b",
+        "data": {
+          "entitlementId": "b650b7fe-1637-40af-ad15-30efc8db70da",
+          "artifactSha256": "acb609172c4627533f12b52fd751a031ff6c8f3b2122b16d6ff4869fff2d7717"
+        },
+        "kind": "fulfillment.issued",
+        "created_at": "2026-11-11T12:35:03.929Z"
+      },
+      {
+        "id": "e198567f-d717-4c4d-9ad6-0932b26ab13f",
+        "data": {
+          "level": "SYNTHETIC_ONLY",
+          "txHash": "0x9f289f518b271c3ed0607368699712de3dc18aa0b5c363b96cd1c3b7885e7b61"
+        },
+        "kind": "settlement.qualified",
+        "created_at": "2026-11-11T12:35:03.929Z"
+      }
+    ],
+    "schema": "routetill.purchase-passport.v1",
+    "source": {
+      "chainId": 42161,
+      "transactionHash": null
+    },
+    "orderId": "420c57cb-05ed-4d41-adb3-024a5f1a1854",
+    "issuedAt": "2026-11-11T12:35:04.920Z",
+    "settlement": {
+      "kind": "SYNTHETIC",
+      "token": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "txHash": "0x9f289f518b271c3ed0607368699712de3dc18aa0b5c363b96cd1c3b7885e7b61",
+      "chainId": 8453,
+      "reasons": [],
+      "receipt": {
+        "logs": [
+          {
+            "data": "0x0000000000000000000000000000000000000000000000000000000000989680",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x2222222222222222222222222222222222222222222222222222222222222222",
+              "0x0000000000000000000000001111111111111111111111111111111111111111"
+            ],
+            "address": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+            "removed": false,
+            "logIndex": "0x0"
+          }
+        ],
+        "status": "0x1",
+        "blockHash": "0xed0317eec639016af839913bfb9ac393fa47aa528dedcdc3876f18f38f950b3d",
+        "blockNumber": "0x10000",
+        "transactionHash": "0x9f289f518b271c3ed0607368699712de3dc18aa0b5c363b96cd1c3b7885e7b61"
+      },
+      "logIndex": 0,
+      "verified": true,
+      "blockHash": "0xed0317eec639016af839913bfb9ac393fa47aa528dedcdc3876f18f38f950b3d",
+      "checkedAt": "2026-11-11T12:35:03.927Z",
+      "finalized": true,
+      "recipient": "0x1111111111111111111111111111111111111111",
+      "blockNumber": "0x10000",
+      "actualAmount": "10000000",
+      "confirmations": 33,
+      "expectedAmount": "10000000",
+      "finalizedBlock": {
+        "hash": "0xed0317eec639016af839913bfb9ac393fa47aa528dedcdc3876f18f38f950b3d",
+        "number": "0x10018"
+      },
+      "providerAssociation": "synthetic:97af01df-4645-43ff-98a3-0401e9dabe16",
+      "requiredConfirmations": 12
+    },
+    "destination": {
+      "token": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "chainId": 8453,
+      "recipient": "0x1111111111111111111111111111111111111111",
+      "actualAmount": "10000000",
+      "expectedAmount": "10000000",
+      "transactionHash": "0x9f289f518b271c3ed0607368699712de3dc18aa0b5c363b96cd1c3b7885e7b61"
+    },
+    "fulfillment": {
+      "eventId": "5f2a372c-bea9-453c-a516-55d919cb806b",
+      "issuedAt": "2026-11-11T12:35:03.929Z",
+      "entitlementId": "b650b7fe-1637-40af-ad15-30efc8db70da",
+      "artifactSha256": "acb609172c4627533f12b52fd751a031ff6c8f3b2122b16d6ff4869fff2d7717"
+    },
+    "limitations": [
+      "Human approval and database uniqueness are application assertions. They are not independently proved by this signature.",
+      "A SHA-256 match establishes byte identity, not usefulness, quality, or off-platform delivery.",
+      "Destination transfer association relies on the provider status response; that response is not a signed proof of causal routing.",
+      "Synthetic fixture. No funds moved. Mainnet settlement is UNVERIFIED.",
+      "The issuer public key must be obtained or pinned independently. A self-supplied key is not an identity proof."
+    ],
+    "approvedTerms": {
+      "mode": "demo",
+      "version": 1,
+      "expiresAt": "2026-11-11T13:05:03.376Z",
+      "productId": "judge-preview-field-notes",
+      "recipient": "0x1111111111111111111111111111111111111111",
+      "merchantId": "judge-preview",
+      "productName": "The verification field notes",
+      "sourceAsset": "nep141:arb-0xaf88d065e77c8cc2239327c5edb3a432268e5831.omft.near",
+      "sourceChain": 42161,
+      "merchantName": "RouteTill Studio",
+      "refundAddress": "0x1111111111111111111111111111111111111111",
+      "artifactSha256": "acb609172c4627533f12b52fd751a031ff6c8f3b2122b16d6ff4869fff2d7717",
+      "authorizationId": "d559c89d-f9a6-46fe-a590-f3ac5fff9cf3",
+      "maxSourceAmount": "11000000",
+      "destinationAsset": "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
+      "destinationChain": 8453,
+      "destinationToken": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "destinationAmount": "10000000"
+    },
+    "quoteEvidence": {
+      "note": "No provider quote is claimed for this settlement fixture.",
+      "synthetic": true
+    },
+    "settlementLevel": "SYNTHETIC_ONLY",
+    "providerEvidence": {
+      "status": "SYNTHETIC_SUCCESS",
+      "fixture": true,
+      "association": "97af01df-4645-43ff-98a3-0401e9dabe16"
+    },
+    "approvedTermsHash": "270d67ad7cc3d2c61afbe60a1e9f3b1afe7c876979d6318e19b8017ad8ac7441"
+  },
+  "signature": {
+    "value": "GvgZ7FroAyWtDWgXzr1OaRHvENo8TmnVL1/AWYVIiKA7pPfJml77DgnHutoXbrNZCTNJNTUYzQwIZXoBQbjRBw==",
+    "algorithm": "Ed25519",
+    "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAhdoSjXdbVNnoOSji3VjMJUGFxz0ifp59zuGLfDDf85Y=\n-----END PUBLIC KEY-----\n",
+    "keyFingerprint": "3cfe4361562ac322b428df49c48a3886ae04dab07d811f751fed52535b0c2d9e"
+  }
+}

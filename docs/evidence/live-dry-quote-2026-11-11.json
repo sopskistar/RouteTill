@@ -1,0 +1,79 @@
+{
+  "checkedAt": "2026-11-11T12:11:28.447Z",
+  "catalogCount": 229,
+  "catalogHash": "30cb810d9330badaf054c7660295bac473b697f8cd6018df366d3cdbd0844517",
+  "request": {
+    "dry": true,
+    "swapType": "EXACT_OUTPUT",
+    "slippageTolerance": 100,
+    "originAsset": "nep141:arb-0xaf88d065e77c8cc2239327c5edb3a432268e5831.omft.near",
+    "destinationAsset": "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
+    "amount": "10000000",
+    "depositType": "ORIGIN_CHAIN",
+    "recipientType": "DESTINATION_CHAIN",
+    "refundType": "ORIGIN_CHAIN",
+    "recipient": "0x1111111111111111111111111111111111111111",
+    "refundTo": "0x1111111111111111111111111111111111111111",
+    "deadline": "2026-11-11T12:31:27.787Z"
+  },
+  "response": {
+    "quote": {
+      "amountIn": "10105320",
+      "amountInFormatted": "10.10532",
+      "amountInUsd": "10.101793243320",
+      "minAmountIn": "10004266",
+      "amountOut": "10000000",
+      "amountOutFormatted": "10.0",
+      "amountOutUsd": "9.996510000000",
+      "minAmountOut": "10000000",
+      "timeEstimate": 27,
+      "refundFee": "5300",
+      "withdrawFee": "2400"
+    },
+    "quoteRequest": {
+      "dry": true,
+      "depositMode": "SIMPLE",
+      "swapType": "EXACT_OUTPUT",
+      "slippageTolerance": 100,
+      "originAsset": "nep141:arb-0xaf88d065e77c8cc2239327c5edb3a432268e5831.omft.near",
+      "depositType": "ORIGIN_CHAIN",
+      "destinationAsset": "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
+      "amount": "10000000",
+      "refundTo": "0x1111111111111111111111111111111111111111",
+      "refundType": "ORIGIN_CHAIN",
+      "recipient": "0x1111111111111111111111111111111111111111",
+      "recipientType": "DESTINATION_CHAIN",
+      "deadline": "2026-11-11T12:31:27.787Z",
+      "confidentiality": "public",
+      "quoteWaitingTimeMs": 0,
+      "insured": false,
+      "appFees": [
+        {
+          "recipient": "5880ad2b362620fadf759cbceb1cd5737ce8c6ed7fb8e9942881e6731f9247dd",
+          "fee": 1
+        }
+      ]
+    },
+    "signature": "ed25519:3tfw6neogcbbutr3MUrndsxwaC1W4b6Ms5bd6hnTyVFMscCPxv8hiPhWrXEz15zX8R41hWUcQgzeXoTxx75ZpHgU",
+    "timestamp": "2026-11-11T12:11:27.794Z",
+    "correlationId": "90145f3e-e131-4951-8288-c2a0a5109200"
+  },
+  "verification": {
+    "signatureVerified": true,
+    "checkedAt": "2026-11-11T12:11:28.307Z",
+    "dry": true,
+    "limitations": [
+      "Signature coverage follows the pinned official SDK; fees and time estimates may be unsigned.",
+      "A quote is not evidence of payment."
+    ]
+  },
+  "checks": {
+    "signatureVerified": true,
+    "recipientTamperRejected": true,
+    "amountTamperRejected": true
+  },
+  "mainnetSettlement": "UNVERIFIED",
+  "fundsMoved": false,
+  "fixtureAddresses": true,
+  "limitations": "Authenticated live dry quote only. It does not authorize or establish a payment."
+}

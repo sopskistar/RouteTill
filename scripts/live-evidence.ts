@@ -1,0 +1,13 @@
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {verifyQuoteSignature} from '@defuse-protocol/one-click-sdk-typescript';
+import {assets,quote} from '../src/integrations/near';
+import {ARB_USDC,BASE_USDC,BASE_TOKEN,DEMO_WALLET} from '../src/core/policy';
+import {fingerprint} from '../src/core/crypto';
+import {Policy} from '../src/core/types';
+const recipient=process.env.DEMO_MERCHANT_ADDRESS||DEMO_WALLET;
+const policy:Policy={version:1,authorizationId:crypto.randomUUID(),merchantId:'quote-probe',merchantName:'Quote-only probe',recipient,productId:'field-notes',productName:'Synthetic field notes',artifactSha256:'0'.repeat(64),sourceAsset:ARB_USDC,destinationAsset:BASE_USDC,sourceChain:42161,destinationChain:8453,destinationToken:BASE_TOKEN,destinationAmount:'10000000',maxSourceAmount:'12000000',refundAddress:process.env.DEMO_REFUND_ADDRESS||DEMO_WALLET,expiresAt:new Date(Date.now()+1800000).toISOString(),mode:'live'};
+const catalog=await assets();const result=await quote(policy,true);
+const changed=structuredClone(result.response);changed.quoteRequest.recipient='0x9999999999999999999999999999999999999999';
+const amount=structuredClone(result.response);amount.quote.amountOut='999999999';
+const evidence={checkedAt:new Date().toISOString(),catalogCount:catalog.length,catalogHash:fingerprint(catalog),...result,checks:{signatureVerified:verifyQuoteSignature(result.response),recipientTamperRejected:!verifyQuoteSignature(changed),amountTamperRejected:!verifyQuoteSignature(amount)},mainnetSettlement:'UNVERIFIED',fundsMoved:false,fixtureAddresses:!process.env.DEMO_MERCHANT_ADDRESS,limitations:'Authenticated live dry quote only. It does not authorize or establish a payment.'};
+mkdirSync('artifacts/live',{recursive:true});writeFileSync('artifacts/live/dry-quote.json',JSON.stringify(evidence,null,2));writeFileSync('artifacts/live/catalog.json',JSON.stringify(catalog,null,2));console.log(JSON.stringify({checkedAt:evidence.checkedAt,catalogCount:catalog.length,amountIn:result.response.quote.amountIn,amountOut:result.response.quote.amountOut,...evidence.checks,mainnetSettlement:evidence.mainnetSettlement}));

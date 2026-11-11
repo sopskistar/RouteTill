@@ -1,0 +1,3 @@
+import {ImageResponse} from 'next/og';
+export const alt='RouteTill — From approved purchase to proven delivery';export const size={width:1200,height:630};export const contentType='image/png';
+export default function Image(){return new ImageResponse(<div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',padding:72,background:'#142b46',color:'#f4f7fb',fontFamily:'sans-serif'}}><div style={{display:'flex',fontSize:36,color:'#fa7656'}}>RouteTill.</div><div style={{display:'flex',fontSize:76,fontWeight:700,marginTop:65,maxWidth:1000,lineHeight:1.08}}>From approved purchase to proven delivery.</div><div style={{display:'flex',fontSize:25,marginTop:45,color:'#bbccdf'}}>Human authorization → NEAR Intents → Purchase Passport</div></div>,size);}
