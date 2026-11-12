@@ -1,0 +1,28 @@
+import {beforeAll,afterAll,afterEach,describe,it,expect,vi} from 'vitest';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createDatabase,Database} from '../src/db';
+import {guestSession,guestScope,reserveGuestChallenge} from '../src/services/guest';
+import {prepareLab,runChallenge} from '../src/services/lab';
+import {getOrder} from '../src/services/orders';
+import {judgeSession} from '../src/services/auth';
+let db:Database,folder:string;
+beforeAll(async()=>{folder=await mkdtemp(join(tmpdir(),'routetill-guest-'));db=await createDatabase(join(folder,'pg'));},30000);
+afterAll(async()=>{await db.close();await rm(folder,{recursive:true,force:true});});
+afterEach(()=>vi.unstubAllEnvs());
+const fresh=()=>guestSession(db,crypto.randomUUID());
+describe('limited public synthetic sessions',()=>{
+ it('issues a cookie-scoped guest identity with 30-minute server expiry',async()=>{const s=await fresh();expect(s.actor).toMatchObject({mode:'demo',role:'guest',authKind:'cookie'});const row=(await db.query('SELECT expires_at FROM sessions WHERE token_hash=$1',[s.actor.sessionHash])).rows[0];expect(new Date(row.expires_at).getTime()-Date.now()).toBeGreaterThan(29*60000);expect(new Date(row.expires_at).getTime()-Date.now()).toBeLessThanOrEqual(30*60000);});
+ it('refuses guest creation on the production deployment before database writes',async()=>{vi.stubEnv('VERCEL','1');vi.stubEnv('DATABASE_URL','present');vi.stubEnv('DEMO_DATABASE_URL','');vi.stubEnv('ENABLE_JUDGE_DEMO','false');await expect(fresh()).rejects.toThrow('live purchases only');});
+ it('keeps elevated judge access-code enforcement',async()=>{vi.stubEnv('JUDGE_ACCESS_CODE','test-only-elevated-code');await expect(judgeSession('')).rejects.toThrow('owner-provided judge');});
+ it('creates one prepared order under twelve concurrent bootstrap calls',async()=>{const s=await fresh();const orders=await Promise.all(Array.from({length:12},()=>prepareLab(db,s.actor)));expect(new Set(orders.map(o=>o.id)).size).toBe(1);expect((await db.query('SELECT order_count FROM demo_guest_limits WHERE session_hash=$1',[s.actor.sessionHash])).rows[0].order_count).toBe(1);});
+ it('allows two reset purchases and retains prior audit records',async()=>{const s=await fresh();const first=await prepareLab(db,s.actor);await prepareLab(db,s.actor,true);await prepareLab(db,s.actor,true);await expect(prepareLab(db,s.actor,true)).rejects.toThrow('two fresh resets');expect((await getOrder(db,first.id,s.actor)).id).toBe(first.id);});
+ it('cannot read another guest purchase',async()=>{const a=await fresh(),b=await fresh();const o=await prepareLab(db,a.actor);await expect(getOrder(db,o.id,b.actor)).rejects.toThrow('another session');});
+ it('enforces fifteen total challenge reservations under concurrency',async()=>{const s=await fresh(),o=await prepareLab(db,s.actor);const attempts=await Promise.allSettled(Array.from({length:24},()=>reserveGuestChallenge(db,s.actor,o.id)));expect(attempts.filter(x=>x.status==='fulfilled')).toHaveLength(15);expect((await db.query('SELECT challenge_count FROM demo_guest_limits WHERE session_hash=$1',[s.actor.sessionHash])).rows[0].challenge_count).toBe(15);});
+ it('prevents running attacks against an old order after reset',async()=>{const s=await fresh(),o=await prepareLab(db,s.actor);await prepareLab(db,s.actor,true);await expect(reserveGuestChallenge(db,s.actor,o.id)).rejects.toThrow('inactive order');});
+ it('enforces expiry during challenge and prepare operations',async()=>{const s=await fresh(),o=await prepareLab(db,s.actor);await db.query("UPDATE sessions SET expires_at=now()-interval '1 minute' WHERE token_hash=$1",[s.actor.sessionHash]);await expect(prepareLab(db,s.actor)).rejects.toThrow('expired');await expect(reserveGuestChallenge(db,s.actor,o.id)).rejects.toThrow('expired');});
+ it('runs all five actual attacks with one durable entitlement for a guest',async()=>{const s=await fresh(),o=await prepareLab(db,s.actor);for(const attack of ['merchant','price','reuse','replay','tamper'])expect((await runChallenge(db,s.actor,o.id,attack)).passed).toBe(true);expect((await db.query('SELECT count(*)::int AS n FROM entitlements WHERE order_id=$1',[o.id])).rows[0].n).toBe(1);});
+ it.each([['POST','auth','api-key'],['GET','merchant',''],['POST','products',''],['GET','assets',''],['POST','orders',''],['POST','orders','order-id'],['POST','wallet','challenge']])('denies guest %s %s %s',async(method,resource,id)=>{const s=await fresh();expect(()=>guestScope(s.actor,method,resource,id)).toThrow('Guest access is limited');});
+ it('allows only the prepared challenge and associated evidence surface',async()=>{const s=await fresh();for(const [method,resource,id] of [['POST','lab','prepare'],['POST','lab','challenge'],['GET','orders','order-id'],['GET','entitlements','entitlement-id']])expect(()=>guestScope(s.actor,method,resource,id)).not.toThrow();});
+});

@@ -7,16 +7,15 @@ import {audit,getOrder} from './orders';
 import {productById} from './catalog';
 export async function qualifyAndFulfill(database:Database,mode:Mode,attemptId:string,evidence:SettlementEvidence,eventKey:string,providerEvidence:unknown){
  return database.transaction(async sql=>{
-  const attempt=(await sql.query<Attempt>('SELECT * FROM attempts WHERE id=$1',[attemptId])).rows[0];requireThat(attempt,'ATTEMPT_NOT_FOUND','Payment attempt not found.',404);
-  const o=await getOrder(sql,attempt.order_id,undefined,true);
+  const binding=(await sql.query('SELECT to_jsonb(a) AS attempt,to_jsonb(o) AS purchase FROM attempts a JOIN orders o ON o.id=a.order_id WHERE a.id=$1 FOR UPDATE OF o',[attemptId])).rows[0];requireThat(binding,'ATTEMPT_NOT_FOUND','Payment attempt not found.',404);
+  const attempt:Attempt=binding.attempt,o=binding.purchase;
   requireThat(o.policy.mode===mode,'ENVIRONMENT_MISMATCH','Demo and live evidence cannot cross environments.',403);
   requireThat(evidence.kind===(mode==='demo'?'SYNTHETIC':'CHAIN'),'SYNTHETIC_LIVE_BLOCKED','Synthetic evidence cannot authorize live delivery.',403);
   requireThat(evidence.verified&&evidence.reasons.length===0,'SETTLEMENT_UNVERIFIED','Required settlement checks did not pass. No entitlement was created.');
   requireThat(evidence.chainId===o.policy.destinationChain&&evidence.token.toLowerCase()===o.policy.destinationToken.toLowerCase()&&evidence.recipient.toLowerCase()===o.policy.recipient.toLowerCase()&&BigInt(evidence.actualAmount)>=BigInt(o.policy.destinationAmount),'SETTLEMENT_TERMS','Settlement does not match the approved purchase.');
   requireThat(evidence.txHash&&evidence.logIndex!==null&&evidence.finalized&&evidence.confirmations>=12,'FINALITY','Final chain evidence is required for fulfillment.');
   if(mode==='live')requireThat(attempt.source_tx&&(providerEvidence as any)?.status==='SUCCESS'&&evidence.providerAssociation,'ASSOCIATION','Confirmed source deposit and provider association are required.');
-  const existing=(await sql.query('SELECT * FROM entitlements WHERE order_id=$1',[o.id])).rows[0];
-  await audit(sql,o.id,'settlement.notification',{attemptId,evidenceFingerprint:fingerprint(evidence)},eventKey);
+  const existing=(await sql.query("WITH notification AS (INSERT INTO events(id,order_id,kind,data,external_key) VALUES($1,$2,'settlement.notification',$3,$4) ON CONFLICT(external_key) DO NOTHING RETURNING id) SELECT * FROM entitlements WHERE order_id=$2",[randomUUID(),o.id,JSON.stringify({attemptId,evidenceFingerprint:fingerprint(evidence)}),eventKey])).rows[0];
   if(existing)return {created:false,entitlementId:existing.id,orderId:o.id};
   const approval=(await sql.query('SELECT * FROM approvals WHERE order_id=$1',[o.id])).rows[0];requireThat(approval?.consumed_at,'APPROVAL_REQUIRED','Approval must be consumed before delivery.');
   transition(o.state,'PROVIDER_SUCCESS');

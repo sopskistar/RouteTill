@@ -50,7 +50,9 @@ A first network attempt timed out; one retry succeeded and produced the reported
 
 ## Real payment gate and evidence record
 
-Pending: owner-approved code publication → Vercel/Neon setup and real persistence checks → verified merchant ownership → approved actual purchase → fresh executable quote and exact-deposit gas preflight → **separate explicit owner authorization and manual Rabby confirmation** → source receipt registration → provider success and independent finalized Base settlement → SQL entitlement count one → real Passport and independent verification.
+Status (2026-11-12, recovery session): both Vercel applications are deployed; local design, guest-demo and diagnostic improvements await owner-approved publication. Both health APIs return 200 with payments disabled. Production's demo-only product returns 404 and the demo product now returns 200. Both public Passport-key endpoints still return 503. Both actual Neon databases accepted migrations 001–003; individual queries succeeded, but the full concurrency/locking suite still fails on intermittent network connections. Local signing keys are valid, distinct Ed25519 identities; sensitive deployed values cannot be read back. Hosted signed Passport issuance and mainnet settlement remain **UNVERIFIED**. No source transaction has been signed, broadcast or transferred. [Recovery evidence](RELEASE_RECOVERY.md).
+
+Remaining proof path: resolve deployed signing-key failures and complete real PostgreSQL concurrency and hosted workflow verification → confirm merchant wallet ownership → prepare a fresh executable quote and exact-deposit gas preflight → **separate explicit owner authorization and manual Rabby confirmation** → source receipt registration → provider success and independent finalized Base settlement → SQL entitlement count one → real Passport and independent verification.
 
 Do not fill source/destination hashes, explorer links, settlement timestamps or a live Passport with synthetic values. They remain absent until obtained from the approved transaction.
 

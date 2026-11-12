@@ -19,6 +19,12 @@ Executed 11–12 November 2026 with Node 22.23.1, Next.js 16.4.6, Vitest 5.1.0 a
 | Owner-address read-only RPC preflight | Both address checksums, chain IDs and native USDC precision passed; source USDC/ETH sufficient at observation time; indicative gas estimated |
 | Real Neon / deployed Vercel / funded settlement | **PENDING / UNVERIFIED**, not counted as passing tests |
 
+## Recovery-session rerun — 12 November 2026
+
+Fresh checks against the preserved working tree: **145 tests in five files passed**, **seven browser journeys passed** in 30.2 seconds, lint and typecheck passed, and the production build passed on Node 22.23.1 outside the execution sandbox. The sandbox caused empty TypeScript subprocess output during builds and terminated Chromium before journeys started; the outside-sandbox runs passed. Secret scan with history and public bundles: **165 inputs, zero findings**. Full and production-only dependency audits: **zero vulnerabilities**. Both private release preflight commands passed with live deposits disabled.
+
+Both real Neon databases accepted migrations 001–003. This is distinct from transaction verification: the full real-Neon suite still failed on connection timeouts over pooled/direct TCP and on a WebSocket connection attempt. Individual production TCP and demo HTTPS/WebSocket queries succeeded; connectivity is intermittent. No successful Neon concurrency report or funded settlement is claimed. [Recovery details](RELEASE_RECOVERY.md).
+
 ## Persistence and adversarial coverage
 
 The original 85 tests remain and pass: integer precision/ranges; exact policy binding; merchant/product/route/refund/artifact substitution; expiry; state transitions; production quote signatures/tampering; quote cap/minimum/precision/expiry; wrong destination chain/token/recipient/amount; failed/missing receipt; confirmations/finality/reorg/removed/ambiguous logs and transaction reference errors.

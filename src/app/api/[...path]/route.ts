@@ -15,6 +15,7 @@ import {verifyPassport} from '@/core/verifier';
 import {sweep,reconcile} from '@/services/reconcile';
 import {assertDeploymentMode,defaultMode,deploymentMode,publicRuntime} from '@/core/deployment';
 import {paymentPreflight} from '@/services/payment-preflight';
+import {guestSession,guestScope,guestBudget} from '@/services/guest';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const evm=z.string().refine(x=>isAddress(x),'Enter a valid EVM address');
 const idSchema=z.string().min(1).max(100);
@@ -38,6 +39,14 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
    const input=z.object({attemptId:idSchema}).strict().parse(JSON.parse(raw));const database=await db('live');await rateLimit(database,'webhook',60);return response(await reconcile(database,input.attemptId));
   }
   checkOrigin(request);
+  if(resource==='auth'&&id==='guest'&&method==='POST'){
+   z.object({}).strict().parse(await json(request));
+   assertDeploymentMode('demo');
+   if(request.cookies.get(COOKIE))try{const existing=await auth(request);if(existing.actor.mode==='demo'&&['guest','judge'].includes(existing.actor.role))return response({mode:'demo',role:existing.actor.role,reused:true});}catch(error){if(!(error instanceof DomainError))throw error;}
+   const database=await db('demo');const ip=sha256((request.headers.get('x-forwarded-for')?.split(',')[0]||'local').slice(0,100));
+   const session=await guestSession(database,ip);const r=response({mode:'demo',role:'guest',expiresIn:1800});
+   r.cookies.set(COOKIE,session.token,{httpOnly:true,secure:!!process.env.VERCEL,sameSite:'strict',maxAge:1800,path:'/'});return r;
+  }
   if(resource==='auth'&&id==='demo'&&method==='POST'){
    const database=await db('demo');await rateLimit(database,'demo-session',100,3600);
    const input=z.object({accessCode:z.string().max(200).optional()}).strict().parse(await json(request));const session=await judgeSession(input.accessCode||'');
@@ -57,9 +66,10 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
    const mode=request.nextUrl.searchParams.get('mode')==='live'?'live':request.nextUrl.searchParams.get('mode')==='demo'?'demo':defaultMode();const database=await db(mode);const p=(await database.query('SELECT document FROM passports WHERE order_id=$1',[id])).rows[0];requireThat(p,'PASSPORT_PENDING','No final Purchase Passport is available for this order.',404);return response(p.document);
   }
   const {actor,database}=await auth(request);await rateLimit(database,'session:'+actor.sessionHash,100);
+  guestScope(actor,method,resource,id,action);
   if(actor.role==='agent')requireThat((method==='GET'&&['products','orders','assets','entitlements'].includes(resource))||(method==='POST'&&resource==='orders'&&(!id||['quote','execute','preflight','deposit','reconcile'].includes(action))),'AGENT_SCOPE','Agent tokens can discover, propose, quote, execute approved purchases, and retrieve their evidence only. Human approval and merchant administration are excluded.',403);
   if(resource==='auth'&&id==='me'){
-   const m=(await database.query('SELECT id,name,email,wallet,wallet_verified FROM merchants WHERE id=$1',[actor.merchantId])).rows[0];return response({actor:{...actor,sessionHash:undefined},merchant:m,storage:database.backend});
+   const m=(await database.query('SELECT id,name,email,wallet,wallet_verified FROM merchants WHERE id=$1',[actor.merchantId])).rows[0];return response({actor:{...actor,sessionHash:undefined},merchant:m,storage:database.backend,guestLimits:await guestBudget(database,actor)});
   }
   if(resource==='auth'&&id==='logout'&&method==='POST'){await database.query('DELETE FROM sessions WHERE token_hash=$1',[actor.sessionHash]);const r=response({ok:true});r.cookies.delete(COOKIE);return r;}
   if(resource==='auth'&&id==='api-key'&&method==='POST'){requireThat(actor.role!=='agent','AGENT_SCOPE','Only a human session can create an agent token.',403);const s=await newSession(database,actor.mode,actor.merchantId,'agent');return response({token:s.token,expiresIn:'12 hours',scope:'propose, quote, execute owner-approved orders, observe and download; cannot approve'});}
@@ -79,7 +89,7 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
    if(method==='POST'&&!id){const input=z.object({productId:idSchema,maxSourceAmount:z.string().regex(/^[1-9]\d{0,29}$/),refundAddress:evm,sourceAsset:z.string().max(200).optional()}).strict().parse(await json(request));return response(await propose(database,actor,input),201);}
    idSchema.parse(id);const order=await getOrder(database,id,actor);
    if(method==='GET'){
-    const attempt=(await database.query('SELECT * FROM attempts WHERE order_id=$1',[id])).rows[0]||null;const entitlements=(await database.query('SELECT id,artifact_hash,created_at FROM entitlements WHERE order_id=$1',[id])).rows;const events=(await database.query('SELECT id,kind,data,created_at FROM events WHERE order_id=$1 ORDER BY created_at LIMIT 100',[id])).rows;return response({order,attempt,entitlements,events});
+    const attempt=(await database.query('SELECT * FROM attempts WHERE order_id=$1',[id])).rows[0]||null;const entitlements=(await database.query('SELECT id,artifact_hash,created_at FROM entitlements WHERE order_id=$1',[id])).rows;const events=(await database.query('SELECT id,kind,data,created_at FROM events WHERE order_id=$1 ORDER BY created_at LIMIT 100',[id])).rows;return response({order,attempt,entitlements,events,viewerRole:actor.role});
    }
    requireThat(method==='POST','METHOD','Method not supported.',405);
    if(action==='approve'){const input=z.object({fingerprint:z.string().regex(/^[0-9a-f]{64}$/)}).strict().parse(await json(request));return response(await approve(database,actor,id,input.fingerprint));}
@@ -105,7 +115,7 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
   if(resource==='lab'&&method==='POST'){
    await rateLimit(database,'lab:'+actor.sessionHash,30,3600);
    if(id==='prepare')return response(await prepareLab(database,actor));
-   if(id==='reset'){const o=await prepareLab(database,actor);return response({order:o,note:'A fresh isolated order was created. Prior evidence remains in the audit history.'});}
+   if(id==='reset'){const o=await prepareLab(database,actor,true);return response({order:o,note:'A fresh isolated order was created. Prior evidence remains in the audit history.'});}
    const input=z.object({orderId:z.uuid(),attack:z.enum(['merchant','price','reuse','replay','tamper'])}).strict().parse(await json(request));return response(await runChallenge(database,actor,input.orderId,input.attack));
   }
   if(resource==='verify'&&method==='POST'){
@@ -116,7 +126,7 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
   if(error instanceof z.ZodError)return response({error:'VALIDATION',message:error.issues.map(x=>`${x.path.join('.')}: ${x.message}`).join('; ')},400);
   if(error instanceof DomainError)return response({error:error.code,message:error.message},error.status);
   if((error as any)?.code==='23505')return response({error:'CONFLICT',message:'This unique record already exists. No duplicate operation was committed.'},409);
-  const trace=randomUUID();console.error('RouteTill request failed',{trace,type:error instanceof Error?error.name:'Unknown'});return response({error:'SERVICE_UNAVAILABLE',message:'The operation could not complete. No successful payment or fulfillment is implied. Check configuration and retry.',trace},503);
+  const trace=randomUUID();const candidate=(error as {code?:unknown})?.code;const safeCode=typeof candidate==='string'&&/^[A-Z0-9_]{2,40}$/.test(candidate)?candidate:undefined;console.error('RouteTill request failed',{trace,type:error instanceof Error?error.name:'Unknown',...(safeCode?{code:safeCode}:{})});return response({error:'SERVICE_UNAVAILABLE',message:'The operation could not complete. No successful payment or fulfillment is implied. Check configuration and retry.',trace},503);
  }
 }
 export const GET=handle;export const POST=handle;

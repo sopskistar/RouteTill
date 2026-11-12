@@ -8,14 +8,26 @@ import {drainOutbox,issuePassport,qualifyAndFulfill} from './fulfillment';
 import {verifyPassport} from '../core/verifier';
 import {publicKeyPem} from '../core/crypto';
 import {DEMO_WALLET} from '../core/policy';
-export async function prepareLab(database:Database,actor:Actor){
- requireThat(actor.mode==='demo'&&actor.role==='judge','JUDGE_ONLY','Break-It Lab requires an isolated judge session.',403);
+import {reserveGuestChallenge} from './guest';
+export async function prepareLab(database:Database,actor:Actor,reset=false){
+ requireThat(actor.mode==='demo'&&['judge','guest'].includes(actor.role),'JUDGE_ONLY','Break-It Lab requires an isolated judge session.',403);
+ if(actor.role==='guest')return database.transaction(async sql=>{
+  const limits=(await sql.query('SELECT g.*,s.expires_at FROM demo_guest_limits g JOIN sessions s ON s.token_hash=g.session_hash WHERE g.session_hash=$1 FOR UPDATE OF g',[actor.sessionHash])).rows[0];
+  requireThat(limits&&new Date(limits.expires_at).getTime()>Date.now(),'SESSION_EXPIRED','The guest challenge session expired. Start a new session.',401);
+  if(limits.active_order_id&&!reset)return getOrder(sql,limits.active_order_id,actor);
+  requireThat(limits.order_count<3,'GUEST_RESET_LIMIT','This guest session allows one prepared purchase and two fresh resets. Elevated judge access remains available.',429);
+  const productId=await seedDemoResource(sql);
+  const transactionDatabase:Database={backend:database.backend,query:(q,v)=>sql.query(q,v),transaction:fn=>fn(sql),close:async()=>{}};
+  const order=await propose(transactionDatabase,actor,{productId,maxSourceAmount:'11000000',refundAddress:DEMO_WALLET});
+  await sql.query('UPDATE demo_guest_limits SET active_order_id=$1,order_count=order_count+1 WHERE session_hash=$2',[order.id,actor.sessionHash]);return order;
+ });
  const productId=await seedDemoResource(database,actor.merchantId,'RouteTill Labs');return propose(database,actor,{productId,maxSourceAmount:'11000000',refundAddress:DEMO_WALLET});
 }
 export async function runChallenge(database:Database,actor:Actor,id:string,attack:string){
- requireThat(actor.mode==='demo'&&actor.role==='judge','JUDGE_ONLY','Challenges are restricted to the synthetic judge database.',403);
+ requireThat(actor.mode==='demo'&&['judge','guest'].includes(actor.role),'JUDGE_ONLY','Challenges are restricted to the synthetic judge database.',403);
  let o=await getOrder(database,id,actor);
  requireThat(o.policy.mode==='demo','ENVIRONMENT_MISMATCH','Live orders cannot enter the lab.',403);
+ await reserveGuestChallenge(database,actor,id);
  if(o.state==='PROPOSED')await approve(database,actor,id,o.fingerprint);
  o=await getOrder(database,id,actor);
  const purchaser={...actor,buyerId:o.buyer_id}; // Only inside the protected synthetic judge environment.

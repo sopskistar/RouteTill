@@ -6,7 +6,9 @@ An AI agent buying a paid developer resource needs to receive the exact approved
 
 **NEAR Intents** supplies authenticated exact-output quotes, quote-specific deposits and cross-chain execution; this is essential to paying from Arbitrum while the merchant receives Base USDC. **ProofFlow** joins that execution to approval and digital delivery: a shareable Purchase Passport, an independent verifier, and a Break-It Lab that lets judges attack the real backend.
 
-**Evidence status:** authenticated production dry quote verified; synthetic PostgreSQL fulfillment demonstrated; real mainnet settlement **UNVERIFIED**. No public deployment or hackathon submission has been made. [Evidence and limitations](docs/NEAR_PROOF.md). Existing 80-second demonstration: `video/output/routetill-demo.mp4` (local rendered asset; explicitly synthetic settlement). Hosted production/demo URLs will be recorded after owner-approved deployment.
+**Live URLs:** [Production](https://routetill.vercel.app) · [Judge demo](https://routetill-demo.vercel.app) · [GitHub](https://github.com/sopskistar/RouteTill). Both health APIs respond and live payments are disabled. The production lookup for the demo-only sample returns 404. The demo product API now returns 200; both public Passport-key endpoints still return 503. Both real Neon databases accepted migrations 001–003, but the full transaction/concurrency suite remains blocked by intermittent network failures. Deployed key-format verification remains unresolved. [Current release recovery](docs/RELEASE_RECOVERY.md). Local changes below are not yet pushed or redeployed.
+
+**Evidence status:** authenticated production dry quote verified; local synthetic PostgreSQL fulfillment demonstrated; real Neon concurrency and mainnet settlement **UNVERIFIED**. No funded mainnet transaction or hackathon submission is claimed. [Evidence and limitations](docs/NEAR_PROOF.md). Existing 80-second demonstration: `video/output/routetill-demo.mp4` (local rendered asset; explicitly synthetic settlement).
 
 ## Try the judge challenge
 
@@ -28,7 +30,7 @@ Open **http://localhost:3001/lab**.
 4. **DO** Inspect tampering → **SEE** the original Passport pass and modified recipient/artifact fail.
 5. **DO** Open the Passport and entitled download → **SEE** the actual file, SHA-256 check, original signed JSON and explicit synthetic settlement label.
 
-The local database is PostgreSQL through persistent PGlite, not an in-memory demo. **Stop the app before running seed/migration scripts**; a process lock enforces one local owner. Hosted evaluation requires separate Neon databases and a protected judge code. [Full walkthrough](docs/JUDGE_WALKTHROUGH.md).
+The local database is PostgreSQL through persistent PGlite, not an in-memory demo. **Stop the app before running seed/migration scripts**; a process lock enforces one local owner. The updated local judge challenge creates a bounded, isolated synthetic guest session with no code, wallet, or funds; merchant administration and agent setup remain behind the owner’s judge access code. Production and demo use separate Neon projects. [Full walkthrough](docs/JUDGE_WALKTHROUGH.md).
 
 ## One complete flow
 
@@ -71,7 +73,7 @@ npm audit
 npm run test:browser
 ```
 
-**Latest local checks: 125 unit/persistence tests and 7 browser journeys passed.** Unit/integration tests use real PostgreSQL transactions in isolated temporary PGlite stores. Browser tests drive the actual application, run axe checks and capture desktop/tablet/mobile screenshots. [Actual results and coverage](docs/TESTING.md). Local passing tests do not establish a successful Neon deployment or paid settlement.
+**Latest local checks: 145 unit/persistence tests and 7 browser journeys passed.** Unit/integration tests use real PostgreSQL transactions in isolated temporary PGlite stores. Browser tests drive the actual application, run axe checks and capture desktop/tablet/mobile screenshots. [Actual results and coverage](docs/TESTING.md). Local passing tests do not establish a successful Neon deployment or paid settlement.
 
 ## Agent integration
 
@@ -95,7 +97,7 @@ Tokens cannot approve purchases. A fulfilled run downloads the actual resource, 
 
 Next.js 16 / React / TypeScript / Tailwind, parameterized typed PostgreSQL queries, official 1Click signature SDK, viem EVM wallet/chain helpers, Vitest and Playwright. Unique constraints and row locks bind approvals, attempts, transfers and entitlements. A transactional outbox and authenticated scheduled reconciliation survive retries. All financial arithmetic uses integer atomic units.
 
-Production: **two Vercel projects, each with only its own Neon database and signing key**. The owner creates Neon through Vercel after the reviewed GitHub publication. `npm run release:init` prepares private configuration without printing secrets. Vercel Hobby runs a daily recovery cron; the prepared GitHub Actions workflow provides a best-effort five-minute wake-up after owner setup. Durable database state and bounded reconciliation remain authoritative. Real Neon verification is pending those credentials; `npm run db:verify:neon` refuses local fallback. [Environment and deployment guide](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), [.env.example](.env.example).
+Production: two Vercel projects connect to separate Neon resources. Production uses `DATABASE_URL`; the demo uses `DEMO_DATABASE_URL`; each signs Passports with its own key. Both hosted projects have their database variables configured, and their URLs are present in ignored local release files. The local verifier rejects accidental URL reuse and refuses a PGlite fallback. Both databases accepted migrations over real Neon TCP connections. Connectivity is intermittent across TCP, HTTPS and WebSocket; the full PostgreSQL locking and replay-persistence suite remains unverified. Do not infer those results from local PGlite tests. `npm run release:init` prepares private configuration without printing secrets. Vercel Hobby recovery and the best-effort scheduled wake-up are documented in the deployment guide. [Environment and deployment guide](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), [.env.example](.env.example).
 
 Live deposits are disabled by default. Deployment, Git push/publication, owner wallet signing, X posting and submission require human approval. No actual transaction hash is presented as live evidence unless obtained from an approved payment.
 

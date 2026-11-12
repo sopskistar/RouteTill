@@ -2,7 +2,7 @@
 
 ## The 30-second challenge
 
-Start the app using the README. Open `/lab` and choose **Open isolated judge workspace**. Hosted deployments require the owner’s judge code; local mode needs no funds or code.
+Start the app using the README and open `/lab`. The updated local judge demo automatically creates a bounded isolated guest session; it needs no wallet, funds, or code. Merchant administration and agent setup still require the owner’s judge access code. The deployed demo product API now returns 200 and both Neon schemas accepted migrations. The public signing-key endpoint still returns 503; the updated guest flow awaits deployment and hosted verification. Do not treat local screenshots or PGlite output as hosted persistence evidence. [Release recovery](RELEASE_RECOVERY.md).
 
 **DO** Read the prepared purchase → **SEE** the named merchant, Agent Purchase Test Vectors, Base recipient, 10 USDC destination price, 11 USDC Arbitrum cap, expiry, digest and immutable fingerprint.
 

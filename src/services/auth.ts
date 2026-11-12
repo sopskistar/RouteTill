@@ -1,7 +1,7 @@
 import {randomBytes,randomUUID,scryptSync,timingSafeEqual} from 'node:crypto';
 import {verifyMessage,isAddress} from 'viem';
 import {NextRequest} from 'next/server';
-import {Database,db} from '../db';
+import {Database,Sql,db} from '../db';
 import {sha256} from '../core/crypto';
 import {Actor,Mode,requireThat} from '../core/types';
 import {seedMerchant} from './catalog';
@@ -13,9 +13,11 @@ export async function rateLimit(database:Database,key:string,limit=40,seconds=60
  requireThat(result.rows[0].count<=limit,'RATE_LIMIT','Request limit reached. Please wait before retrying.',429);
 }
 export function safeEqual(a:string,b:string){const x=Buffer.from(a),y=Buffer.from(b);return x.length===y.length&&timingSafeEqual(x,y);}
-export async function newSession(database:Database,mode:Mode,merchantId:string,role:Actor['role']='merchant',buyerId?:string){
+export async function newSession(database:Sql,mode:Mode,merchantId:string,role:Actor['role']='merchant',buyerId?:string,lifetimeMinutes=720){
+ requireThat(role!=='guest'||mode==='demo','GUEST_LIVE_BLOCKED','Guest sessions cannot access live purchases.',403);
+ requireThat(Number.isInteger(lifetimeMinutes)&&lifetimeMinutes>=1&&lifetimeMinutes<=720,'SESSION_LIFETIME','Invalid session lifetime.');
  const raw=`rt_${mode}_${randomBytes(32).toString('base64url')}`;const sessionHash=sha256(raw);const buyer=buyerId||randomUUID();
- await database.query('INSERT INTO sessions(token_hash,merchant_id,buyer_id,role,expires_at) VALUES($1,$2,$3,$4,now()+interval \'12 hours\')',[sessionHash,merchantId,buyer,role]);
+ await database.query('INSERT INTO sessions(token_hash,merchant_id,buyer_id,role,expires_at) VALUES($1,$2,$3,$4,now()+($5*interval \'1 minute\'))',[sessionHash,merchantId,buyer,role,lifetimeMinutes]);
  return {token:raw,actor:{merchantId,buyerId:buyer,role,mode,sessionHash,authKind:'cookie'} as Actor};
 }
 export async function auth(request:NextRequest):Promise<{actor:Actor;database:Database}>{

@@ -2,7 +2,6 @@ import {readFileSync,existsSync,mkdirSync,writeFileSync} from 'node:fs';
 import {parseEnv} from 'node:util';
 import {randomUUID} from 'node:crypto';
 import assert from 'node:assert/strict';
-import {Pool} from 'pg';
 import {assertIsolatedStores,createDatabase,migrate,Database} from '../src/db';
 import {prepareLab,runChallenge} from '../src/services/lab';
 import {approve,consumeApproval,getOrder} from '../src/services/orders';
@@ -17,15 +16,16 @@ assertIsolatedStores(urls.production,urls.demo);
 for(const value of Object.values(urls)){const u=new URL(value!);assert(/\.neon\.tech$/.test(u.hostname),'This command requires actual Neon endpoints.');assert(['require','verify-full','verify-ca'].includes(u.searchParams.get('sslmode')||''),'Neon TLS is required.');}
 process.env.DEMO_PASSPORT_PRIVATE_KEY ||= demo.DEMO_PASSPORT_PRIVATE_KEY;
 assert(process.env.DEMO_PASSPORT_PRIVATE_KEY,'Configure the distinct demo Passport signing key.');
-const report:any={testedAt:new Date().toISOString(),backend:'Real Neon PostgreSQL',productionOrdersTouched:false,mainnetSettlement:'UNVERIFIED',stores:[]};
+const transport=process.argv.includes('--neon-ws')?'neon-ws':'tcp';
+const report:any={testedAt:new Date().toISOString(),backend:'Real Neon PostgreSQL',transport:transport==='neon-ws'?'Official Neon WebSocket Pool':'node-postgres TCP with interactive transactions',productionOrdersTouched:false,mainnetSettlement:'UNVERIFIED',stores:[]};
 for(const [name,url] of Object.entries(urls)){
  const namespace='rt_release_test_'+randomUUID().replaceAll('-','');
- const admin=new Pool({connectionString:url,max:1,connectionTimeoutMillis:15000});let database:Database|undefined;
+ const admin=await createDatabase(url!,undefined,transport);let database:Database|undefined;
  try{
   const version=(await admin.query('SELECT version() AS version')).rows[0].version;
   // Idempotent application migrations; test purchases themselves live only in our generated schema.
   await migrate(admin);await admin.query(`CREATE SCHEMA "${namespace}"`);
-  database=await createDatabase(url!,namespace);await migrate(database);
+  database=await createDatabase(url!,namespace,transport);await migrate(database);
   const actor:Actor={merchantId:'neon-release-test',buyerId:'neon-release-buyer',mode:'demo',role:'judge',authKind:'cookie',sessionHash:'isolated-release-test'};
   const order=await prepareLab(database,actor);await approve(database,actor,order.id,order.fingerprint);
   const consumption=await Promise.allSettled(Array.from({length:12},()=>consumeApproval(database!,actor,order.id,order.policy,randomUUID())));
@@ -39,11 +39,11 @@ for(const [name,url] of Object.entries(urls)){
   assert.equal((await getOrder(database,rollbackOrder.id)).state,'APPROVED');
   assert.equal((await database.query('SELECT consumed_at FROM approvals WHERE order_id=$1',[rollbackOrder.id])).rows[0].consumed_at,null);
   await assert.rejects(getOrder(database,challengeOrder.id,{...actor,merchantId:'unrelated',buyerId:'unrelated'}));
-  await database.close();database=await createDatabase(url!,namespace);
+  await database.close();database=await createDatabase(url!,namespace,transport);
   const count=(await database.query('SELECT count(*)::int AS n FROM entitlements WHERE order_id=$1',[challengeOrder.id])).rows[0].n;assert.equal(count,1);
   report.stores.push({name,identityHash:sha256(new URL(url!).hostname.replace('-pooler.','.')+new URL(url!).pathname),version,migrations:'PASS',concurrentApprovalRequests:12,acceptedApprovals:1,rollback:'PASS',merchantIsolation:'PASS',persistentEntitlementCount:count,attacks});
   console.log(`PASS ${name}: Neon migrations, 12 concurrent approval requests, all five challenges, replay 20 → 1, rollback, isolation and reconnect persistence.`);
- }finally{await database?.close();await admin.query(`DROP SCHEMA IF EXISTS "${namespace}" CASCADE`);await admin.end();}
+ }finally{await database?.close();await admin.query(`DROP SCHEMA IF EXISTS "${namespace}" CASCADE`);await admin.close();}
 }
 mkdirSync('docs/evidence',{recursive:true});writeFileSync('docs/evidence/neon-verification.json',JSON.stringify(report,null,2));
 console.log('Saved sanitized Neon evidence. No real purchase, blockchain settlement or funds movement was performed.');

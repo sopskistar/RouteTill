@@ -1,11 +1,13 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+import {parseEnv} from 'node:util';
 import {execFileSync} from 'node:child_process';
 import {generatePrivateKey,privateKeyToAccount} from 'viem/accounts';
 const captures='artifacts/screenshots';mkdirSync(captures,{recursive:true});
+function localJudgeCode(){if(process.env.JUDGE_ACCESS_CODE)return process.env.JUDGE_ACCESS_CODE;for(const file of ['.env.local','.env.release-demo.local'])try{const code=parseEnv(readFileSync(file,'utf8')).JUDGE_ACCESS_CODE;if(code)return code;}catch{}return '';}
 async function capture(page:any,options:any){await page.evaluate(async()=>{(document.activeElement as HTMLElement)?.blur();window.scrollTo({top:0,left:0,behavior:'instant'});await new Promise(requestAnimationFrame);});await page.screenshot(options);}
-async function judge(page:any){await page.goto('/lab');await page.getByRole('button',{name:'Open isolated judge workspace'}).click();await expect(page.getByRole('heading',{name:'Break-It Lab',exact:true})).toBeVisible();}
+async function judge(page:any){await page.goto('/lab');await expect(page.getByRole('heading',{name:'Break-It Lab',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Run all 5 attacks'})).toBeEnabled();}
 test('landing navigation, light/dark, responsive layout and keyboard access',async({page})=>{
  await page.goto('/');await expect(page.getByRole('heading',{name:'From approved purchase to proven delivery.'})).toBeVisible();await capture(page,{path:captures+'/home-desktop.png',fullPage:true});
  await page.getByRole('button',{name:'Switch to dark mode'}).click();await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await capture(page,{path:captures+'/home-dark.png',fullPage:true});
@@ -26,7 +28,7 @@ test('merchant onboarding, product creation and hosted checkout',async({page})=>
 });
 test('five real backend attacks, Passport export, local tamper verification and mobile',async({page})=>{
  await judge(page);await capture(page,{path:captures+'/lab-before-desktop.png',fullPage:true});
- await page.getByRole('button',{name:'Run all five challenges'}).click();await expect(page.getByText('Tampering detected',{exact:true})).toBeVisible({timeout:45000});await expect(page.getByTestId('entitlement-count')).toHaveText('1');await expect(page.getByText('Attack rejected',{exact:true})).toHaveCount(3);await expect(page.getByText('Exactly one issued',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Run all 5 attacks'}).click();await expect(page.getByText('Tampering detected',{exact:true})).toBeVisible({timeout:45000});await expect(page.getByTestId('entitlement-count')).toHaveText('1');await expect(page.getByText('Attack rejected',{exact:true})).toHaveCount(3);await expect(page.getByText('Exactly one issued',{exact:true})).toBeVisible();
  await capture(page,{path:captures+'/lab-after-desktop.png',fullPage:true});
  const desktopAxe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();writeFileSync('artifacts/lab-axe.json',JSON.stringify(desktopAxe.violations,null,2));expect(desktopAxe.violations).toEqual([]);
  await page.setViewportSize({width:390,height:844});await capture(page,{path:captures+'/lab-mobile.png',fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -47,6 +49,8 @@ test('public pages, accessible checkout, error states and cross-origin protectio
 });
 test('working deterministic agent client, human-only approval and entitled artifact retrieval',async({page})=>{
  await judge(page);const origin=new URL(page.url()).origin;
+ const guestKey=await page.request.post('/api/auth/api-key',{headers:{Origin:origin},data:{}});expect(guestKey.status()).toBe(403);
+ const elevated=await page.request.post('/api/auth/demo',{headers:{Origin:origin},data:{accessCode:localJudgeCode()}});expect(elevated.ok()).toBe(true);
  const credentials=await page.request.post('/api/auth/api-key',{headers:{Origin:origin},data:{}});expect(credentials.ok()).toBe(true);const {token}=await credentials.json();
  const env={...process.env,ROUTETILL_AGENT_TOKEN:token,ROUTETILL_URL:origin};
  const output=execFileSync(process.execPath,['--import','tsx','scripts/agent.ts'],{env,encoding:'utf8'});const proposed=JSON.parse(output);writeFileSync('artifacts/agent-example-run.json',output);

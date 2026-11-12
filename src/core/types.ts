@@ -17,7 +17,7 @@ export type SettlementEvidence = {
 export type Product = {id:string;merchant_id:string;slug:string;title:string;description:string;amount:string;artifact:string;artifact_hash:string;created_at:string;merchant_name?:string;wallet?:string;wallet_verified?:boolean};
 export type Order = {id:string;merchant_id:string;buyer_id:string;buyer_owner_id:string;product_id:string;policy:Policy;fingerprint:string;state:State;created_at:string;updated_at:string};
 export type Attempt = {id:string;order_id:string;idempotency_key:string;state:State;quote:any;deposit_address:string|null;source_tx:string|null;provider:any;evidence:SettlementEvidence|null;poll_count:number;next_poll_at:string;last_error:string|null;created_at:string};
-export type Actor = {merchantId:string;buyerId:string;mode:Mode;sessionHash:string;role:'merchant'|'judge'|'agent';authKind?:'cookie'|'bearer'};
+export type Actor = {merchantId:string;buyerId:string;mode:Mode;sessionHash:string;role:'merchant'|'judge'|'agent'|'guest';authKind?:'cookie'|'bearer'};
 export class DomainError extends Error {
   constructor(public code:string, message:string, public status=400) {super(message);}
 }

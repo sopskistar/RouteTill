@@ -1,6 +1,6 @@
 # Two isolated Vercel + Neon deployments
 
-Status: local release preparation only. Git push/publication and deployment await owner approval. Real Neon, hosted reconciliation and wallet-extension sessions remain UNVERIFIED. The owner will create Neon through Vercel's Neon Postgres integration after the reviewed source is published.
+Status (2026-11-12, recovery session): both Vercel projects are deployed. Health routes return 200 with live payments disabled; production's demo-only product returns 404 and the demo product now returns 200. Both public Passport-key endpoints still return 503 independently of database queries. Both actual Neon databases accepted migrations 001–003, but the full transaction/concurrency suite still fails on intermittent network connections. The local signing keys are valid and distinct; Vercel confirms the expected key variables exist but redacts their sensitive values. The local parser/diagnostic improvements await owner-approved publication and redeployment. Hosted judge persistence, deployed signing identity, wallet pairing and mainnet settlement remain UNVERIFIED. [Recovery evidence and next steps](RELEASE_RECOVERY.md).
 
 ## Exact configuration
 

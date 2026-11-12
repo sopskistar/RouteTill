@@ -2,7 +2,7 @@ import {Fingerprint} from 'lucide-react';
 import {Policy} from '@/core/types';
 import {decimal} from '@/core/amounts';
 import {Badge,Hash} from './ui';
-export function ProductCover(){return <div className="artifact-cover" aria-hidden="true"><span>RouteTill<br/>Field notes</span><Fingerprint size={44}/><span className="cover-bottom">A guide to verifiable purchases</span></div>;}
+export function ProductCover({title='Digital resource'}:{title?:string}){return <div className="artifact-cover" aria-hidden="true"><span>RouteTill<br/>Digital resource</span><Fingerprint size={38}/><span className="cover-bottom">{title}</span></div>;}
 export function PurchaseTerms({policy,hash,compact=false}:{policy:Policy;hash:string;compact?:boolean}){return <>
  <div className="terms-header"><div><p className="muted">{policy.merchantName}</p><h2>{policy.productName}</h2></div><Badge tone={policy.mode==='demo'?'warn':'neutral'}>{policy.mode==='demo'?'Synthetic purchase':'Live purchase'}</Badge></div>
  <p className="terms-price">{decimal(policy.destinationAmount)} <span>USDC on Base</span></p>

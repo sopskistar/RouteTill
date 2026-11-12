@@ -69,3 +69,8 @@ describe('actual developer resource processing',()=>{
  it('preserves generic files by rejecting unsupported processing formats',()=>expect(()=>analyseResource('generic product')).toThrow('Generic digital downloads remain available'));
  it('does not accept malformed dataset records',()=>expect(()=>analyseResource('```json\n{"format":"routetill.purchase-vectors.v1","cases":[{}]}\n```')).toThrow('Invalid purchase-vector'));
 });
+
+describe('deployment Passport key serialization',()=>{
+ it('preserves the same signing identity for PEM, escaped lines and quoted env-file values',async()=>{const {passportPrivateKey}=await import('../src/core/crypto');const {createPublicKey}=await import('node:crypto');const pem=generateKeyPairSync('ed25519').privateKey.export({type:'pkcs8',format:'pem'}).toString();const identity=(v:string)=>createPublicKey(passportPrivateKey(v)).export({type:'spki',format:'pem'});expect(identity(pem.replaceAll('\n','\\n'))).toBe(identity(pem));expect(identity(JSON.stringify(pem.replaceAll('\n','\\n')))).toBe(identity(pem));expect(identity(JSON.stringify(pem))).toBe(identity(pem));});
+ it('fails with a useful configuration code without exposing the supplied value',async()=>{const {passportPrivateKey}=await import('../src/core/crypto');try{passportPrivateKey('deliberately-invalid-private-value');throw new Error('Unexpected acceptance');}catch(e:any){expect(e.code).toBe('PASSPORT_KEY_CONFIGURATION');expect(e.message).not.toContain('deliberately-invalid-private-value');}});
+});
