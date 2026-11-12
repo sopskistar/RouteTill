@@ -4,7 +4,7 @@
 
 Start the app using the README. Open `/lab` and choose **Open isolated judge workspace**. Hosted deployments require the owner’s judge code; local mode needs no funds or code.
 
-**DO** Read the prepared purchase → **SEE** RouteTill Studio, exact product, Base recipient, 10 USDC destination price, 11 USDC Arbitrum cap, expiry, digest and immutable fingerprint.
+**DO** Read the prepared purchase → **SEE** the named merchant, Agent Purchase Test Vectors, Base recipient, 10 USDC destination price, 11 USDC Arbitrum cap, expiry, digest and immutable fingerprint.
 
 **DO** Run all five challenges → **SEE** backend codes `MERCHANT_SUBSTITUTION`, `PRICE_LIMIT` and `APPROVAL_REUSED`; 20 deliveries against the SQL transaction produce one entitlement; original Passport integrity passes while modified recipient and artifact fail.
 
@@ -20,7 +20,7 @@ Start the app using the README. Open `/lab` and choose **Open isolated judge wor
 4. Prepare the proposal. Read every term and check the explicit authorization box. **SEE** the approval recorded as a single-use purchase permission, with no wallet access.
 5. With `NEAR_INTENTS_JWT` configured, request **Get live dry quote**. **SEE** the real signed provider response and fee details. A dry quote is not payment success.
 6. Choose **Run synthetic settlement & deliver**. **SEE** qualified synthetic evidence and one actual persistent entitlement after replay.
-7. Open the entitled download, verify delivered bytes, download the file and open its Purchase Passport.
+7. Open the entitled download, verify delivered bytes, inspect the deterministic seven-case test plan, download the actual file and generated JSON, then open its Purchase Passport. A generic download still supports byte verification without dataset processing.
 8. Check original record integrity and test a modified recipient. Export JSON and run the separate CLI using a pinned public key and the downloaded file.
 
 ## Independent offline evidence
@@ -30,3 +30,7 @@ Before starting the server, `npm run seed` exports a synthetic Passport, public 
 ## Real-payment path
 
 See [deployment preparation](DEPLOYMENT.md). An owner must first configure Neon, a live merchant account, verified Base recipient, source wallet/refund address, issuer key and live enablement. The owner explicitly approves the exact quote and wallet transaction. Inspect actual source transfer, provider state, destination receipt/log and finalized block. No synthetic record can substitute for that evidence. Until completed, real mainnet settlement is UNVERIFIED.
+
+## Deterministic agent completion
+
+Create an agent token in the workspace and run the README example. **DO** let the client discover the resource and propose → **SEE** an approval URL; it cannot approve itself. **DO** approve in the browser and run the synthetic settlement step → **SEE** one entitlement. **DO** run `npm run agent -- ORDER_ID` → **SEE** `artifacts/agent/product.md`, Passport JSON, and a digest-checked `test-plan.json` containing seven fixture cases (one expected acceptance, six rejections). The client consumes a real downloaded file; there is no LLM or autonomous signing. The plan summarizes supplied fixture labels and is separate from the executable Break-It Lab checks.

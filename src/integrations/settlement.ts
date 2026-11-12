@@ -1,6 +1,7 @@
 import {fingerprint} from '../core/crypto';
 import {Policy,SettlementEvidence,requireThat} from '../core/types';
 import {ARB_TOKEN} from '../core/policy';
+import {transferData} from '../wallet/evm';
 export const TRANSFER_TOPIC='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 export type ChainFacts={chainId:string;receipt:any;head:string;finalized:any;canonicalBlock:any};
 export function inspectTransfer(policy:Policy,txHash:string,facts:ChainFacts):SettlementEvidence {
@@ -42,10 +43,14 @@ export async function verifyDestination(policy:Policy,providerStatus:any,attempt
  evidence.providerAssociation=providerStatus.correlationId;return evidence;
 }
 export async function verifySource(txHash:string,attempt:any,policy:Policy){
- const [chainId,receipt]=await Promise.all([rpc('eth_chainId',[],true),rpc('eth_getTransactionReceipt',[txHash],true)]);
+ const [chainId,receipt,transaction]=await Promise.all([rpc('eth_chainId',[],true),rpc('eth_getTransactionReceipt',[txHash],true),rpc('eth_getTransactionByHash',[txHash],true)]);
  requireThat(BigInt(chainId)===42161n,'SOURCE_CHAIN','Wrong source chain.');
  requireThat(receipt?.status==='0x1','SOURCE_PENDING','Source transaction is not yet confirmed. Retry after confirmation.');
- requireThat(receipt.logs.some((l:any)=>l.address?.toLowerCase()===ARB_TOKEN&&l.topics?.[0]===TRANSFER_TOPIC&&l.topics?.[1]?.toLowerCase()==='0x'+policy.refundAddress.slice(2).toLowerCase().padStart(64,'0')&&l.topics?.[2]?.toLowerCase()==='0x'+attempt.deposit_address.slice(2).toLowerCase().padStart(64,'0')&&BigInt(l.data)===BigInt(attempt.quote.response.quote.amountIn)),'SOURCE_TRANSFER','Source receipt does not contain the exact authorized USDC deposit.');return receipt;
+ const canonical=await rpc('eth_getBlockByNumber',[receipt.blockNumber,false],true);
+ requireThat(receipt.transactionHash?.toLowerCase()===txHash.toLowerCase()&&receipt.blockHash===canonical?.hash,'SOURCE_REFERENCE','The source receipt reference or canonical block is invalid.');
+ requireThat(transaction?.hash?.toLowerCase()===txHash.toLowerCase()&&transaction.from?.toLowerCase()===policy.refundAddress.toLowerCase()&&transaction.to?.toLowerCase()===ARB_TOKEN&&BigInt(transaction.value)===0n&&transaction.input?.toLowerCase()===transferData(attempt.deposit_address,attempt.quote.response.quote.amountIn).toLowerCase(),'SOURCE_TRANSACTION','The source transaction is not the exact approved native USDC transfer from the refund wallet.');
+ const matches=receipt.logs.filter((l:any)=>!l.removed&&l.address?.toLowerCase()===ARB_TOKEN&&l.topics?.length===3&&l.topics[0]===TRANSFER_TOPIC&&l.topics[1]?.toLowerCase()==='0x'+policy.refundAddress.slice(2).toLowerCase().padStart(64,'0')&&l.topics[2]?.toLowerCase()==='0x'+attempt.deposit_address.slice(2).toLowerCase().padStart(64,'0')&&/^0x[0-9a-fA-F]{64}$/.test(l.data)&&BigInt(l.data)===BigInt(attempt.quote.response.quote.amountIn));
+ requireThat(matches.length===1,'SOURCE_TRANSFER','Source receipt must contain one exact authorized USDC deposit.');return {chainId,transaction,receipt,canonicalBlock:canonical,checkedAt:new Date().toISOString()};
 }
 export function syntheticFacts(policy:Policy,seed:string):ChainFacts{
  const tx='0x'+fingerprint({seed,fixture:'synthetic-transaction'});const block='0x'+fingerprint({seed,fixture:'synthetic-block'});

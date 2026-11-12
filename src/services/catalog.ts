@@ -5,6 +5,13 @@ import {DEMO_WALLET} from '../core/policy';
 import {Actor,Product,requireThat} from '../core/types';
 import {atomic} from '../core/amounts';
 import {SAMPLE_ARTIFACT} from '../core/artifact';
+import {RESOURCE_ARTIFACT,RESOURCE_TITLE,RESOURCE_DESCRIPTION} from '../core/resource';
+export async function seedDemoResource(sql:Sql,id='studio-demo',name='RouteTill Labs'){
+ await seedMerchant(sql,id,name);
+ const productId=id==='studio-demo'?'purchase-vectors':id+'-purchase-vectors';
+ await sql.query('INSERT INTO products(id,merchant_id,slug,title,description,amount,artifact,artifact_hash) VALUES($1,$2,$1,$3,$4,$5,$6,$7) ON CONFLICT(id) DO NOTHING',[productId,id,RESOURCE_TITLE,RESOURCE_DESCRIPTION,'10000000',RESOURCE_ARTIFACT,sha256(RESOURCE_ARTIFACT)]);
+ return productId;
+}
 export async function seedMerchant(sql:Sql,id='studio-demo',name='RouteTill Studio'){
  await sql.query('INSERT INTO merchants(id,email,name,wallet,wallet_verified) VALUES($1,$2,$3,$4,false) ON CONFLICT(id) DO NOTHING',[id,id+'@demo.invalid',name,DEMO_WALLET]);
  const productId=id==='studio-demo'?'field-notes':id+'-field-notes';

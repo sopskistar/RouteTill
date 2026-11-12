@@ -1,10 +1,10 @@
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {db} from '../src/db';
 import {prepareLab,runChallenge} from '../src/services/lab';
-import {seedMerchant} from '../src/services/catalog';
+import {seedDemoResource} from '../src/services/catalog';
 import {publicKeyPem} from '../src/core/crypto';
 import {Actor} from '../src/core/types';
-const database=await db('demo');await seedMerchant(database);
+const database=await db('demo');await seedDemoResource(database);
 const actor:Actor={merchantId:'judge-preview',buyerId:'judge-preview-buyer',mode:'demo',sessionHash:'seed-only',role:'judge'};
 const order=await prepareLab(database,actor);const result=await runChallenge(database,actor,order.id,'replay');
 const entitlement=(await database.query('SELECT * FROM entitlements WHERE order_id=$1',[order.id])).rows[0];

@@ -1,5 +1,5 @@
 import {Database} from '../db';
-import {Actor,Attempt,DomainError,State,requireThat} from '../core/types';
+import {Actor,Attempt,DomainError,Mode,State,requireThat} from '../core/types';
 import {getOrder,audit} from './orders';
 import {status} from '../integrations/near';
 import {verifyDestination} from '../integrations/settlement';
@@ -29,7 +29,8 @@ export async function reconcile(database:Database,attemptId:string,actor?:Actor)
   await database.transaction(async sql=>{const current=await getOrder(sql,o.id,undefined,true);transition(current.state,next);await sql.query('UPDATE attempts SET state=$1,provider=$2 WHERE id=$3',[next,JSON.stringify(s),a.id]);await sql.query('UPDATE orders SET state=$1,updated_at=now() WHERE id=$2',[next,o.id]);await audit(sql,o.id,'provider.status',{status:s.status});});return {state:next};
  }catch(error){await database.query('UPDATE attempts SET last_error=$1 WHERE id=$2',[error instanceof Error?error.message:'Reconciliation error',a.id]);throw error;}finally{await database.query('UPDATE attempts SET lease_until=NULL WHERE id=$1',[a.id]);}
 }
-export async function sweep(database:Database){
+export async function sweep(database:Database,mode:Mode='live'){
+ if(mode==='demo')return {checked:0,syntheticOnly:true,outbox:await drainOutbox(database)};
  const stuck=(await database.query("SELECT id,order_id FROM attempts WHERE state='QUOTING' AND created_at<now()-interval '3 minutes' LIMIT 10")).rows;
  for(const a of stuck){await database.transaction(async sql=>{const o=await getOrder(sql,a.order_id,undefined,true);if(o.state==='QUOTING'){await sql.query("UPDATE attempts SET state='FAILED',last_error='Quote creation interrupted; create a new approval.' WHERE id=$1",[a.id]);await sql.query("UPDATE orders SET state='FAILED' WHERE id=$1",[o.id]);}});}
  const due=(await database.query("SELECT id FROM attempts WHERE state IN ('AWAITING_DEPOSIT','PROCESSING','INCOMPLETE','PROVIDER_SUCCESS') AND next_poll_at<=now() AND poll_count<120 AND (lease_until IS NULL OR lease_until<now()) LIMIT 10")).rows;

@@ -39,7 +39,7 @@ The migration declares unique order→attempt, order→approval, order→entitle
 
 ## Reconciliation and outbox
 
-Attempts are leased durably, checked with bounded exponential backoff (10–300 seconds), and capped at 120 checks. A five-minute authenticated cron checks due attempts and drains the Passport outbox. Interrupted quote creation is failed conservatively after three minutes; its single-use approval is not reopened. A new purchase requires new approval.
+Attempts are leased durably, checked with bounded exponential backoff (10–300 seconds), and capped at 120 checks. A best-effort five-minute authenticated GitHub Actions wake-up (owner configuration required), a daily Vercel Hobby recovery cron, bounded buyer polling and optional signed wake-ups all check the same durable due attempts and Passport outbox. No frequent Vercel Hobby schedule is assumed. Interrupted quote creation is failed conservatively after three minutes; its single-use approval is not reopened. A new purchase requires new approval.
 
 The transaction commits the entitlement and outbox intent together. Passport generation is idempotent, and its worker records delivery, attempts and errors. This is exactly-once entitlement issuance within PostgreSQL, not exactly-once external messaging.
 
@@ -48,3 +48,5 @@ An optional HMAC-authenticated reconciliation webhook accepts an attempt identif
 ## Deployment
 
 Next.js Node runtime on Vercel; Neon for durable data; an Ed25519 issuer key in server environment; no wallet private key. [Deployment guide](DEPLOYMENT.md) lists the configuration and approval boundary. Source tracing explicitly excludes local keys, data, environment files, captures and video outputs.
+
+Hosted production and judge deployments each expose exactly one database URL and a distinct mode-specific Ed25519 signing identity. A hosted request for the other evidence mode is rejected before opening a connection. Local dual-mode development remains available. EIP-6963 selects a specific EVM provider; Rabby is prioritized without assuming `window.ethereum` belongs to it. The read-only payment preflight checks chain IDs, native USDC contracts/decimals, source balances, exact transfer calldata and estimated gas before an explicit wallet request.

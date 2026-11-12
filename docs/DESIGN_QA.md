@@ -25,3 +25,13 @@ Action contrast increased to 4.81:1 against white. Full-width mobile headings, r
 No physical-device or real wallet-signing audit is claimed. See [brand guide](BRAND.md) and [DESIGN.md](../DESIGN.md).
 
 The detector assessor measured 40px mobile header controls: above the WCAG AA 24px minimum but below the preferred 44px target. This remains a minor touch-target refinement; no AA failure was established.
+
+## Production release review — 12 November
+
+Preserved the existing RouteTill palette, typography, icon/wordmark, light/dark modes, folio and proof rail. Scoped additions use those tokens for explicit wallet choices, exact-deposit review and approved/unauthorized comparison panels. No replacement design or new animation system was introduced.
+
+The release suite passed seven production-browser journeys. Screenshots inspected include desktop Lab with all five actual outcomes, phone wallet selector, tablet/phone home, dark desktop home and phone Passport. Layout assertions found no horizontal overflow at 768, 390 and 360px. Checkout, populated lab and wallet settings axe checks returned zero A/AA violations. Wallet choice, rejection, chain/account changes and disconnect were exercised with explicitly labeled mock providers.
+
+Capture review found an offscreen fixed skip-link appearing in full-page captures when smooth scrolling had not reached the top. Normal browser geometry showed it at top -100px, unfocused and outside the viewport. Screenshot capture now explicitly resets scroll instantly and waits a frame. This is capture hygiene; keyboard access is preserved. The review does not claim a physical phone or real Rabby/WalletConnect session.
+
+The prior independent Impeccable critique and scored fixes above remain the design baseline. This release used scoped audit/polish guidance and actual browser inspection; no new independent two-agent critique is claimed. The 80-second MP4 is preserved because there is no new funded-settlement footage to replace its explicitly synthetic sequence.

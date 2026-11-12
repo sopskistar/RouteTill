@@ -3,6 +3,7 @@ import {Pool} from 'pg';
 import {readFileSync,mkdirSync,writeFileSync,unlinkSync,existsSync} from 'node:fs';
 import {join} from 'node:path';
 import {Mode} from '../core/types';
+import {assertDeploymentMode} from '../core/deployment';
 export interface Sql {query<T=any>(text:string,values?:unknown[]):Promise<{rows:T[];rowCount?:number|null}>}
 export interface Database extends Sql {transaction<T>(fn:(sql:Sql)=>Promise<T>):Promise<T>;close():Promise<void>;backend:string}
 export function assertIsolatedStores(live?:string,demo?:string){
@@ -10,11 +11,13 @@ export function assertIsolatedStores(live?:string,demo?:string){
  const identity=(raw:string)=>{const u=new URL(raw);return u.hostname.replace(/-pooler(?=\.)/,'').toLowerCase()+':'+(u.port||'5432')+u.pathname;};
  if(identity(live)===identity(demo))throw new Error('Demo and live must use separate PostgreSQL databases; credentials or pooler parameters do not create isolation.');
 }
-const schema=()=>readFileSync(join(process.cwd(),'migrations/001_init.sql'),'utf8');
-export async function createDatabase(pathOrUrl:string):Promise<Database>{
+const schema=()=>['001_init.sql','002_release.sql'].map(name=>readFileSync(join(process.cwd(),'migrations',name),'utf8')).join('\n');
+export async function createDatabase(pathOrUrl:string,namespace?:string):Promise<Database>{
  if(/^postgres(ql)?:/.test(pathOrUrl)){
+  if(namespace&&!/^rt_release_test_[a-z0-9_]+$/.test(namespace))throw new Error('Only an isolated generated release-test schema may be selected.');
   const pool=new Pool({connectionString:pathOrUrl,max:4,connectionTimeoutMillis:10000,idleTimeoutMillis:15000});
-  return {backend:'PostgreSQL',query:(q,v)=>pool.query(q,v) as any,transaction:async fn=>{const c=await pool.connect();try{await c.query('BEGIN');const r=await fn({query:(q,v)=>c.query(q,v) as any});await c.query('COMMIT');return r;}catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}},close:()=>pool.end()};
+  const transaction:Database['transaction']=async fn=>{const c=await pool.connect();try{await c.query('BEGIN');if(namespace)await c.query(`SET LOCAL search_path TO "${namespace}"`);const r=await fn({query:(q,v)=>c.query(q,v) as any});await c.query('COMMIT');return r;}catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}};
+  return {backend:'PostgreSQL',query:(q,v)=>namespace?transaction(sql=>sql.query(q,v)):pool.query(q,v) as any,transaction,close:()=>pool.end()};
  }
  const lock=pathOrUrl+'.process-lock';
  if(existsSync(lock)){
@@ -34,6 +37,7 @@ export async function createDatabase(pathOrUrl:string):Promise<Database>{
 const globalDb=globalThis as unknown as {routeTillDb?:Map<string,Promise<Database>>};
 globalDb.routeTillDb??=new Map();
 export async function db(mode:Mode='demo'){
+ assertDeploymentMode(mode);
  assertIsolatedStores(process.env.DATABASE_URL,process.env.DEMO_DATABASE_URL);
  const url=mode==='demo'?process.env.DEMO_DATABASE_URL:process.env.DATABASE_URL;
  if(process.env.VERCEL){

@@ -5,7 +5,7 @@ import {isAddress} from 'viem';
 import {db} from '@/db';
 import {DomainError,Policy,requireThat} from '@/core/types';
 import {auth,checkOrigin,COOKIE,confirmWallet,judgeSession,login,newSession,rateLimit,safeEqual,walletChallenge} from '@/services/auth';
-import {createProduct,productById,seedMerchant} from '@/services/catalog';
+import {createProduct,productById,seedDemoResource} from '@/services/catalog';
 import {approve,execute,getOrder,propose} from '@/services/orders';
 import {assets,provider,quote} from '@/integrations/near';
 import {verifySource} from '@/integrations/settlement';
@@ -13,6 +13,8 @@ import {prepareLab,runChallenge} from '@/services/lab';
 import {publicKeyPem,sha256} from '@/core/crypto';
 import {verifyPassport} from '@/core/verifier';
 import {sweep,reconcile} from '@/services/reconcile';
+import {assertDeploymentMode,defaultMode,deploymentMode,publicRuntime} from '@/core/deployment';
+import {paymentPreflight} from '@/services/payment-preflight';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const evm=z.string().refine(x=>isAddress(x),'Enter a valid EVM address');
 const idSchema=z.string().min(1).max(100);
@@ -22,11 +24,11 @@ function response(data:unknown,status=200){return NextResponse.json(data,{status
 async function handle(request:NextRequest,{params}: {params:Promise<{path:string[]}>}){
  try{
   const path=(await params).path;const [resource,id,action]=path;const method=request.method;
-  if(resource==='health')return response({service:'RouteTill',mainnetSettlement:'UNVERIFIED',livePayments:process.env.ENABLE_LIVE_PAYMENTS==='true',demo:'synthetic isolated database'});
-  if(resource==='keys'&&method==='GET')return new NextResponse(publicKeyPem(),{headers:{'Content-Type':'application/x-pem-file','Cache-Control':'public, max-age=300'}});
+  if(resource==='health')return response({service:'RouteTill',deployment:deploymentMode(),mainnetSettlement:'UNVERIFIED',livePayments:deploymentMode()!=='demo'&&process.env.ENABLE_LIVE_PAYMENTS==='true',...publicRuntime()});
+  if(resource==='keys'&&method==='GET'){const mode=request.nextUrl.searchParams.get('mode')||defaultMode();requireThat(mode==='live'||mode==='demo','MODE','Unknown evidence environment.');assertDeploymentMode(mode);return new NextResponse(publicKeyPem(mode),{headers:{'Content-Type':'application/x-pem-file','Cache-Control':'public, max-age=300'}});}
   if(resource==='cron'){
    requireThat(process.env.CRON_SECRET&&safeEqual(request.headers.get('authorization')||'','Bearer '+process.env.CRON_SECRET),'CRON_AUTH','Invalid reconciliation credential.',401);
-   requireThat(method==='GET','METHOD','Use GET for scheduled reconciliation.',405);return response(await sweep(await db('live')));
+   requireThat(method==='GET','METHOD','Use GET for scheduled reconciliation.',405);const mode=defaultMode();return response(await sweep(await db(mode),mode));
   }
   if(resource==='webhooks'){
    requireThat(method==='POST'&&process.env.RECONCILE_WEBHOOK_SECRET,'WEBHOOK_DISABLED','Webhook reconciliation is not configured.',403);
@@ -47,15 +49,15 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
    const session=await login(input);const r=response({mode:'live'});r.cookies.set(COOKIE,session.token,{httpOnly:true,secure:!!process.env.VERCEL,sameSite:'strict',maxAge:43200,path:'/'});return r;
   }
   if(resource==='products'&&method==='GET'){
-   const mode=request.nextUrl.searchParams.get('mode')==='live'?'live':'demo';const database=await db(mode);if(mode==='demo')await seedMerchant(database);
+   const mode=request.nextUrl.searchParams.get('mode')==='live'?'live':request.nextUrl.searchParams.get('mode')==='demo'?'demo':defaultMode();const database=await db(mode);if(mode==='demo')await seedDemoResource(database);
    if(id){const p=await productById(database,id);const {artifact,...publicProduct}=p;void artifact;return response({...publicProduct,mode,acceptedSettlement:'Base USDC',supportedSource:'Arbitrum USDC'});}
-   return response({mode,products:(await database.query('SELECT p.id,p.slug,p.title,p.description,p.amount,p.artifact_hash,m.name AS merchant_name,m.wallet,m.wallet_verified FROM products p JOIN merchants m ON m.id=p.merchant_id '+(mode==='demo'?"WHERE p.merchant_id='studio-demo'":"WHERE m.wallet_verified=true")+' ORDER BY p.created_at DESC LIMIT 50')).rows});
+   return response({mode,products:(await database.query('SELECT p.id,p.slug,p.title,p.description,p.amount,p.artifact_hash,m.name AS merchant_name,m.wallet,m.wallet_verified FROM products p JOIN merchants m ON m.id=p.merchant_id '+(mode==='demo'?"WHERE p.id='purchase-vectors'":"WHERE m.wallet_verified=true")+' ORDER BY p.created_at DESC LIMIT 50')).rows});
   }
   if(resource==='passports'&&method==='GET'){
-   const mode=request.nextUrl.searchParams.get('mode')==='live'?'live':'demo';const database=await db(mode);const p=(await database.query('SELECT document FROM passports WHERE order_id=$1',[id])).rows[0];requireThat(p,'PASSPORT_PENDING','No final Purchase Passport is available for this order.',404);return response(p.document);
+   const mode=request.nextUrl.searchParams.get('mode')==='live'?'live':request.nextUrl.searchParams.get('mode')==='demo'?'demo':defaultMode();const database=await db(mode);const p=(await database.query('SELECT document FROM passports WHERE order_id=$1',[id])).rows[0];requireThat(p,'PASSPORT_PENDING','No final Purchase Passport is available for this order.',404);return response(p.document);
   }
   const {actor,database}=await auth(request);await rateLimit(database,'session:'+actor.sessionHash,100);
-  if(actor.role==='agent')requireThat((method==='GET'&&['products','orders','assets','entitlements'].includes(resource))||(method==='POST'&&resource==='orders'&&(!id||['quote','execute','deposit','reconcile'].includes(action))),'AGENT_SCOPE','Agent tokens can discover, propose, quote, execute approved purchases, and retrieve their evidence only. Human approval and merchant administration are excluded.',403);
+  if(actor.role==='agent')requireThat((method==='GET'&&['products','orders','assets','entitlements'].includes(resource))||(method==='POST'&&resource==='orders'&&(!id||['quote','execute','preflight','deposit','reconcile'].includes(action))),'AGENT_SCOPE','Agent tokens can discover, propose, quote, execute approved purchases, and retrieve their evidence only. Human approval and merchant administration are excluded.',403);
   if(resource==='auth'&&id==='me'){
    const m=(await database.query('SELECT id,name,email,wallet,wallet_verified FROM merchants WHERE id=$1',[actor.merchantId])).rows[0];return response({actor:{...actor,sessionHash:undefined},merchant:m,storage:database.backend});
   }
@@ -86,17 +88,19 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
     const q=await quote(order.policy,true);return response(q);
    }
    if(action==='execute'){const input=z.object({policy:policySchema,idempotencyKey:z.uuid()}).strict().parse(await json(request));await rateLimit(database,'executable:'+actor.merchantId,5,3600);return response(await execute(database,actor,id,input.policy as Policy,input.idempotencyKey));}
+   if(action==='preflight'){await rateLimit(database,'preflight:'+actor.merchantId,12,3600);return response(await paymentPreflight(database,actor,id));}
    if(action==='deposit'){
     requireThat(actor.mode==='live','DEMO_PAYMENT_BLOCKED','Synthetic orders cannot submit a real deposit.',403);const input=z.object({txHash:z.string().regex(/^0x[0-9a-fA-F]{64}$/)}).strict().parse(await json(request));
-    const attempt=(await database.query('SELECT * FROM attempts WHERE order_id=$1',[id])).rows[0];requireThat(attempt?.deposit_address,'NO_DEPOSIT','Create authorized payment instructions first.');await verifySource(input.txHash,attempt,order.policy);
-    await database.query('UPDATE attempts SET source_tx=$1 WHERE id=$2 AND (source_tx IS NULL OR source_tx=$1)',[input.txHash,attempt.id]);await provider('/v0/deposit/submit',{depositAddress:attempt.deposit_address,txHash:input.txHash});return response({accepted:true});
+    await rateLimit(database,'deposit:'+actor.merchantId,20,3600);
+    const attempt=(await database.query('SELECT * FROM attempts WHERE order_id=$1',[id])).rows[0];requireThat(attempt?.deposit_address,'NO_DEPOSIT','Create authorized payment instructions first.');const evidence=await verifySource(input.txHash,attempt,order.policy);
+    const bound=await database.query('UPDATE attempts SET source_tx=$1,source_receipt=$2 WHERE id=$3 AND (source_tx IS NULL OR source_tx=$1) RETURNING id',[input.txHash.toLowerCase(),JSON.stringify(evidence),attempt.id]);requireThat(bound.rows.length===1,'SOURCE_ALREADY_BOUND','This attempt already has a different source transaction.',409);await provider('/v0/deposit/submit',{depositAddress:attempt.deposit_address,txHash:input.txHash});return response({accepted:true});
    }
    if(action==='reconcile'){const a=(await database.query('SELECT id FROM attempts WHERE order_id=$1',[id])).rows[0];requireThat(a,'NO_ATTEMPT','No payment attempt exists.');return response(await reconcile(database,a.id,actor));}
   }
   if(resource==='entitlements'&&method==='GET'){
    const e=(await database.query('SELECT * FROM entitlements WHERE id=$1',[id])).rows[0];requireThat(e,'ENTITLEMENT_NOT_FOUND','Entitlement not found.',404);await getOrder(database,e.order_id,actor);
    requireThat(sha256(e.artifact)===e.artifact_hash,'ARTIFACT_CORRUPTION','Stored artifact integrity check failed.',500);
-   return new NextResponse(e.artifact,{headers:{'Content-Type':'text/markdown; charset=utf-8','Content-Disposition':'attachment; filename="routetill-field-notes.md"','X-Artifact-SHA256':e.artifact_hash,'Cache-Control':'private, no-store'}});
+   return new NextResponse(e.artifact,{headers:{'Content-Type':'text/markdown; charset=utf-8','Content-Disposition':'attachment; filename="routetill-resource.md"','X-Artifact-SHA256':e.artifact_hash,'Cache-Control':'private, no-store'}});
   }
   if(resource==='lab'&&method==='POST'){
    await rateLimit(database,'lab:'+actor.sessionHash,30,3600);
@@ -105,7 +109,7 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
    const input=z.object({orderId:z.uuid(),attack:z.enum(['merchant','price','reuse','replay','tamper'])}).strict().parse(await json(request));return response(await runChallenge(database,actor,input.orderId,input.attack));
   }
   if(resource==='verify'&&method==='POST'){
-   const input=z.object({document:z.unknown(),artifact:z.string().max(16000)}).strict().parse(await json(request));return response(verifyPassport(input.document,{trustedKey:publicKeyPem(),artifact:input.artifact}));
+   const input=z.object({document:z.unknown(),artifact:z.string().max(16000)}).strict().parse(await json(request));return response(verifyPassport(input.document,{trustedKey:publicKeyPem(actor.mode),artifact:input.artifact}));
   }
   throw new DomainError('NOT_FOUND','API endpoint not found.',404);
  }catch(error){

@@ -48,7 +48,7 @@ export async function issuePassport(database:Database,orderId:string){
    o.policy.mode==='demo'?'Synthetic fixture. No funds moved. Mainnet settlement is UNVERIFIED.':'Chain facts were observed through an independent RPC. Re-query a trusted RPC; stored JSON alone does not establish blockchain finality.',
    'The issuer public key must be obtained or pinned independently. A self-supplied key is not an identity proof.'
   ]};
-  const document={payload,signature:{algorithm:'Ed25519',value:signPayload(payload),publicKey:publicKeyPem(),keyFingerprint:sha256(publicKeyPem())}};
+  const document={payload,signature:{algorithm:'Ed25519',value:signPayload(payload,o.policy.mode),publicKey:publicKeyPem(o.policy.mode),keyFingerprint:sha256(publicKeyPem(o.policy.mode))}};
   await sql.query('INSERT INTO passports(order_id,document) VALUES($1,$2) ON CONFLICT(order_id) DO NOTHING',[orderId,JSON.stringify(document)]);return document;
  });
 }

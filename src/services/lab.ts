@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto';
 import {Database} from '../db';
 import {Actor,DomainError,requireThat} from '../core/types';
 import {consumeApproval,approve,getOrder,propose} from './orders';
-import {seedMerchant} from './catalog';
+import {seedDemoResource} from './catalog';
 import {inspectTransfer,syntheticFacts} from '../integrations/settlement';
 import {drainOutbox,issuePassport,qualifyAndFulfill} from './fulfillment';
 import {verifyPassport} from '../core/verifier';
@@ -10,7 +10,7 @@ import {publicKeyPem} from '../core/crypto';
 import {DEMO_WALLET} from '../core/policy';
 export async function prepareLab(database:Database,actor:Actor){
  requireThat(actor.mode==='demo'&&actor.role==='judge','JUDGE_ONLY','Break-It Lab requires an isolated judge session.',403);
- const productId=await seedMerchant(database,actor.merchantId,'RouteTill Studio');return propose(database,actor,{productId,maxSourceAmount:'11000000',refundAddress:DEMO_WALLET});
+ const productId=await seedDemoResource(database,actor.merchantId,'RouteTill Labs');return propose(database,actor,{productId,maxSourceAmount:'11000000',refundAddress:DEMO_WALLET});
 }
 export async function runChallenge(database:Database,actor:Actor,id:string,attack:string){
  requireThat(actor.mode==='demo'&&actor.role==='judge','JUDGE_ONLY','Challenges are restricted to the synthetic judge database.',403);
@@ -21,7 +21,7 @@ export async function runChallenge(database:Database,actor:Actor,id:string,attac
  const purchaser={...actor,buyerId:o.buyer_id}; // Only inside the protected synthetic judge environment.
  if(attack==='merchant'||attack==='price'){
   const changed={...o.policy,...(attack==='merchant'?{recipient:'0x9999999999999999999999999999999999999999'}:{maxSourceAmount:(BigInt(o.policy.maxSourceAmount)+1n).toString()})};
-  try{await consumeApproval(database,purchaser,id,changed,randomUUID());return {passed:false,message:'Attack unexpectedly accepted'};}catch(e){if(!(e instanceof DomainError))throw e;return {passed:e.code===(attack==='merchant'?'MERCHANT_SUBSTITUTION':'PRICE_LIMIT'),code:e.code,message:e.message,approvedFingerprint:o.fingerprint};}
+  try{await consumeApproval(database,purchaser,id,changed,randomUUID());return {passed:false,message:'Attack unexpectedly accepted'};}catch(e){if(!(e instanceof DomainError))throw e;return {passed:e.code===(attack==='merchant'?'MERCHANT_SUBSTITUTION':'PRICE_LIMIT'),code:e.code,message:e.message,approvedFingerprint:o.fingerprint,comparison:{condition:attack==='merchant'?'Recipient must equal the approved merchant wallet':'Requested source maximum must stay within the approved cap',approved:attack==='merchant'?o.policy.recipient:o.policy.maxSourceAmount,attempted:attack==='merchant'?changed.recipient:changed.maxSourceAmount,units:attack==='merchant'?'EVM address':'USDC atomic units'}};}
  }
  if(attack==='reuse'){
   if(o.state==='APPROVED')await consumeApproval(database,purchaser,id,o.policy,randomUUID());

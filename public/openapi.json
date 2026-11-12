@@ -1053,6 +1053,62 @@
           }
         }
       }
+    },
+    "/api/orders/{id}/preflight": {
+      "post": {
+        "summary": "Read-only exact-deposit balance, network, token and gas preflight",
+        "operationId": "post_api_orders_id_preflight",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or policy rejection"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Scope or environment rejected"
+          },
+          "409": {
+            "description": "Conflict, consumed approval, or invalid transition"
+          },
+          "429": {
+            "description": "Rate limit or reconciliation backoff"
+          },
+          "503": {
+            "description": "Service or required configuration unavailable"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "agentToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Live, owner-enabled, unfunded attempt only. Revalidates the signed executable quote and approved policy, checks source/destination RPC chain IDs and native USDC precision, source balances and exact ERC20 transfer gas. Stores a short-lived read-only packet. This endpoint never signs or sends a transaction."
+      }
     }
   },
   "components": {

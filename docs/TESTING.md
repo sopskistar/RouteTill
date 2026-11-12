@@ -1,54 +1,61 @@
-# Actual verification
+# Actual release verification
 
-Executed locally on 11 November 2026 with Node 22.23.1, Next.js 16.4.6, Vitest 5.1.0 and Playwright Chromium 158. All counts below are actual completed runs, not planned coverage.
+Executed 11–12 November 2026 with Node 22.23.1, Next.js 16.4.6, Vitest 5.1.0 and Playwright Chromium 158. Counts are completed local runs. None constitutes a funded transaction or real Neon verification.
 
 | Command | Actual result |
 |---|---|
-| `npm test` | **85 passed**, 3 files |
-| `npm run test:browser` | **6 passed**, production server, 23.7 seconds |
-| `npm run lint` | Passed, no warnings in the final app pass |
+| `npm test` | **125 passed**, 4 files; latest recorded run 9.43 seconds |
+| `npm run test:browser` | **7 passed**, local production server, 17.9 seconds; targeted wallet recapture also passed |
+| `npm run lint` | Passed, no warnings |
 | `npm run typecheck` | Passed |
-| `npm run build` | Passed; all application/metadata routes generated |
-| `npm audit --json` | **0 vulnerabilities** after patching test dependencies |
-| `npm run scan:secrets` | **0 findings**; source count is printed by the command |
+| `npm run build` | Passed with declared `next build --webpack`; all application/metadata routes generated |
+| `npm audit --json` | **0 vulnerabilities** after selecting the minimal official WalletConnect provider |
+| `npm run scan:secrets -- --history --bundle` | **0 findings** across reviewable source, all local Git-history refs and generated public assets; private configured secret values are checked without printing them |
 | `git diff --check` | Passed |
-| Independent Passport CLI | Original signature/policy/bytes PASS; mainnet UNVERIFIED |
-| CLI tampered recipient | FAIL, nonzero exit |
-| Live dry-quote probe | Signature valid; recipient/amount tampering rejected |
+| `npm run seed` + actual independent CLI | Original exported signature/policy/bytes **PASS**, synthetic mainnet settlement **UNVERIFIED** |
+| CLI modified recipient | **FAIL**, exit 1; application signature and settlement binding failed |
+| CLI modified artifact | **FAIL**, exit 1; artifact SHA-256 failed |
+| Authenticated live dry quote | Signature valid; recipient and amount tampering rejected |
+| Owner-address read-only RPC preflight | Both address checksums, chain IDs and native USDC precision passed; source USDC/ETH sufficient at observation time; indicative gas estimated |
+| Real Neon / deployed Vercel / funded settlement | **PENDING / UNVERIFIED**, not counted as passing tests |
 
-## Persistence and adversarial tests
+## Persistence and adversarial coverage
 
-`tests/policy-payment.test.ts`: integer precision/ranges; exact policy binding; merchant/product/route/refund/artifact substitution; expiry; state transitions; original production quote signature and tampering; quote cap/minimum/precision/expiry; wrong destination chain/token/recipient/amount, failed/missing receipt, insufficient confirmations, missing finality, reorg, removed/ambiguous logs and wrong transaction reference.
+The original 85 tests remain and pass: integer precision/ranges; exact policy binding; merchant/product/route/refund/artifact substitution; expiry; state transitions; production quote signatures/tampering; quote cap/minimum/precision/expiry; wrong destination chain/token/recipient/amount; failed/missing receipt; confirmations/finality/reorg/removed/ambiguous logs and transaction reference errors.
 
-`tests/lifecycle.test.ts`: locked single-use approval under concurrent execution, reused approval, idempotency-key conflict rollback, merchant isolation, bearer approval denial, human approval of an agent proposal, product digest mutation, successful fulfillment, sequential replay, 20 concurrent deliveries, duplicate notification keys, missing evidence, synthetic/live rejection, rollback after artifact corruption, duplicate chain-transfer association, retried outbox, persistence after closing and reopening PostgreSQL, signed Passport binding/tampering/missing key/artifact behavior, and all five real lab challenges.
+Actual PostgreSQL statements in isolated temporary on-disk PGlite stores exercise row-locked approval consumption under concurrency, reused approval, idempotency-key rollback, merchant isolation, bearer approval denial, human approval of an agent proposal, product digest mutation, successful fulfillment, sequential and 20 concurrent notifications, duplicate event keys, missing evidence, synthetic/live rejection, rollback after corruption, duplicate transfer association, retried outbox, persistence after reopening and Passport signature/fingerprint/artifact checks. The five lab challenges call the real handlers and SQL constraints; 20 deliveries (15 concurrent) yield one durable entitlement.
 
-`tests/auth.test.ts`: genuine locally generated EIP-191 ownership signatures, signature substitution, nonce replay, expired challenge, merchant binding, hashed sessions, concurrent durable rate limiting and the single-process local database lock.
+Ownership tests use genuine locally generated EIP-191 signatures for test-only accounts, nonce replay/expiry/merchant checks, hashed sessions, durable rate limits and the single-process PGlite lock. These are **not real Rabby extension or Neon tests**.
 
-These tests run actual PostgreSQL statements/constraints through PGlite in temporary on-disk stores. **They are not Neon concurrency tests.** The external production adapter requires configured database credentials and a separate deployed run.
+`tests/release.test.ts` adds 40 cases for hosted single-store isolation, distinct signing keys, Rabby/MetaMask flag coexistence, EIP-6963 announcements and nonreplacement, Coinbase discovery, exact ERC20 transaction constraints, wallet rejection/network errors, mock-RPC chain/token/balance/gas/expiry checks, canonical source transaction sender/calldata/log association and deterministic resource processing. No source test sends a blockchain transaction.
 
-## Browser and design tests
+## Browser and design coverage
 
-The six journeys cover responsive landing navigation/theme/reduced motion; judge merchant onboarding and actual product/link creation; checkout/proposal/approval; synthetic settlement and entitled download; local SHA-256 and WebCrypto signature checks; all five backend attacks; signed JSON export; privacy/docs/custom 404; cross-origin and unauthenticated denial; the actual deterministic agent CLI, human-only approval, agent admin denial, and agent entitlement retrieval; and real local merchant registration/sign-in with a generated test-only EIP-191 wallet ownership signature.
+Seven journeys drive merchant onboarding, generic product creation, hosted checkout/proposal/human approval, synthetic fulfillment and entitled file retrieval, browser SHA-256/WebCrypto verification, all five lab attacks, Passport export/tampering, privacy/docs/404/error/CSRF states, real deterministic agent CLI and generated seven-case test plan, scoped-token restrictions, sign-in and test-only ownership signatures.
 
-The suite captures 1440/1280-class desktop, 768px tablet, 390px phone and 360px small-phone landing views, plus checkout/lab/Passport/delivery routes. Axe scans of checkout and the populated lab returned zero WCAG A/AA violations. Separate design review inspected real screenshots and requested two fixes: stack mobile page headings before actions, and show synthetic settlement as amber/unverified. Recaptures were reviewed and both fixes scored resolved. [Design audit details](DESIGN_QA.md).
+The new wallet journey presents mock Rabby, MetaMask and Coinbase providers together. It proves requests target the explicitly selected provider, Rabby sorts first even with MetaMask compatibility flags, rejected connection/switch requests are handled, network/account changes update displayed state and disconnect clears it. Transaction requests are forbidden by that mock. This is automated provider-contract coverage, **not a real extension/device/relay test**. WalletConnect requires a deployment project ID and manual pairing.
+
+Axe WCAG A/AA scans returned zero violations for checkout, populated lab and wallet settings. Desktop, 768px tablet, 390px and 360px phone layouts, light/dark themes, reduced motion, navigation, forms and hash wrapping were exercised. Screenshots are inspected rather than assumed correct. [Design review](DESIGN_QA.md).
 
 ## Reproduce
 
 ```sh
 npm ci
-cp .env.example .env.local # fresh clone only; preserve an existing configured file
+cp .env.example .env.local # fresh clone only; preserve existing configuration
 npm test
 npm run lint
 npm run typecheck
-npm run seed # server stopped
+npm run seed              # app stopped
 npm run build
+npm run scan:secrets -- --history --bundle
+npm audit
 npm run start -- --port 3001
-# In another terminal:
+# Another terminal:
 npm run test:browser
 ```
 
-`PLAYWRIGHT_BASE_URL` overrides the target URL. Browser tests assume the local judge access configuration; hosted judge-code setup must be supplied before a deployed run. Captures, traces, original evidence and local exports are under ignored `artifacts/`, `test-results/` and `playwright-report/`.
+The local judge works without external credentials. Add `NEAR_INTENTS_JWT` only for authenticated dry quotes. Generated release files are named `.env.release-*.local` to avoid silently overriding Next.js local judge configuration. `PLAYWRIGHT_BASE_URL` overrides the browser origin; hosted judge-code authentication and single-mode deployment need the explicit owner-configured setup, so the dual-mode local suite is not a claim of hosted success.
 
-The first development browser runs exposed cold compilation delays, an origin mismatch and low button contrast. Those were fixed; the reported five-test run uses the optimized production build. A seeder was inadvertently started while a local database owner was running; prior synthetic data was preserved, a fresh store was seeded, and a process lock plus a regression test now prevents simultaneous local owners. These local issues do not represent a mainnet transaction or Neon test.
+The first release browser run found a stale exact-label locator after the description textarea gained initial content. The query was corrected to its accessible textbox role/name, and the full seven-journey run passed. Turbopack could not bind its compiler port in the execution sandbox, including an escalated retry; the supported Webpack build passed and is the declared release build command. Dependency audit initially found an advisory through an unused WalletConnect UI tree; replacing it with official Universal Provider removed that tree and the final audit reported zero known vulnerabilities.
 
-No real wallet transaction, funded settlement, physical-device session, external production deployment or paid scheduler was verified by these commands. See [limitations](LIMITATIONS.md).
+Captures and CLI evidence live in ignored `artifacts/`; browser traces/reports are under `test-results/` and `playwright-report/`. For real Neon migrations, concurrent row-lock testing and deployment checks after the Vercel integration exists, follow [DEPLOYMENT](DEPLOYMENT.md). The verification command refuses PGlite fallback and has not run against missing credentials.

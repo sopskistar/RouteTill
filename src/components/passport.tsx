@@ -2,14 +2,15 @@
 import {useEffect,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
 import Link from 'next/link';
+import {useRuntime} from './wallet-provider';
 import {Check,Download,ShieldCheck,X,ArrowUpRight,Copy} from 'lucide-react';
 import {api,downloadJSON} from './api';
 import {Badge,Brand,Hash,Notice,PageHead,ProofRail} from './ui';
 import {browserHash,browserVerify} from '@/core/browser-verifier';
 import {decimal} from '@/core/amounts';
-export function Passport({id}:{id:string}){const search=useSearchParams();const mode=search.get('mode')==='live'?'live':'demo';const [doc,setDoc]=useState<any>(null),[error,setError]=useState(''),[check,setCheck]=useState<any>(null),[artifact,setArtifact]=useState<any>(null),[busy,setBusy]=useState(false),[copied,setCopied]=useState(false);
+export function Passport({id}:{id:string}){const runtime=useRuntime();const search=useSearchParams();const mode=search.get('mode')==='live'?'live':search.get('mode')==='demo'?'demo':runtime.mode==='live'?'live':'demo';const [doc,setDoc]=useState<any>(null),[error,setError]=useState(''),[check,setCheck]=useState<any>(null),[artifact,setArtifact]=useState<any>(null),[busy,setBusy]=useState(false),[copied,setCopied]=useState(false);
 useEffect(()=>{api(`passports/${id}?mode=${mode}`).then(setDoc).catch(e=>setError(e.message));},[id,mode]);
-async function verify(tamper=false){setBusy(true);setError('');try{const key=await fetch('/api/keys').then(r=>r.text());const d=structuredClone(doc);if(tamper)d.payload.destination.recipient='0x9999999999999999999999999999999999999999';setCheck({...await browserVerify(d,key),tampered:tamper});}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
+async function verify(tamper=false){setBusy(true);setError('');try{const key=await fetch('/api/keys?mode='+mode).then(r=>r.text());const d=structuredClone(doc);if(tamper)d.payload.destination.recipient='0x9999999999999999999999999999999999999999';setCheck({...await browserVerify(d,key),tampered:tamper});}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
 async function checkFile(file:File){const hash=await browserHash(await file.arrayBuffer());setArtifact({hash,match:hash===doc.payload.fulfillment.artifactSha256,name:file.name});}
 if(!doc)return <>{error?<Notice tone="bad">{error}</Notice>:<p role="status">Loading signed Purchase Passport…</p>}</>;
 const p=doc.payload,demo=p.mode==='demo';

@@ -24,3 +24,10 @@ RouteTill focuses on the joined purchase authorization, independently qualified 
 Installed skills applied: Premium UI Design, Hallmark, Impeccable, UI UX Pro Max, Brand Identity Studio, Frontend Motion Design, Frontend Visual QA, Hackathon Video Studio and Remotion guidance. Shared creative/video workspaces supply existing tools and reference conventions, not fabricated proof.
 
 Software uses the repository’s MIT license. Next.js/React/Tailwind/viem/Vitest/Playwright are attributed dependencies; exact versions and transitive licenses are in `package-lock.json` and installed package licenses. Lucide icons: ISC. Manrope: SIL OFL via Fontsource. The official NEAR quote-signature SDK is used under its package license. Original sample product text is dedicated under CC0-1.0. Demo-video licensing is documented with its editable source; no purchased asset or unlicensed audio is required.
+
+## Release integration references
+
+- [AP2 specification](https://ap2-protocol.org/ap2/specification/) and [payment mandate](https://ap2-protocol.org/ap2/payment_mandate/): existing authorization mandates and linked receipts; RouteTill makes no invention or compatibility claim.
+- [Rabby integration](https://rabby.io/docs/integrating-rabby-wallet), [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963), [WalletConnect Universal Provider](https://github.com/WalletConnect/walletconnect-monorepo/tree/v2.0/providers/universal-provider), [viem](https://viem.sh/docs/clients/wallet).
+- [Circle native USDC contracts](https://developers.circle.com/stablecoins/usdc-contract-addresses): Arbitrum and Base contract allowlist; chain IDs and six-decimal precision are also checked through RPC.
+- [Neon Vercel integration](https://neon.com/docs/guides/vercel-managed-integration), [Vercel native integration naming](https://vercel.com/docs/integrations/install-an-integration/product-integration), [Hobby cron limits](https://vercel.com/docs/cron-jobs/usage-and-pricing).
