@@ -9,11 +9,16 @@ import {decimal} from '@/core/amounts';
 import {LivePayment} from './live-payment';
 export function OrderView({id}:{id:string}){
  const [data,setData]=useState<any>(null),[error,setError]=useState(''),[busy,setBusy]=useState(''),[approved,setApproved]=useState(false),[quote,setQuote]=useState<any>(null),[note,setNote]=useState('');
- const requestSequence=useRef(0),actionBusy=useRef(false);
- const refresh=useCallback(async()=>{const sequence=++requestSequence.current,started=performance.now();try{
+ const requestSequence=useRef(0),actionBusy=useRef(false),pendingRead=useRef<{id:string;promise:Promise<any>}|null>(null);
+ const refresh=useCallback(async()=>{
+  if(pendingRead.current?.id===id)return pendingRead.current.promise;
+  const sequence=++requestSequence.current,started=performance.now();
+  const task=(async()=>{try{
   const result=await api('orders/'+id,undefined,{signal:AbortSignal.timeout(20000)});
   if(sequence===requestSequence.current)setData({...result,clockServerNow:Date.parse(result.serverNow||new Date().toISOString())+performance.now()-started,clockObservedAt:performance.now()});return result;
- }catch(e){setError((e as Error).message);return null;}},[id]);
+  }catch(e){setError((e as Error).message);return null;}})();
+  pendingRead.current={id,promise:task};try{return await task;}finally{if(pendingRead.current?.promise===task)pendingRead.current=null;}
+ },[id]);
  useEffect(()=>{void refresh();},[refresh]);
  const attemptId=data?.attempt?.id,orderMode=data?.order?.policy?.mode,orderState=data?.order?.state;
  useEffect(()=>{
@@ -33,7 +38,7 @@ export function OrderView({id}:{id:string}){
  {error&&<div className="field-error" role="alert">{error}</div>}{note&&<p className="status-message" role="status">{note}</p>}
  <div className="purchase-grid"><section className="panel"><PurchaseTerms policy={p} hash={o.fingerprint}/><details className="form-section"><summary>Inspect the immutable policy</summary><pre>{JSON.stringify(p,null,2)}</pre></details></section>
  <div className="stack"><section className="panel"><div className="stage-heading"><h2>{fulfilled?'Delivery is ready':o.state==='PROPOSED'?'Human authorization':'Payment & settlement'}</h2><ShieldCheck size={22}/></div>
- {o.state==='PROPOSED'&&<><p>Approve this merchant, exact product, settlement amount, route, source limit, expiry, and expected artifact hash. This authorization can be consumed once.</p><label className="check-label"><input type="checkbox" checked={approved} onChange={e=>setApproved(e.target.checked)}/><span>I reviewed the purchase terms and authorize this single purchase. This permits one signed deposit-instruction set after secure trial activation. I retain control of my wallet and any transaction signature.</span></label><button className="button button-full" disabled={!approved||!!busy} onClick={()=>run('approval',()=>api(`orders/${id}/approve`,{fingerprint:o.fingerprint}))}>{busy==='approval'?'Recording approval…':'Authorize this purchase'}<Check size={17}/></button></>}
+ {o.state==='PROPOSED'&&<><p>Approve this merchant, exact product, settlement amount, route, source limit, expiry, and expected artifact hash. This authorization can be consumed once.</p><label className="check-label"><input type="checkbox" checked={approved} onChange={e=>setApproved(e.target.checked)}/><span>I reviewed the purchase terms and authorize this single purchase and one payment preparation. I retain control of my wallet and personally confirm the transaction in Rabby.</span></label><button className="button button-full" disabled={!approved||!!busy} onClick={()=>run('approval',()=>api(`orders/${id}/approve`,{fingerprint:o.fingerprint}))}>{busy==='approval'?'Recording approval…':'Authorize this purchase'}<Check size={17}/></button></>}
  {demo&&!fulfilled&&data.viewerRole!=='guest'&&<div className="form-section"><h3>Genuine NEAR Intents quote</h3><p className="terms-description">Authenticated server-side dry quote. No deposit address, signing request, or funds movement.</p><button className="button button-quiet margin-top" disabled={!!busy} onClick={()=>run('quote',async()=>setQuote(await api(`orders/${id}/quote`,{})))}>{busy==='quote'?'Requesting live quote…':'Get live dry quote'}<RefreshCw size={16}/></button>{quote&&<><div className="live-quote"><Badge tone="good">Provider signature verified</Badge><p>Arbitrum USDC → Base USDC</p><strong>{decimal(quote.response.quote.amountIn)} USDC</strong><p>For {decimal(quote.response.quote.amountOut)} USDC to the merchant. Source wallet gas is extra. Preview only; re-quote before payment.</p><p>Quoted {new Date(quote.response.timestamp).toLocaleString()}</p></div><details><summary>Quote evidence & fee details</summary><pre>{JSON.stringify(quote,null,2)}</pre></details></>}</div>}
  {o.state==='APPROVED'&&demo&&<div className="form-section"><h3>Complete the synthetic purchase</h3><p className="terms-description">Run the same settlement validator and PostgreSQL fulfillment transaction with isolated fixture evidence. Twenty notifications exercise replay handling.</p><button className="button button-full margin-top" disabled={!!busy} onClick={()=>run('demo',async()=>{const r=await api('lab/challenge',{orderId:id,attack:'replay'});setNote(`${r.deliveries} notifications; ${r.storedEntitlements} stored entitlement. Synthetic fixture only.`);})}>{busy==='demo'?'Verifying & issuing…':'Run synthetic settlement & deliver'}<ArrowRight size={17}/></button></div>}
  {!demo&&o.state!=='PROPOSED'&&!fulfilled&&<LivePayment key={o.id} data={data} refresh={refresh}/>}

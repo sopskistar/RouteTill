@@ -1,0 +1,67 @@
+{
+  "integrity": "PASS",
+  "settlement": "INDEPENDENTLY_OBSERVED",
+  "checks": [
+    {
+      "name": "Issuer key pinned",
+      "pass": true,
+      "detail": "Obtain the issuer key through a separate trusted channel."
+    },
+    {
+      "name": "Application signature",
+      "pass": true,
+      "detail": "Ed25519 protects the exported application assertions."
+    },
+    {
+      "name": "Purchase fingerprint",
+      "pass": true,
+      "detail": "Canonical SHA-256 of approved terms."
+    },
+    {
+      "name": "Environment binding",
+      "pass": true,
+      "detail": "Synthetic evidence is never live evidence."
+    },
+    {
+      "name": "Delivery binding",
+      "pass": true,
+      "detail": "Delivered digest must equal the approved digest."
+    },
+    {
+      "name": "Settlement binding",
+      "pass": true,
+      "detail": "Transaction, recipient, asset, chain, and amounts stay linked."
+    },
+    {
+      "name": "Provider quote signature",
+      "pass": true,
+      "detail": "Official SDK production manager key; this does not sign provider execution status."
+    },
+    {
+      "name": "Quote policy binding",
+      "pass": true,
+      "detail": "Executable quote must satisfy the original authorization at its quoted timestamp; a dry quote cannot prove execution."
+    },
+    {
+      "name": "Provider transaction association",
+      "pass": true,
+      "detail": "Signed quote and confirmed source stay bound; additional references must be origin-chain refunds. Provider status itself is an unsigned assertion."
+    },
+    {
+      "name": "Artifact SHA-256",
+      "pass": true,
+      "detail": "Checks the actual delivered bytes."
+    },
+    {
+      "name": "Independent destination RPC",
+      "pass": true,
+      "detail": "Canonical successful token transfer, confirmations and finality observed."
+    },
+    {
+      "name": "Independent origin refund RPC",
+      "pass": true,
+      "detail": "Re-query the origin chain to distinguish an origin refund from a second destination payment."
+    }
+  ],
+  "synthetic": false
+}

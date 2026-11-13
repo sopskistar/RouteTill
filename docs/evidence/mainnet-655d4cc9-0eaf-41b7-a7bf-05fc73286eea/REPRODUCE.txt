@@ -1,0 +1,3 @@
+node --import tsx scripts/verify-passport.ts docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/purchase-passport.json --key docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/production-public-key.txt --artifact docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/agent-purchase-test-vectors.md --rpc https://mainnet.base.org --source-rpc https://arb1.arbitrum.io/rpc
+
+Use independently trusted RPC endpoints. All files contain public transaction evidence, public verification material or the CC0 purchased artifact. No credentials or private keys are included.

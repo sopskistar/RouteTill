@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-11-13T17:06:15.806Z",
+  "normalReconciliationRepeated": true,
+  "cronChecked": 1,
+  "state": "FULFILLED",
+  "attempts": 1,
+  "entitlements": 1,
+  "passports": 1,
+  "fulfillment_events": 1,
+  "delivered_passport_jobs": 1,
+  "privateReleaseFilesUnchanged": true,
+  "noNewPaymentRequested": true
+}

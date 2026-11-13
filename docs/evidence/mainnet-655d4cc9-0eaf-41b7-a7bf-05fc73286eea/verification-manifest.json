@@ -1,0 +1,109 @@
+{
+  "verifiedAt": "2026-11-13T17:02:47.696Z",
+  "orderId": "655d4cc9-0eaf-41b7-a7bf-05fc73286eea",
+  "state": "FULFILLED",
+  "attempts": 1,
+  "source": {
+    "chainId": 42161,
+    "transactionHash": "0x1afadae771327b11deb4132df51953bd307e2d13c57a8e276ec95f420e5a4a81",
+    "explorer": "https://arbiscan.io/tx/0x1afadae771327b11deb4132df51953bd307e2d13c57a8e276ec95f420e5a4a81",
+    "token": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+    "amountAtomic": "10105156",
+    "amountUsdc": "10.105156",
+    "fundedAt": "2026-11-13T16:11:16.000Z",
+    "canonicalReceiptVerified": true,
+    "approvalExpiresAt": "2026-11-13T16:34:33.318Z",
+    "fundedBeforeApprovalAndRequestDeadlines": true
+  },
+  "provider": {
+    "status": "SUCCESS",
+    "correlationId": "30785079-9323-4037-9a3d-b412b313f53d",
+    "updatedAt": "2026-11-13T16:12:12.000Z",
+    "quoteSignatureVerified": true
+  },
+  "destination": {
+    "chainId": 8453,
+    "transactionHash": "0x8cc1225a938538842a42db97b5e3592fb37ede94632872d626dd91d1acafe121",
+    "explorer": "https://basescan.org/tx/0x8cc1225a938538842a42db97b5e3592fb37ede94632872d626dd91d1acafe121",
+    "token": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+    "recipient": "0x66a7694a7e88edd9c22847e422c00c1d4053d288",
+    "amountAtomic": "10000000",
+    "amountUsdc": "10",
+    "confirmations": 15253,
+    "requiredConfirmations": 12,
+    "finalized": true
+  },
+  "refunds": [
+    {
+      "chainId": 42161,
+      "transactionHash": "0x040de1f0e88378fcabcaa141480c5fa5499c329a8d899e4b4426fa7c8a6965a6",
+      "explorer": "https://arbiscan.io/tx/0x040de1f0e88378fcabcaa141480c5fa5499c329a8d899e4b4426fa7c8a6965a6",
+      "amountAtomic": "95729",
+      "amountUsdc": "0.095729",
+      "recipient": "0x8e45ae32aba44b0fa90eba821818ceede726026f"
+    }
+  ],
+  "entitlement": {
+    "count": 1,
+    "id": "95e6e2f6-0648-40e2-a86e-f190a4ef75c1",
+    "artifactSha256": "f7ecb13c8d1b1576b17311ad3eb3a18848f44bdac3a742dbc66e0ba726f65643",
+    "bytes": 1613,
+    "createdAt": "2026-11-13T17:01:55.853132+00:00",
+    "download": "https://routetill.vercel.app/entitlements/95e6e2f6-0648-40e2-a86e-f190a4ef75c1?order=655d4cc9-0eaf-41b7-a7bf-05fc73286eea&mode=live",
+    "authenticatedDownloadRequiresBuyerSession": true,
+    "storedEntitledBytesVerified": true
+  },
+  "passport": {
+    "count": 1,
+    "url": "https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live",
+    "publicJson": "https://routetill.vercel.app/api/passports/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live",
+    "keySha256": "84a160fb109bbd108883adb71f30669d82ede4d945c97bfe22172c5d1e30e354",
+    "integrity": "PASS",
+    "settlement": "INDEPENDENTLY_OBSERVED",
+    "tamperedPassportRejected": true,
+    "tamperedArtifactRejected": true
+  },
+  "normalWorkflow": {
+    "manualFulfillmentStatusUpdate": false,
+    "settlementQualifiedEvents": 1,
+    "fulfillmentIssuedEvents": 1,
+    "lifecycle": [
+      {
+        "kind": "purchase.human-approved",
+        "at": "2026-11-13T16:04:40.553563+00:00"
+      },
+      {
+        "kind": "approval.consumed",
+        "at": "2026-11-13T16:10:59.299246+00:00"
+      },
+      {
+        "kind": "fulfillment.issued",
+        "at": "2026-11-13T17:01:55.853132+00:00"
+      },
+      {
+        "kind": "settlement.qualified",
+        "at": "2026-11-13T17:01:55.853132+00:00"
+      }
+    ]
+  },
+  "productionPreparationDisabled": true,
+  "demoPaymentsDisabled": true,
+  "limitations": [
+    "Provider status supplies the routing association and is not a signed causal proof.",
+    "Issuer signature verifies application assertions; independent RPC observations establish the checked chain facts.",
+    "Authenticated hosted file access remains restricted to the purchasing session; the exported entitled bytes were read and hashed from the durable entitlement."
+  ],
+  "reconciliationRelease": {
+    "checkedAt": "2026-11-13T17:04:20.440Z",
+    "commit": "402f1a7fd338ad112796fbe6e939275be25a21c4",
+    "productionReady": true,
+    "demoReady": true,
+    "productionDeployment": "dpl_7HUsD7u8Q947jXkxBMF37RsRTtPM",
+    "demoDeployment": "dpl_FGNgf6C4CMJfFujKmou7SuMgywPN",
+    "trialBindingsAbsent": true,
+    "demoSigningIdentityUnchanged": true
+  },
+  "regressionTestsPassed": 138,
+  "standaloneVerifierChecksPassed": 12,
+  "repeatedReconciliationExactlyOnce": true
+}

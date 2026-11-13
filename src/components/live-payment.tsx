@@ -64,14 +64,14 @@ export function LivePayment({data,refresh}:{data:any;refresh:()=>Promise<any>}){
   if(!liveAttempt||!correctWallet||submitted||expired||progress||busy||document.hidden)return;
   if(performance.now()>=retryAt.current&&packetExpires.current-performance.now()<20000&&!checkRequest.current)void checks().catch(()=>{});
  },[tick,liveAttempt,correctWallet,submitted,expired,progress,busy,checks]);
- useEffect(()=>{const wake=()=>{retryAt.current=0;setTick(performance.now());void refresh();};window.addEventListener('online',wake);window.addEventListener('focus',wake);return()=>{window.removeEventListener('online',wake);window.removeEventListener('focus',wake);};},[refresh]);
+ useEffect(()=>{const wake=()=>{if(document.hidden)return;retryAt.current=0;setTick(performance.now());void refresh();};window.addEventListener('online',wake);window.addEventListener('focus',wake);document.addEventListener('visibilitychange',wake);return()=>{window.removeEventListener('online',wake);window.removeEventListener('focus',wake);document.removeEventListener('visibilitychange',wake);};},[refresh]);
 
  // Only this authenticated buyer's approved, server-eligible trial can prepare once.
  useEffect(()=>{
   if(o.state!=='APPROVED'||data.approvalConsumed||!data.preparation?.ready||!correctWallet||expired||executionStarted.current)return;
   executionStarted.current=true;
   const key='routetill-prepare-'+o.id;
-  if(localStorage.getItem(key)){setNote('Checking the saved instruction request. Do not create another purchase or repeat the request.');return;}
+  if(localStorage.getItem(key)){setError('A payment request was already started, but its result is not yet available. Checking the saved purchase; a second request is blocked.');return;}
   const idempotencyKey=crypto.randomUUID();localStorage.setItem(key,idempotencyKey);setBusy('instructions');setError('');
   void api(`orders/${o.id}/execute`,{policy:p,idempotencyKey},{signal:AbortSignal.timeout(90000)}).catch(e=>setError(message(e))).finally(async()=>{await refresh();setBusy('');});
  },[o.id,o.state,p,data.approvalConsumed,data.preparation?.ready,correctWallet,expired,refresh]);
@@ -120,22 +120,23 @@ export function LivePayment({data,refresh}:{data:any;refresh:()=>Promise<any>}){
 
  const date=(value:number|string)=>new Date(value).toLocaleString(undefined,{timeZoneName:'short'});
  return <div className="form-section">
-  <h3>{submitted?'Track your payment':a?.deposit_address?'Confirm the exact payment':'Connect your payment wallet'}</h3>
+  <h3>{submitted?'Track your payment':a?.deposit_address?'Confirm the exact payment':data.preparation?.message?'Payment preparation could not complete':'Preparing your payment…'}</h3>
+  {!submitted&&<p>Your wallet will not be charged until you confirm in Rabby.</p>}
   <dl className="data-list"><div><dt>Buyer & refund wallet</dt><dd><Hash value={p.refundAddress}/></dd></div><div><dt>Purchase authorization ends</dt><dd>{date(p.expiresAt)}</dd></div>{q&&<><div><dt>Exact source spend</dt><dd>{decimal(q.quote.amountIn)} native USDC on Arbitrum One</dd></div><div><dt>Merchant receives</dt><dd>{decimal(p.destinationAmount)} native USDC on Base</dd></div><div><dt>Merchant recipient</dt><dd><Hash value={p.recipient}/></dd></div><div><dt>Deposit address</dt><dd><Hash value={a.deposit_address}/></dd></div><div><dt>Fund before</dt><dd>{date(deadline)} — later provider dates do not extend this purchase</dd></div></>}</dl>
   {error&&<p className="field-error" role="alert">{error}</p>}{note&&<p role="status">{note}</p>}
   {!submitted&&!expired&&!progress&&['APPROVED','AWAITING_DEPOSIT'].includes(o.state)&&<>
    <WalletSelector/>
    {wallet.account&&!correctWallet&&<Notice tone="warn">{wallet.account.toLowerCase()!==p.refundAddress.toLowerCase()?'Select the approved buyer account in Rabby. The merchant wallet cannot fund this purchase.':'Switch the selected wallet to Arbitrum One. Checks resume automatically.'}</Notice>}
   </>}
-  {o.state==='APPROVED'&&!expired&&!data.preparation?.ready&&<Notice>Waiting for this exact purchase’s secure trial activation. This page checks automatically. No approval is consumed until the server allows preparation.</Notice>}
-  {(o.state==='QUOTING'||busy==='instructions')&&<p role="status">Preparing one signed instruction set. Your approval is single-use; do not repeat the request. No wallet transaction is being signed.</p>}
+  {o.state==='APPROVED'&&!expired&&!data.preparation?.ready&&<Notice tone={data.preparation?.message?'warn':undefined}>{data.preparation?.message||'Preparing your payment…'}</Notice>}
+  {(o.state==='QUOTING'||busy==='instructions')&&<p role="status">Preparing your payment…</p>}
   {liveAttempt&&!submitted&&!expired&&!progress&&<div className="payment-preflight">
    <Badge tone={fresh?'good':'neutral'}>{checking?'Checking balances & gas…':fresh?'Read-only checks current':'Refreshing read-only checks'}</Badge>
    {packet&&<dl className="data-list"><div><dt>USDC balance</dt><dd>{decimal(packet.source.usdcBalance)}</dd></div><div><dt>Arbitrum ETH balance</dt><dd>{formatEther(BigInt(packet.source.ethBalanceWei))} ETH</dd></div><div><dt>Estimated gas</dt><dd>{formatEther(BigInt(packet.gas.estimatedGasWei))} ETH, additional to USDC</dd></div><div><dt>Buffered gas reserve</dt><dd>{formatEther(BigInt(packet.gas.reserveWei))} ETH</dd></div></dl>}
    <p className="terms-description">Balances and gas refresh automatically. Pay performs fresh server checks before opening Rabby. Connecting and checking never move funds.</p>
    {q&&<details><summary>Exact transaction, provider deadline & risks</summary><p>Provider deposit lifetime: {date(q.quote.deadline)}. RouteTill’s earlier funding deadline above controls this purchase.</p><pre>{JSON.stringify(packet?.transaction||{chainId:42161,token:'Native Arbitrum USDC',depositAddress:a.deposit_address,amount:q.quote.amountIn},null,2)}</pre><p>Gas is spent even if settlement fails. Refunds use the approved refund wallet and depend on the provider; recovery can be delayed or reduced by fees. Reject a wallet request if the funding deadline passes while it is open.</p></details>}
    <label className="check-label"><input type="checkbox" checked={consent} disabled={!!busy||!correctWallet} onChange={e=>setConsent(e.target.checked)}/><span>I authorize exactly {decimal(q.quote.amountIn)} native Arbitrum USDC to this deposit address, plus ETH gas. I will personally review and confirm the transaction in Rabby.</span></label>
-   <button className="button button-full" disabled={!consent||!correctWallet||!!busy} onClick={pay}><Wallet size={17}/>{busy==='payment'?'Checking, then awaiting your wallet confirmation…':`Pay ${decimal(q.quote.amountIn)} USDC with ${wallet.selected?.name||'your wallet'}`}</button>
+   <button className="button button-full" disabled={!consent||!correctWallet||!!busy} onClick={pay}><Wallet size={17}/>{busy==='payment'?'Checking, then awaiting your wallet confirmation…':`Pay with ${wallet.selected?.name||'Rabby'}`}</button>
   </div>}
   {progress&&!submitted&&<Notice tone="warn">{progress.status==='wallet-open'?'Review the one request in Rabby. Do not confirm after the funding deadline.':'Wallet outcome unknown. Check Rabby activity before doing anything else.'} A second transfer is blocked. If a transaction was submitted, paste its hash below to resume tracking.</Notice>}
   {expired&&!submitted&&<Notice tone="warn">The funding window has closed. Do not send to this deposit, even if its provider date is later. Existing evidence and reconciliation are preserved; an expired approval cannot be reused.</Notice>}

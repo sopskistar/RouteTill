@@ -7,9 +7,9 @@ import {generatePrivateKey,privateKeyToAccount} from 'viem/accounts';
 const captures='artifacts/screenshots';mkdirSync(captures,{recursive:true});
 function localJudgeCode(){if(process.env.JUDGE_ACCESS_CODE)return process.env.JUDGE_ACCESS_CODE;for(const file of ['.env.local','.env.release-demo.local'])try{const code=parseEnv(readFileSync(file,'utf8')).JUDGE_ACCESS_CODE;if(code)return code;}catch{}return '';}
 async function capture(page:any,options:any){await page.evaluate(async()=>{(document.activeElement as HTMLElement)?.blur();window.scrollTo({top:0,left:0,behavior:'instant'});await new Promise(requestAnimationFrame);});await page.screenshot(options);}
-async function judge(page:any){await page.goto('/lab');await expect(page.getByRole('heading',{name:'Break-It Lab',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Run all 5 attacks'})).toBeEnabled();}
+async function judge(page:any){await page.goto('/lab');await expect(page.getByRole('heading',{name:'Break-It Lab',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Run 5 security checks'})).toBeEnabled();}
 test('landing navigation, light/dark, responsive layout and keyboard access',async({page})=>{
- await page.goto('/');await expect(page.getByRole('heading',{name:'From approved purchase to proven delivery.'})).toBeVisible();await capture(page,{path:captures+'/home-desktop.png',fullPage:true});
+ await page.goto('/');await expect(page.getByRole('heading',{name:'Your agent finds it. You approve it.'})).toBeVisible();await capture(page,{path:captures+'/home-desktop.png',fullPage:true});
  await page.getByRole('button',{name:'Switch to dark mode'}).click();await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await capture(page,{path:captures+'/home-dark.png',fullPage:true});
  await page.getByRole('button',{name:'Switch to light mode'}).click();
  for(const [name,width,height] of [['tablet',768,1024],['mobile',390,844],['small-phone',360,800]] as const){await page.setViewportSize({width,height});await capture(page,{path:`${captures}/home-${name}.png`,fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}
@@ -28,7 +28,7 @@ test('merchant onboarding, product creation and hosted checkout',async({page})=>
 });
 test('five real backend attacks, Passport export, local tamper verification and mobile',async({page})=>{
  await judge(page);await capture(page,{path:captures+'/lab-before-desktop.png',fullPage:true});
- await page.getByRole('button',{name:'Run all 5 attacks'}).click();await expect(page.getByText('Tampering detected',{exact:true})).toBeVisible({timeout:45000});await expect(page.getByTestId('entitlement-count')).toHaveText('1');await expect(page.getByText('Attack rejected',{exact:true})).toHaveCount(3);await expect(page.getByText('Exactly one issued',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Run 5 security checks'}).click();await expect(page.getByText('Tampering detected',{exact:true})).toBeVisible({timeout:45000});await expect(page.getByTestId('entitlement-count')).toHaveText('1');await expect(page.getByText('Unsafe change rejected',{exact:true})).toHaveCount(3);await expect(page.getByText('One entitlement stored',{exact:true})).toBeVisible();
  await capture(page,{path:captures+'/lab-after-desktop.png',fullPage:true});
  const desktopAxe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();writeFileSync('artifacts/lab-axe.json',JSON.stringify(desktopAxe.violations,null,2));expect(desktopAxe.violations).toEqual([]);
  await page.setViewportSize({width:390,height:844});await capture(page,{path:captures+'/lab-mobile.png',fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -43,7 +43,7 @@ test('public pages, accessible checkout, error states and cross-origin protectio
  await page.goto('/checkout/field-notes');await expect(page.getByRole('heading',{name:'Prepare your purchase',exact:true})).toBeVisible();const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();writeFileSync('artifacts/checkout-axe.json',JSON.stringify(axe.violations,null,2));expect(axe.violations).toEqual([]);
  await page.setViewportSize({width:390,height:844});await capture(page,{path:captures+'/checkout-mobile.png',fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.goto('/checkout/no-such-product');await expect(page.getByText('This product does not exist.')).toBeVisible();
- await page.goto('/docs');await expect(page.getByRole('heading',{name:'Build around a precise purchase.'})).toBeVisible();await page.goto('/privacy');await expect(page.getByRole('heading',{name:'Privacy, plainly.'})).toBeVisible();await page.goto('/does-not-exist');await expect(page.getByRole('heading',{name:'This route ends here.'})).toBeVisible();
+ await page.goto('/docs');await expect(page.getByRole('heading',{name:'Understand it. Try it. Verify it.'})).toBeVisible();await page.goto('/privacy');await expect(page.getByRole('heading',{name:'Privacy, plainly.'})).toBeVisible();await page.goto('/does-not-exist');await expect(page.getByRole('heading',{name:'This route ends here.'})).toBeVisible();
  const rejected=await request.post('/api/auth/demo',{headers:{Origin:'https://attacker.invalid'},data:{}});expect(rejected.status()).toBe(403);
  const privateOrder=await request.get('/api/orders/private-unknown');expect(privateOrder.status()).toBe(401);
 });
@@ -71,13 +71,13 @@ test('merchant registration, EIP-191 wallet ownership and secure sign-in',async(
  await page.getByRole('link',{name:'Settlement & API',exact:true}).click();await page.getByRole('button',{name:'Browser wallet Legacy browser provider'}).click();await page.getByRole('button',{name:'Connect Browser wallet',exact:true}).click();await page.getByRole('button',{name:'Verify selected settlement wallet'}).click();await expect(page.getByText('Settlement wallet ownership verified.')).toBeVisible();await expect(page.getByText('Verified',{exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Sign out'}).click();await page.getByLabel('Email',{exact:true}).fill(email);await page.getByLabel(/^Password/).fill('Incorrect password 2026');await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.getByText('Email or password is incorrect.')).toBeVisible();await page.getByLabel(/^Password/).fill(password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.getByRole('heading',{name:'Merchant workspace',exact:true})).toBeVisible();
 });
-test('explicit EIP-6963 Rabby selection with simultaneous MetaMask and Coinbase (mock providers)',async({page})=>{
+test('injected Rabby, MetaMask, Coinbase and OKX selection with legacy deduplication (mock providers)',async({page})=>{
  const account='0x2222222222222222222222222222222222222222';
  await page.addInitScript(({account})=>{
   const calls:any[]=[];const listeners:Record<string,Record<string,((...args:any[])=>void)[]>>={};
-  function wallet(name:string,rdns:string,uuid:string){let chain='0x1',rejected=false,switched=false;listeners[name]={};return {info:{name,rdns,uuid},provider:{isMetaMask:name!=='Coinbase Wallet',isRabby:name==='Rabby',isCoinbaseWallet:name==='Coinbase Wallet',on:(event:string,fn:(...args:any[])=>void)=>(listeners[name][event]||=[]).push(fn),removeListener:(event:string,fn:(...args:any[])=>void)=>{listeners[name][event]=(listeners[name][event]||[]).filter(x=>x!==fn);},request:async({method}:any)=>{calls.push({name,method});if(method==='eth_requestAccounts'){if(name==='Rabby'&&!rejected){rejected=true;throw {code:4001};}return [account];}if(method==='eth_accounts')return [account];if(method==='eth_chainId')return chain;if(method==='wallet_switchEthereumChain'){if(!switched){switched=true;throw {code:4001};}chain='0xa4b1';for(const fn of listeners[name].chainChanged||[])fn(chain);return null;}throw new Error('Signing and transfer requests are forbidden in this discovery test');}}};}
-  const discovered=[wallet('MetaMask','io.metamask','a'),wallet('Rabby','io.rabby','b'),wallet('Coinbase Wallet','com.coinbase.wallet','c')];
-  (window as any).ethereum=discovered[0].provider;
+  function wallet(name:string,rdns:string,uuid:string){let chain='0x1',rejected=false,switched=false;listeners[name]={};return {info:{name,rdns,uuid},provider:{isMetaMask:name!=='Coinbase Wallet',isRabby:name==='Rabby',isOkxWallet:name==='OKX Wallet',isCoinbaseWallet:name==='Coinbase Wallet',on:(event:string,fn:(...args:any[])=>void)=>(listeners[name][event]||=[]).push(fn),removeListener:(event:string,fn:(...args:any[])=>void)=>{listeners[name][event]=(listeners[name][event]||[]).filter(x=>x!==fn);},request:async({method}:any)=>{calls.push({name,method});if(method==='eth_requestAccounts'){if(name==='Rabby'&&!rejected){rejected=true;throw {code:4001};}return [account];}if(method==='eth_accounts')return [account];if(method==='eth_chainId')return chain;if(method==='wallet_switchEthereumChain'){if(!switched){switched=true;throw {code:4001};}chain='0xa4b1';for(const fn of listeners[name].chainChanged||[])fn(chain);return null;}throw new Error('Signing and transfer requests are forbidden in this discovery test');}}};}
+  const discovered=[wallet('MetaMask','io.metamask','a'),wallet('Rabby','io.rabby','b'),wallet('Coinbase Wallet','com.coinbase.wallet','c'),wallet('OKX Wallet','com.okex.wallet','d')];
+  (window as any).ethereum={...discovered[0].provider,providers:[{...discovered[1].provider},discovered[0].provider]};(window as any).okxwallet={...discovered[3].provider};
   const announce=()=>discovered.forEach(detail=>window.dispatchEvent(new CustomEvent('eip6963:announceProvider',{detail})));
   window.addEventListener('eip6963:requestProvider',announce);
   (window as any).walletTest={calls,emit:(event:string,value:any)=>{for(const fn of listeners.Rabby[event]||[])fn(value);}};
@@ -85,15 +85,25 @@ test('explicit EIP-6963 Rabby selection with simultaneous MetaMask and Coinbase 
  const origin=new URL(test.info().project.use.baseURL||'http://localhost:3001').origin;
  const response=await page.request.post('/api/auth/login',{headers:{Origin:origin},data:{register:true,name:'Wallet selection test',email:`wallet-${crypto.randomUUID()}@example.invalid`,password:'RouteTill wallet tests 2026'}});expect(response.ok()).toBe(true);
  await page.goto('/merchant?view=settings');
- const wallets=page.getByRole('group',{name:'Detected browser wallets'});await expect(wallets.getByRole('button')).toHaveCount(3);
+ const wallets=page.getByRole('group',{name:'Detected browser wallets'});await expect(wallets.getByRole('button')).toHaveCount(4);await page.waitForTimeout(500);await expect(wallets.getByRole('button')).toHaveCount(4);
  await expect(wallets.getByRole('button').first()).toContainText('Rabby');
  await wallets.getByRole('button',{name:/^MetaMask/}).click();await page.getByRole('button',{name:'Connect MetaMask',exact:true}).click();
- await expect(page.getByText(account,{exact:true})).toBeVisible();
+ await expect(page.getByText(account,{exact:true})).toBeVisible();await wallets.getByRole('button',{name:/^OKX Wallet/}).click();await page.getByRole('button',{name:'Connect OKX Wallet',exact:true}).click();await expect(page.getByText(account,{exact:true})).toBeVisible();
  await wallets.getByRole('button',{name:/^Rabby/}).click();await page.getByRole('button',{name:'Connect Rabby',exact:true}).click();await expect(page.getByText('You declined the wallet request. Nothing was sent by RouteTill.')).toBeVisible();
- await page.getByRole('button',{name:'Connect Rabby',exact:true}).click();await page.getByRole('button',{name:'Switch to Arbitrum One'}).click();await expect(page.getByText('You declined the wallet request. Nothing was sent by RouteTill.')).toBeVisible();await page.getByRole('button',{name:'Switch to Arbitrum One'}).click();await expect(page.getByText('Arbitrum One',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Connect Rabby',exact:true}).click();await expect(page.getByText('Native USDC on Base',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Switch to Arbitrum One'})).toHaveCount(0);await page.evaluate(()=>{(window as any).walletTest.emit('chainChanged','0x2105');});await expect(page.getByText('Base',{exact:true})).toBeVisible();
  await page.evaluate(()=>{(window as any).walletTest.emit('accountsChanged',['0x3333333333333333333333333333333333333333']);});await expect(page.getByText('0x3333333333333333333333333333333333333333',{exact:true})).toBeVisible();
- const calls=await page.evaluate(()=>(window as any).walletTest.calls);expect(calls.filter((c:any)=>c.method==='eth_requestAccounts').map((c:any)=>c.name)).toEqual(['MetaMask','Rabby','Rabby']);expect(calls.some((c:any)=>/send|sign/i.test(c.method))).toBe(false);
+ const calls=await page.evaluate(()=>(window as any).walletTest.calls);expect(calls.filter((c:any)=>c.method==='eth_requestAccounts').map((c:any)=>c.name)).toEqual(['MetaMask','OKX Wallet','Rabby','Rabby']);expect(calls.some((c:any)=>/send|sign/i.test(c.method))).toBe(false);
  await capture(page,{path:captures+'/wallet-desktop.png',fullPage:true});
  await page.setViewportSize({width:390,height:844});await page.evaluate(()=>{(document.activeElement as HTMLElement)?.blur();window.scrollTo(0,0);});await capture(page,{path:captures+'/wallet-mobile.png',fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);await page.getByRole('button',{name:'Disconnect',exact:true}).click();await expect(page.getByRole('button',{name:'Connect Rabby',exact:true})).toBeVisible();
+});
+
+test('John story stays distinct from verified payment and respects reduced motion',async({page})=>{
+ await page.goto('/');const story=page.locator('.john-story');const chapters=story.getByRole('group',{name:'Explore John’s five story chapters'}).getByRole('button');await expect(chapters).toHaveCount(5);
+ for(let i=0;i<5;i++){await chapters.nth(i).click();await expect(chapters.nth(i)).toHaveAttribute('aria-pressed','true');}
+ await expect(story.getByText(/Fictional example/)).toBeVisible();await expect(page.getByRole('article',{name:'Verified mainnet Purchase Passport'}).getByText('Fulfilled',{exact:true})).toBeVisible();
+ await expect(page.getByRole('link',{name:'Arbitrum payment',exact:true})).toHaveAttribute('href','https://arbiscan.io/tx/0x1afadae771327b11deb4132df51953bd307e2d13c57a8e276ec95f420e5a4a81');
+ await page.emulateMedia({reducedMotion:'reduce'});await expect(story.getByRole('button',{name:'Play story'})).toBeDisabled();await chapters.nth(2).focus();await page.keyboard.press('Enter');await expect(chapters.nth(2)).toHaveAttribute('aria-pressed','true');
+ expect(await story.evaluate(e=>e.getAnimations({subtree:true}).filter(a=>a.playState==='running').length)).toBe(0);
+ const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
 });

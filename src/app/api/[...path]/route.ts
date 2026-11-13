@@ -93,9 +93,14 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
    if(method==='GET'){
     const attempt=(await database.query('SELECT * FROM attempts WHERE order_id=$1',[id])).rows[0]||null;const entitlements=(await database.query('SELECT id,artifact_hash,created_at FROM entitlements WHERE order_id=$1',[id])).rows;const events=(await database.query('SELECT id,kind,data,created_at FROM events WHERE order_id=$1 ORDER BY created_at LIMIT 100',[id])).rows;
     const approval=(await database.query('SELECT * FROM approvals WHERE order_id=$1',[id])).rows[0];
-    let preparation={ready:false,code:'NOT_APPROVED'};
+    let preparation:{ready:boolean;code:string;message?:string}={ready:false,code:'NOT_APPROVED'};
     if(order.policy.mode==='live'&&order.state==='APPROVED'&&approval&&!attempt){
-     try{enforceLiveTrial(order,actor,approval);preparation={ready:true,code:'READY'};}catch(e){if(!(e instanceof DomainError))throw e;preparation={ready:false,code:e.code};}
+     try{enforceLiveTrial(order,actor,approval);preparation={ready:true,code:'READY'};}catch(e){
+      if(!(e instanceof DomainError))throw e;preparation={ready:false,code:e.code};
+      if(['TRIAL_TERMS','TRIAL_AUTHORIZATION','TRIAL_ROUTE','TRIAL_SCOPE'].includes(e.code))preparation.message='The saved purchase cannot be prepared because its payment terms or buyer authorization do not match. No wallet charge was requested.';
+      else if(['TRIAL_EXPIRED','APPROVAL_EXPIRED'].includes(e.code))preparation.message='The payment window has expired. Do not send funds for this purchase.';
+      else if(Date.now()-Date.parse(order.updated_at)>240000)preparation.message='Payment preparation is currently unavailable. Your approval has not been consumed and no wallet charge was requested.';
+     }
     }
     return response({order,attempt,entitlements,events,viewerRole:actor.role,serverNow:new Date().toISOString(),approvalConsumed:!!approval?.consumed_at,preparation});
    }
