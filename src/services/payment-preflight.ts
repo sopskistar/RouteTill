@@ -8,11 +8,13 @@ import {checkQuote} from '../integrations/near';
 import {rpc} from '../integrations/settlement';
 import {transferData} from '../wallet/evm';
 import {getOrder} from './orders';
+import {fundingDeadline} from '../core/payment-window';
 
 const erc20=parseAbi(['function balanceOf(address owner) view returns (uint256)','function decimals() view returns (uint8)']);
 export type ReadRpc=(method:string,params:unknown[],source?:boolean)=>Promise<any>;
 /** Read-only RPC preflight. Estimates are neither a fee guarantee nor a wallet signature. */
 export async function inspectPayment(policy:Policy,response:any,read:ReadRpc=rpc,now=Date.now()){
+ const started=Date.now();
  const q=response.quote;
  const transaction={chainId:42161,from:policy.refundAddress,to:ARB_TOKEN,value:'0',data:transferData(q.depositAddress,q.amountIn)};
  const call={from:transaction.from,to:transaction.to,value:'0x0',data:transaction.data};
@@ -30,9 +32,10 @@ export async function inspectPayment(policy:Policy,response:any,read:ReadRpc=rpc
  const estimatedGasWei=BigInt(gas)*BigInt(gasPrice),gasReserveWei=gasLimit*bufferedGasPrice;
  requireThat(BigInt(gas)>0n&&BigInt(gasPrice)>0n,'GAS_UNAVAILABLE','A positive gas estimate and gas price are required.');
  requireThat(BigInt(eth)>=gasReserveWei,'INSUFFICIENT_GAS','The source wallet needs more Arbitrum ETH for the estimated gas reserve.');
- const validUntil=Math.min(now+60000,Date.parse(q.deadline)-15000,Date.parse(q.timeWhenInactive)-15000,Date.parse(policy.expiresAt));
- requireThat(validUntil>now+5000,'QUOTE_EXPIRED','Too little quote lifetime remains. Do not send a deposit.');
- return {checkedAt:new Date(now).toISOString(),validUntil:new Date(validUntil).toISOString(),policyFingerprint:fingerprint(policy),quoteFingerprint:fingerprint(response),
+ const deadline=fundingDeadline(policy,response),finished=now+Math.max(0,Date.now()-started);
+ const validUntil=Math.min(now+60000,deadline-15000);
+ requireThat(validUntil>finished+15000,'QUOTE_EXPIRED','Too little quote lifetime remains. Do not send a deposit.');
+ return {checkedAt:new Date(now).toISOString(),serverNow:new Date(finished).toISOString(),validUntil:new Date(validUntil).toISOString(),fundingDeadline:new Date(deadline).toISOString(),policyExpiresAt:policy.expiresAt,policyFingerprint:fingerprint(policy),quoteFingerprint:fingerprint(response),
   source:{chainId:42161,token:ARB_TOKEN,decimals:6,account:policy.refundAddress,amount:q.amountIn,usdcBalance:BigInt(usdc).toString(),ethBalanceWei:BigInt(eth).toString()},
   destination:{chainId:8453,token:BASE_TOKEN,recipient:policy.recipient,expectedAmount:policy.destinationAmount,quotedAmount:q.amountOut},
   depositAddress:q.depositAddress,refundAddress:policy.refundAddress,quoteExpiresAt:q.deadline,inactiveAt:q.timeWhenInactive,
@@ -42,7 +45,7 @@ export async function inspectPayment(policy:Policy,response:any,read:ReadRpc=rpc
    'Send exactly the quoted native USDC on Arbitrum One before expiry. Incorrect tokens, networks or late deposits can cause loss or provider-managed refunds.',
    'The refund wallet is fixed by the approved policy. RouteTill cannot reverse a blockchain transaction.']};
 }
-export async function paymentPreflight(database:Database,actor:Actor,id:string){
+export async function paymentPreflight(database:Database,actor:Actor,id:string,requestedAt=Date.now()){
  requireThat(actor.mode==='live','DEMO_PAYMENT_BLOCKED','Synthetic purchases cannot request a real payment preflight.',403);
  requireThat(process.env.ENABLE_LIVE_PAYMENTS==='true','LIVE_DISABLED','Live payment requests are disabled.',403);
  const order=await getOrder(database,id,actor);
@@ -53,8 +56,9 @@ export async function paymentPreflight(database:Database,actor:Actor,id:string){
  requireThat(attempt?.deposit_address&&!attempt.source_tx,'PAYMENT_STATE','There is no unfunded executable payment attempt.');
  checkQuote(attempt.quote.response,order.policy,false,Date.now(),false);
  requireThat(attempt.deposit_address===attempt.quote.response.quote.depositAddress,'ASSOCIATION','Stored deposit instructions do not match the signed quote.');
- const packet=await inspectPayment(order.policy,attempt.quote.response);
+ const packet={...await inspectPayment(order.policy,attempt.quote.response),serverRequestAt:new Date(requestedAt).toISOString()};
  const saved=await database.query('UPDATE attempts SET preflight=$1 WHERE id=$2 AND source_tx IS NULL AND state=\'AWAITING_DEPOSIT\' RETURNING id',[JSON.stringify(packet),attempt.id]);
  requireThat(saved.rows.length===1,'PAYMENT_STATE','The payment state changed during preflight. Refresh the purchase.');
- return packet;
+ requireThat(Date.parse(packet.validUntil)>Date.now()+5000,'PREFLIGHT_STALE','The checks took too long. RouteTill must refresh them before asking your wallet.');
+ return {...packet,serverNow:new Date().toISOString()};
 }

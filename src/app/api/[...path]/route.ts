@@ -16,6 +16,7 @@ import {sweep,reconcile} from '@/services/reconcile';
 import {assertDeploymentMode,defaultMode,deploymentMode,publicRuntime} from '@/core/deployment';
 import {paymentPreflight} from '@/services/payment-preflight';
 import {guestSession,guestScope,guestBudget} from '@/services/guest';
+import {enforceLiveTrial} from '@/core/live-trial';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const evm=z.string().refine(x=>isAddress(x),'Enter a valid EVM address');
 const idSchema=z.string().min(1).max(100);
@@ -23,6 +24,7 @@ const policySchema=z.object({version:z.literal(1),authorizationId:z.uuid(),merch
 async function json(request:NextRequest){requireThat(Number(request.headers.get('content-length')||0)<=40000,'BODY_TOO_LARGE','Request is too large.',413);const raw=await request.text();requireThat(Buffer.byteLength(raw)<=40000,'BODY_TOO_LARGE','Request is too large.',413);try{return JSON.parse(raw);}catch{throw new DomainError('INVALID_JSON','Send a valid JSON request body.');}}
 function response(data:unknown,status=200){return NextResponse.json(data,{status,headers:{'Cache-Control':'no-store'}});}
 async function handle(request:NextRequest,{params}: {params:Promise<{path:string[]}>}){
+ const requestStartedAt=Date.now();
  try{
   const path=(await params).path;const [resource,id,action]=path;const method=request.method;
   if(resource==='health')return response({service:'RouteTill',deployment:deploymentMode(),mainnetSettlement:'UNVERIFIED',livePayments:deploymentMode()!=='demo'&&process.env.ENABLE_LIVE_PAYMENTS==='true',...publicRuntime()});
@@ -89,7 +91,13 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
    if(method==='POST'&&!id){const input=z.object({productId:idSchema,maxSourceAmount:z.string().regex(/^[1-9]\d{0,29}$/),refundAddress:evm,sourceAsset:z.string().max(200).optional()}).strict().parse(await json(request));return response(await propose(database,actor,input),201);}
    idSchema.parse(id);const order=await getOrder(database,id,actor);
    if(method==='GET'){
-    const attempt=(await database.query('SELECT * FROM attempts WHERE order_id=$1',[id])).rows[0]||null;const entitlements=(await database.query('SELECT id,artifact_hash,created_at FROM entitlements WHERE order_id=$1',[id])).rows;const events=(await database.query('SELECT id,kind,data,created_at FROM events WHERE order_id=$1 ORDER BY created_at LIMIT 100',[id])).rows;return response({order,attempt,entitlements,events,viewerRole:actor.role});
+    const attempt=(await database.query('SELECT * FROM attempts WHERE order_id=$1',[id])).rows[0]||null;const entitlements=(await database.query('SELECT id,artifact_hash,created_at FROM entitlements WHERE order_id=$1',[id])).rows;const events=(await database.query('SELECT id,kind,data,created_at FROM events WHERE order_id=$1 ORDER BY created_at LIMIT 100',[id])).rows;
+    const approval=(await database.query('SELECT * FROM approvals WHERE order_id=$1',[id])).rows[0];
+    let preparation={ready:false,code:'NOT_APPROVED'};
+    if(order.policy.mode==='live'&&order.state==='APPROVED'&&approval&&!attempt){
+     try{enforceLiveTrial(order,actor,approval);preparation={ready:true,code:'READY'};}catch(e){if(!(e instanceof DomainError))throw e;preparation={ready:false,code:e.code};}
+    }
+    return response({order,attempt,entitlements,events,viewerRole:actor.role,serverNow:new Date().toISOString(),approvalConsumed:!!approval?.consumed_at,preparation});
    }
    requireThat(method==='POST','METHOD','Method not supported.',405);
    if(action==='approve'){const input=z.object({fingerprint:z.string().regex(/^[0-9a-f]{64}$/)}).strict().parse(await json(request));return response(await approve(database,actor,id,input.fingerprint));}
@@ -98,10 +106,10 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
     const q=await quote(order.policy,true);return response(q);
    }
    if(action==='execute'){const input=z.object({policy:policySchema,idempotencyKey:z.uuid()}).strict().parse(await json(request));await rateLimit(database,'executable:'+actor.merchantId,5,3600);return response(await execute(database,actor,id,input.policy as Policy,input.idempotencyKey));}
-   if(action==='preflight'){await rateLimit(database,'preflight:'+actor.merchantId,12,3600);return response(await paymentPreflight(database,actor,id));}
+   if(action==='preflight'){await rateLimit(database,'preflight:'+actor.merchantId,120,3600);await rateLimit(database,'preflight-order:'+id,10,60);return response(await paymentPreflight(database,actor,id,requestStartedAt));}
    if(action==='deposit'){
     requireThat(actor.mode==='live','DEMO_PAYMENT_BLOCKED','Synthetic orders cannot submit a real deposit.',403);const input=z.object({txHash:z.string().regex(/^0x[0-9a-fA-F]{64}$/)}).strict().parse(await json(request));
-    await rateLimit(database,'deposit:'+actor.merchantId,20,3600);
+    await rateLimit(database,'deposit:'+actor.merchantId,60,3600);
     const attempt=(await database.query('SELECT * FROM attempts WHERE order_id=$1',[id])).rows[0];requireThat(attempt?.deposit_address,'NO_DEPOSIT','Create authorized payment instructions first.');const evidence=await verifySource(input.txHash,attempt,order.policy);
     const bound=await database.query('UPDATE attempts SET source_tx=$1,source_receipt=$2 WHERE id=$3 AND (source_tx IS NULL OR source_tx=$1) RETURNING id',[input.txHash.toLowerCase(),JSON.stringify(evidence),attempt.id]);requireThat(bound.rows.length===1,'SOURCE_ALREADY_BOUND','This attempt already has a different source transaction.',409);await provider('/v0/deposit/submit',{depositAddress:attempt.deposit_address,txHash:input.txHash});return response({accepted:true});
    }

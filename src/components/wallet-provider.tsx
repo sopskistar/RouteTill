@@ -12,13 +12,14 @@ export const useRuntime=()=>useContext(RuntimeContext);
 export function useWallet(){const v=useContext(WalletContext);if(!v)throw new Error('Wallet context missing');return v;}
 export function WalletProvider({runtime,children}:{runtime:Runtime;children:React.ReactNode}){
   const [options,setOptions]=useState<WalletOption[]>([]),[selectedId,setSelectedId]=useState<string|null>(null),[account,setAccount]=useState<string|null>(null),[chainId,setChainId]=useState<number|null>(null),[revision,setRevision]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[qr,setQr]=useState<string|null>(null);
+  const selectedIdRef=useRef<string|null>(null);
   const generation=useRef(0),wc=useRef<EvmProvider|null>(null);
   const selected=options.find(o=>o.id===selectedId)||null;
   const refresh=useCallback(()=>window.dispatchEvent(new Event('eip6963:requestProvider')),[]);
   useEffect(()=>{
-    const receive=(event:Event)=>{const entry=announcedWallet((event as CustomEvent).detail);if(entry)setOptions(v=>mergeWallets(v,entry));};
+    const receive=(event:Event)=>{const entry=announcedWallet((event as CustomEvent).detail);if(entry)setOptions(v=>mergeWallets(v,entry,selectedIdRef.current));};
     window.addEventListener('eip6963:announceProvider',receive);refresh();
-    const fallback=setTimeout(()=>{for(const option of legacyWallets((window as any).ethereum))setOptions(v=>v.some(w=>w.provider===option.provider)?v:mergeWallets(v,option));},400);
+    const fallback=setTimeout(()=>{for(const provider of [(window as any).ethereum,(window as any).okxwallet])for(const option of legacyWallets(provider))setOptions(v=>mergeWallets(v,option,selectedIdRef.current));},400);
     return()=>{clearTimeout(fallback);window.removeEventListener('eip6963:announceProvider',receive);};
   },[refresh]);
   useEffect(()=>{
@@ -29,7 +30,7 @@ export function WalletProvider({runtime,children}:{runtime:Runtime;children:Reac
     selected.provider.on?.('accountsChanged',accounts);selected.provider.on?.('chainChanged',chain);selected.provider.on?.('disconnect',gone);
     return()=>{selected.provider.removeListener?.('accountsChanged',accounts);selected.provider.removeListener?.('chainChanged',chain);selected.provider.removeListener?.('disconnect',gone);};
   },[selected]);
-  function select(id:string){generation.current++;setSelectedId(id);setAccount(null);setChainId(null);setError('');setQr(null);setRevision(v=>v+1);}
+  function select(id:string){generation.current++;selectedIdRef.current=id;setSelectedId(id);setAccount(null);setChainId(null);setError('');setQr(null);setRevision(v=>v+1);}
   async function connect(){
     if(!selected)throw new Error('Select Rabby or another discovered wallet first.');
     const g=++generation.current;setBusy(true);setError('');
@@ -45,7 +46,7 @@ export function WalletProvider({runtime,children}:{runtime:Runtime;children:Reac
       wc.current=bridge;
       provider.on('display_uri',async(uri:string)=>{const image=await QRCode.toDataURL(uri,{width:256,margin:2});if(g===generation.current)setQr(image);});
       const option:WalletOption={id:'walletconnect',name:'WalletConnect',rdns:'org.walletconnect',kind:'walletconnect',provider:bridge};
-      setOptions(v=>[...v.filter(w=>w.id!=='walletconnect'),option]);setSelectedId(option.id);setAccount(null);setChainId(null);
+      setOptions(v=>[...v.filter(w=>w.id!=='walletconnect'),option]);selectedIdRef.current=option.id;setSelectedId(option.id);setAccount(null);setChainId(null);
       await provider.connect({namespaces:{eip155:{chains:['eip155:42161'],methods:['eth_sendTransaction','personal_sign'],events:['accountsChanged','chainChanged']}},optionalNamespaces:{eip155:{chains:['eip155:8453'],methods:['wallet_switchEthereumChain'],events:['accountsChanged','chainChanged']}}});if(g!==generation.current)return;
       const addresses=await provider.request({method:'eth_accounts'});if(!Array.isArray(addresses)||!isAddress(addresses[0]))throw new Error('WalletConnect returned no EVM account.');
       setAccount(addresses[0]);setChainId(chainNumber(await provider.request({method:'eth_chainId'})));setQr(null);setRevision(v=>v+1);
