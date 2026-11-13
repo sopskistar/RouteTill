@@ -1,9 +1,9 @@
 import {verifyQuoteSignature} from '@defuse-protocol/one-click-sdk-typescript';
 import {fingerprint,sha256,verifyPayload} from './crypto';
-import {inspectTransfer,ChainFacts} from '../integrations/settlement';
+import {inspectTransfer,inspectRefund,providerAssociationMatches,ChainFacts} from '../integrations/settlement';
 import {checkQuote} from '../integrations/near';
 export type Verification={integrity:'PASS'|'FAIL';settlement:'UNVERIFIED'|'INDEPENDENTLY_OBSERVED';checks:{name:string;pass:boolean;detail:string}[];synthetic:boolean};
-export function verifyPassport(document:any,options:{trustedKey?:string;artifact?:Buffer|string;chainFacts?:ChainFacts}={}):Verification {
+export function verifyPassport(document:any,options:{trustedKey?:string;artifact?:Buffer|string;chainFacts?:ChainFacts;refundFacts?:Record<string,ChainFacts>}={}):Verification {
  const checks:Verification['checks']=[];
  const add=(name:string,pass:boolean,detail:string)=>checks.push({name,pass,detail});
  try{
@@ -20,12 +20,17 @@ export function verifyPassport(document:any,options:{trustedKey?:string;artifact
    const q=p.quoteEvidence.response;
    let terms=false;try{checkQuote(q,p.approvedTerms,false,Date.parse(q.timestamp),false);terms=true;}catch{}
    add('Quote policy binding',terms,'Executable quote must satisfy the original authorization at its quoted timestamp; a dry quote cannot prove execution.');
-   add('Provider transaction association',p.providerEvidence?.status==='SUCCESS'&&fingerprint(p.providerEvidence.quoteResponse)===fingerprint(q)&&p.providerEvidence.swapDetails?.destinationChainTxHashes?.length===1&&p.providerEvidence.swapDetails.destinationChainTxHashes[0].hash===p.destination.transactionHash,'Association is a saved provider assertion, not a signed causal proof.');
+   const refs=p.providerEvidence?.swapDetails?.destinationChainTxHashes||[],refunds=p.settlement.relatedRefunds||[];
+   const expected=[p.destination.transactionHash,...refunds.map((r:any)=>r.txHash)];
+   add('Provider transaction association',providerAssociationMatches(p.approvedTerms,p.providerEvidence,q,p.source.transactionHash,q.quote.depositAddress)&&refs.length===expected.length&&expected.length<=2&&new Set(expected).size===expected.length&&refs.every((r:any)=>expected.includes(r.hash))&&refunds.every((r:any)=>r.chainId===42161&&r.amount===p.providerEvidence.swapDetails.refundedAmount),'Signed quote and confirmed source stay bound; additional references must be origin-chain refunds. Provider status itself is an unsigned assertion.');
   }else add('Synthetic disclosure',p.settlementLevel==='SYNTHETIC_ONLY','No blockchain payment is represented by this fixture.');
   if(options.artifact!==undefined)add('Artifact SHA-256',sha256(options.artifact)===p.fulfillment.artifactSha256,'Checks the actual delivered bytes.');
   else add('Artifact supplied',false,'Provide the artifact to verify its bytes independently.');
   let observed=false;
-  if(p.mode==='live'&&options.chainFacts){const inspected=inspectTransfer(p.approvedTerms,p.destination.transactionHash,options.chainFacts);observed=inspected.verified&&inspected.actualAmount===p.destination.actualAmount&&inspected.logIndex===p.settlement.logIndex;add('Independent destination RPC',observed,inspected.reasons.join('; ')||'Canonical successful token transfer, confirmations and finality observed.');}
+  if(p.mode==='live'&&options.chainFacts){
+   const inspected=inspectTransfer(p.approvedTerms,p.destination.transactionHash,options.chainFacts);observed=inspected.verified&&inspected.actualAmount===p.destination.actualAmount&&inspected.logIndex===p.settlement.logIndex;add('Independent destination RPC',observed,inspected.reasons.join('; ')||'Canonical successful token transfer, confirmations and finality observed.');
+   for(const r of p.settlement.relatedRefunds||[]){const facts=options.refundFacts?.[r.txHash];add('Independent origin refund RPC',!!facts&&inspectRefund(p.approvedTerms,r.txHash,r.amount,facts),'Re-query the origin chain to distinguish an origin refund from a second destination payment.');}
+  }
   return {integrity:checks.every(c=>c.pass)?'PASS':'FAIL',settlement:observed&&checks.every(c=>c.pass)?'INDEPENDENTLY_OBSERVED':'UNVERIFIED',checks,synthetic:p.mode==='demo'};
  }catch{add('Document structure',false,'Malformed or incomplete Purchase Passport.');return {integrity:'FAIL',settlement:'UNVERIFIED',checks,synthetic:false};}
 }

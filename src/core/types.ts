@@ -13,6 +13,7 @@ export type SettlementEvidence = {
   txHash:string|null; logIndex:number|null; blockNumber:string|null; blockHash:string|null;
   confirmations:number; requiredConfirmations:number; finalized:boolean; checkedAt:string;
   receipt?:unknown; finalizedBlock?:unknown; providerAssociation?:string;
+  relatedRefunds?:{chainId:42161;txHash:string;amount:string;proof:unknown}[];
 };
 export type Product = {id:string;merchant_id:string;slug:string;title:string;description:string;amount:string;artifact:string;artifact_hash:string;created_at:string;merchant_name?:string;wallet?:string;wallet_verified?:boolean};
 export type Order = {id:string;merchant_id:string;buyer_id:string;buyer_owner_id:string;product_id:string;policy:Policy;fingerprint:string;state:State;created_at:string;updated_at:string};

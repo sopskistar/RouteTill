@@ -1,9 +1,13 @@
-import {verifyQuoteSignature} from '@defuse-protocol/one-click-sdk-typescript';
+import {verifyQuoteSignature,quoteHash} from '@defuse-protocol/one-click-sdk-typescript';
 import {isAddress} from 'viem';
 import {Policy,requireThat} from '../core/types';
 import {assertAtomic,decimal} from '../core/amounts';
 import {ARB_USDC,BASE_USDC} from '../core/policy';
 const base='https://1click.chaindefuser.com';
+/** Compare the pinned SDK's signed payload, not optional response metadata. */
+export function sameSignedQuote(original:any,returned:any):boolean {
+ try{return verifyQuoteSignature(original)&&verifyQuoteSignature(returned)&&quoteHash(original)===quoteHash(returned);}catch{return false;}
+}
 export async function provider(path:string,body?:unknown){
  const jwt=process.env.NEAR_INTENTS_JWT;
  requireThat(jwt,'NEAR_CREDENTIAL_MISSING','Authenticated NEAR Intents quoting is not configured.',503);

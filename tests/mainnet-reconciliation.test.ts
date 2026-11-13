@@ -1,0 +1,34 @@
+import {describe,it,expect} from 'vitest';
+import {generateKeyPairSync,sign} from 'node:crypto';
+import fixture from './fixtures/mainnet-settlement.json';
+import {sameSignedQuote} from '../src/integrations/near';
+import {verifyDestination,ChainFacts} from '../src/integrations/settlement';
+import {Policy} from '../src/core/types';
+import {canonical,fingerprint} from '../src/core/crypto';
+import {verifyPassport} from '../src/core/verifier';
+import {RESOURCE_ARTIFACT} from '../src/core/resource';
+const policy=fixture.policy as Policy;
+const facts=()=>structuredClone(fixture.observations) as Record<string,ChainFacts>;
+const reader=(observations:Record<string,ChainFacts>)=>async(hash:string,source=false)=>observations[(source?'origin:':'base:')+hash];
+const destination=fixture.evidence.txHash!,refund=fixture.evidence.relatedRefunds[0].txHash;
+describe('genuine mainnet status regression — saved public evidence, no network',()=>{
+ it('accepts normalized optional metadata only when both signed SDK payloads match',()=>expect(sameSignedQuote(fixture.attempt.quote.response,fixture.status.quoteResponse)).toBe(true));
+ it.each(['amountIn','depositAddress'])('rejects a changed signed %s',field=>{const returned:any=structuredClone(fixture.status.quoteResponse);returned.quote[field]='0';expect(sameSignedQuote(fixture.attempt.quote.response,returned)).toBe(false);});
+ it('qualifies one finalized Base payment while independently identifying the Arbitrum refund',async()=>{const result=await verifyDestination(policy,fixture.status,fixture.attempt,reader(facts()));expect(result).toMatchObject({verified:true,txHash:destination,actualAmount:'10000000',finalized:true});expect(result.relatedRefunds?.[0]).toMatchObject({chainId:42161,txHash:refund,amount:'95729'});});
+ it('rejects a provider status associated with another source transfer',async()=>{await expect(verifyDestination(policy,fixture.status,{...fixture.attempt,source_tx:'0x'+'0'.repeat(64)},reader(facts()))).rejects.toMatchObject({code:'ASSOCIATION'});});
+ it('rejects duplicate destination references',async()=>{const s=structuredClone(fixture.status);s.swapDetails.destinationChainTxHashes[1]=s.swapDetails.destinationChainTxHashes[0];await expect(verifyDestination(policy,s,fixture.attempt,reader(facts()))).rejects.toMatchObject({code:'MISSING_CHAIN_EVIDENCE'});});
+ it('rejects two possible merchant payments rather than choosing the first',async()=>{const f=facts();f['base:'+refund]=structuredClone(f['base:'+destination]);f['base:'+refund].receipt.transactionHash=refund;await expect(verifyDestination(policy,fixture.status,fixture.attempt,reader(f))).rejects.toMatchObject({code:'MISSING_CHAIN_EVIDENCE'});});
+ it('rejects an unproved extra reference or a refund to another wallet',async()=>{const f=facts();f['origin:'+refund].receipt.logs.forEach((log:any)=>{if(log.topics?.[0]?.startsWith('0xddf252'))log.topics[2]='0x'+'9'.repeat(64);});await expect(verifyDestination(policy,fixture.status,fixture.attempt,reader(f))).rejects.toMatchObject({code:'REFUND_ASSOCIATION'});});
+ it('does not fulfill a Base receipt before required finality',async()=>{const f=facts();f['base:'+destination].finalized=null;const result=await verifyDestination(policy,fixture.status,fixture.attempt,reader(f));expect(result.verified).toBe(false);expect(result.reasons).toContain('Destination block is not finalized');});
+ it('does not fulfill an insufficient merchant transfer',async()=>{const f=facts();const merchantTopic='0x'+policy.recipient.slice(2).padStart(64,'0');f['base:'+destination].receipt.logs.filter((log:any)=>log.topics?.[2]?.toLowerCase()===merchantTopic).forEach((log:any)=>{log.data='0x'+(9000000n).toString(16).padStart(64,'0');});const result=await verifyDestination(policy,fixture.status,fixture.attempt,reader(f));expect(result.verified).toBe(false);});
+ it('independently verifies a Passport and detects changed settlement or artifact bytes',()=>{
+  const {privateKey,publicKey}=generateKeyPairSync('ed25519'),trustedKey=publicKey.export({type:'spki',format:'pem'}).toString();
+  const payload={mode:'live',approvedTerms:policy,approvedTermsHash:fingerprint(policy),quoteEvidence:fixture.attempt.quote,source:{transactionHash:fixture.attempt.source_tx},destination:{transactionHash:destination,recipient:policy.recipient,token:policy.destinationToken,chainId:8453,expectedAmount:'10000000',actualAmount:'10000000'},providerEvidence:fixture.status,settlement:fixture.evidence,fulfillment:{artifactSha256:policy.artifactSha256}};
+  const document={payload,signature:{algorithm:'Ed25519',value:sign(null,Buffer.from(canonical(payload)),privateKey).toString('base64'),publicKey:trustedKey}};
+  const options={trustedKey,artifact:RESOURCE_ARTIFACT,chainFacts:facts()['base:'+destination],refundFacts:{[refund]:facts()['origin:'+refund]}};
+  expect(verifyPassport(document,options)).toMatchObject({integrity:'PASS',settlement:'INDEPENDENTLY_OBSERVED',synthetic:false});
+  expect(verifyPassport(document,{...options,artifact:RESOURCE_ARTIFACT+'tampered'}).integrity).toBe('FAIL');
+  const changed=structuredClone(document);changed.payload.destination.recipient='0x'+'9'.repeat(40);expect(verifyPassport(changed,options).integrity).toBe('FAIL');
+  expect(verifyPassport(document,{...options,refundFacts:{}}).integrity).toBe('FAIL');
+ });
+});

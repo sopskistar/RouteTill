@@ -26,7 +26,7 @@ export async function qualifyAndFulfill(database:Database,mode:Mode,attemptId:st
   await audit(sql,o.id,'settlement.qualified',{level:mode==='demo'?'SYNTHETIC_ONLY':'INDEPENDENT_RPC_OBSERVATION',txHash:evidence.txHash});
   await sql.query('INSERT INTO entitlements(id,order_id,merchant_id,attempt_id,artifact,artifact_hash) VALUES($1,$2,$3,$4,$5,$6)',[entitlementId,o.id,o.merchant_id,attemptId,p.artifact,p.artifact_hash]);
   await sql.query("UPDATE orders SET state='FULFILLED',updated_at=now() WHERE id=$1",[o.id]);
-  await sql.query("UPDATE attempts SET state='FULFILLED' WHERE id=$1",[attemptId]);
+  await sql.query("UPDATE attempts SET state='FULFILLED',last_error=NULL WHERE id=$1",[attemptId]);
   await audit(sql,o.id,'fulfillment.issued',{entitlementId,artifactSha256:p.artifact_hash});
   await sql.query("INSERT INTO outbox(id,order_id,topic,payload) VALUES($1,$2,'passport.issue',$3) ON CONFLICT(order_id,topic) DO NOTHING",[randomUUID(),o.id,JSON.stringify({entitlementId})]);
   return {created:true,entitlementId,orderId:o.id};

@@ -2,6 +2,7 @@ import {fingerprint} from '../core/crypto';
 import {Policy,SettlementEvidence,requireThat} from '../core/types';
 import {ARB_TOKEN} from '../core/policy';
 import {transferData} from '../wallet/evm';
+import {sameSignedQuote,checkQuote} from './near';
 export const TRANSFER_TOPIC='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 export type ChainFacts={chainId:string;receipt:any;head:string;finalized:any;canonicalBlock:any};
 export function inspectTransfer(policy:Policy,txHash:string,facts:ChainFacts):SettlementEvidence {
@@ -28,18 +29,42 @@ export async function rpc(method:string,params:unknown[],source=false){
  requireThat(res.ok,'RPC_UNAVAILABLE','Independent chain evidence is unavailable. Settlement remains UNVERIFIED.',502);
  const data=await res.json();requireThat(!data.error&&data.result!==undefined,'RPC_UNAVAILABLE','Chain RPC could not return the required evidence.',502);return data.result;
 }
-export async function chainFacts(txHash:string):Promise<ChainFacts>{
- const [chainId,receipt,head,finalized]=await Promise.all([rpc('eth_chainId',[]),rpc('eth_getTransactionReceipt',[txHash]),rpc('eth_blockNumber',[]),rpc('eth_getBlockByNumber',['finalized',false])]);
- const canonicalBlock=receipt?await rpc('eth_getBlockByNumber',[receipt.blockNumber,false]):null;return {chainId,receipt,head,finalized,canonicalBlock};
+export async function chainFacts(txHash:string,source=false):Promise<ChainFacts>{
+ const [chainId,receipt,head,finalized]=await Promise.all([rpc('eth_chainId',[],source),rpc('eth_getTransactionReceipt',[txHash],source),rpc('eth_blockNumber',[],source),rpc('eth_getBlockByNumber',['finalized',false],source)]);
+ const canonicalBlock=receipt?await rpc('eth_getBlockByNumber',[receipt.blockNumber,false],source):null;return {chainId,receipt,head,finalized,canonicalBlock};
 }
-export async function verifyDestination(policy:Policy,providerStatus:any,attempt:any):Promise<SettlementEvidence>{
+export function providerAssociationMatches(policy:Policy,providerStatus:any,originalQuote:any,sourceTx:string,depositAddress:string):boolean {
+ const details=providerStatus?.swapDetails,origins=details?.originChainTxHashes;
+ return providerStatus?.status==='SUCCESS'&&!!sourceTx&&sameSignedQuote(originalQuote,providerStatus.quoteResponse)&&
+  providerStatus.quoteResponse?.quote?.depositAddress===depositAddress&&
+  Array.isArray(origins)&&origins.length===1&&origins[0].hash?.toLowerCase()===sourceTx.toLowerCase()&&
+  details.depositedAmount===originalQuote?.quote?.amountIn&&/^\d+$/.test(details.amountOut)&&BigInt(details.amountOut)>=BigInt(policy.destinationAmount);
+}
+/** An extra provider reference may be a canonical origin-chain USDC refund. */
+export function inspectRefund(policy:Policy,txHash:string,amount:string,facts:ChainFacts):boolean {
+ if(!/^[1-9]\d*$/.test(amount||''))return false;
+ const proof=inspectTransfer({...policy,destinationChain:42161,destinationToken:ARB_TOKEN,recipient:policy.refundAddress,destinationAmount:amount},txHash,facts);
+ // Refund observation excludes a non-Base reference; merchant settlement still requires finality.
+ return proof.actualAmount===amount&&proof.reasons.every(reason=>reason==='Destination block is not finalized');
+}
+export async function verifyDestination(policy:Policy,providerStatus:any,attempt:any,read:typeof chainFacts=chainFacts):Promise<SettlementEvidence>{
  requireThat(providerStatus.status==='SUCCESS','PROVIDER_PENDING','Provider has not reported successful settlement.');
- requireThat(providerStatus.quoteResponse?.quote?.depositAddress===attempt.deposit_address,'ASSOCIATION','Status is not associated with the stored payment deposit.');
- requireThat(fingerprint(providerStatus.quoteResponse)===fingerprint(attempt.quote.response),'ASSOCIATION','Status quote differs from the original saved quote.');
+ requireThat(providerAssociationMatches(policy,providerStatus,attempt.quote.response,attempt.source_tx,attempt.deposit_address),'ASSOCIATION','Provider status does not match the signed quote, exact source deposit and saved payment.');
+ checkQuote(providerStatus.quoteResponse,policy,false,Date.parse(attempt.quote.response.timestamp),false);
  const references=providerStatus.swapDetails?.destinationChainTxHashes;
- requireThat(Array.isArray(references)&&references.length===1&&/^0x[0-9a-fA-F]{64}$/.test(references[0].hash),'MISSING_CHAIN_EVIDENCE','Destination transaction is missing or ambiguous. Settlement remains UNVERIFIED.');
- requireThat(BigInt(providerStatus.swapDetails.amountOut)>=BigInt(policy.destinationAmount),'INSUFFICIENT_OUTPUT','Provider output is below the approved price.');
- const evidence=inspectTransfer(policy,references[0].hash,await chainFacts(references[0].hash));
+ requireThat(Array.isArray(references)&&references.length>=1&&references.length<=2&&references.every((r:any)=>/^0x[0-9a-fA-F]{64}$/.test(r.hash))&&new Set(references.map((r:any)=>r.hash.toLowerCase())).size===references.length,'MISSING_CHAIN_EVIDENCE','Destination transaction is missing or ambiguous. Settlement remains UNVERIFIED.');
+ const observations=await Promise.all(references.map(async(r:any)=>({hash:r.hash,facts:await read(r.hash)})));
+ const merchantTopic='0x'+policy.recipient.slice(2).toLowerCase().padStart(64,'0');
+ const candidates=observations.filter(r=>(r.facts.receipt?.logs||[]).some((log:any)=>log.address?.toLowerCase()===policy.destinationToken.toLowerCase()&&log.topics?.[0]===TRANSFER_TOPIC&&log.topics?.[2]?.toLowerCase()===merchantTopic));
+ // Preserve pending receipt handling for the usual single-reference response.
+ requireThat(candidates.length===1||(observations.length===1&&candidates.length===0),'MISSING_CHAIN_EVIDENCE','No single unambiguous Base merchant payment was identified. Settlement remains UNVERIFIED.');
+ const chosen=candidates[0]||observations[0],evidence=inspectTransfer(policy,chosen.hash,chosen.facts);
+ const extras=observations.filter(r=>r!==chosen);
+ if(extras.length){
+  const extra=extras[0],amount=providerStatus.swapDetails.refundedAmount,facts=await read(extra.hash,true);
+  requireThat(inspectRefund(policy,extra.hash,amount,facts),'REFUND_ASSOCIATION','The additional provider reference is not a verified origin-chain refund. Settlement remains UNVERIFIED.');
+  evidence.relatedRefunds=[{chainId:42161,txHash:extra.hash,amount,proof:facts}];
+ }
  evidence.providerAssociation=providerStatus.correlationId;return evidence;
 }
 export async function verifySource(txHash:string,attempt:any,policy:Policy){
