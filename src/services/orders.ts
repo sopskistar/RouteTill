@@ -1,7 +1,8 @@
 import {randomUUID} from 'node:crypto';
 import {Database,Sql} from '../db';
 import {Actor,Order,Policy,requireThat} from '../core/types';
-import {fingerprint} from '../core/crypto';
+import {fingerprint,sha256} from '../core/crypto';
+import {enforceLiveTrial} from '../core/live-trial';
 import {ARB_USDC,BASE_USDC,BASE_TOKEN,enforcePolicy,transition} from '../core/policy';
 import {assertAtomic} from '../core/amounts';
 import {productById} from './catalog';
@@ -32,13 +33,19 @@ export async function approve(database:Database,actor:Actor,id:string,approvedFi
 export async function consumeApproval(database:Database,actor:Actor,id:string,requested:Policy,idempotencyKey:string){
  return database.transaction(async sql=>{
   const o=await getOrder(sql,id,actor,true);requireThat(o.buyer_id===actor.buyerId,'BUYER_REQUIRED','Only the approved buyer can execute this purchase.',403);
+  requireThat(o.policy.mode===actor.mode,'ENVIRONMENT_MISMATCH','Purchase and session environments must match.',403);
   enforcePolicy(o.policy,requested,o.fingerprint);
   const a=(await sql.query('SELECT * FROM approvals WHERE order_id=$1 FOR UPDATE',[id])).rows[0];
   requireThat(a,'HUMAN_REQUIRED','Explicit human approval is required.',403);
   requireThat(!a.consumed_at,'APPROVAL_REUSED','This single-use approval has already been consumed. No second purchase was authorized.',409);
   requireThat(new Date(a.expires_at).getTime()>Date.now(),'APPROVAL_EXPIRED','Approval expired. Prepare a new purchase.');
   const p=await productById(sql,o.product_id);
+  if(o.policy.mode==='live')enforceLiveTrial(o,actor,a);
   requireThat(p.wallet===o.policy.recipient&&p.amount===o.policy.destinationAmount&&p.artifact_hash===o.policy.artifactSha256,'TERMS_CHANGED','Merchant terms changed since approval. Prepare a new purchase.');
+  if(o.policy.mode==='live'){
+   requireThat(p.wallet_verified&&p.merchant_id===o.merchant_id,'WALLET_UNVERIFIED','The trial merchant settlement wallet must remain verified.',403);
+   requireThat(sha256(p.artifact)===o.policy.artifactSha256,'ARTIFACT_MISMATCH','Product bytes do not match the approved trial artifact.');
+  }
   transition(o.state,'QUOTING');const attemptId=randomUUID();
   await sql.query('UPDATE approvals SET consumed_at=now() WHERE order_id=$1 AND consumed_at IS NULL',[id]);
   await sql.query("INSERT INTO attempts(id,order_id,idempotency_key,state) VALUES($1,$2,$3,'QUOTING')",[attemptId,id,idempotencyKey]);
@@ -50,6 +57,8 @@ export async function execute(database:Database,actor:Actor,id:string,requested:
  requireThat(process.env.ENABLE_LIVE_PAYMENTS==='true','LIVE_DISABLED','Live deposit creation is disabled until the owner enables it.',403);
  const {order,attemptId}=await consumeApproval(database,actor,id,requested,idempotencyKey);
  try{
+  // A slow commit must not start provider quoting after the approved policy expires.
+  enforcePolicy(order.policy,order.policy,order.fingerprint);
   const q=await quote(order.policy,false);
   await database.transaction(async sql=>{await sql.query("UPDATE attempts SET quote=$1,deposit_address=$2,state='AWAITING_DEPOSIT',next_poll_at=now() WHERE id=$3",[JSON.stringify(q),q.response.quote.depositAddress,attemptId]);await sql.query("UPDATE orders SET state='AWAITING_DEPOSIT',updated_at=now() WHERE id=$1",[id]);await audit(sql,id,'payment.instructions-created',{attemptId});});
   return {attemptId,...q};

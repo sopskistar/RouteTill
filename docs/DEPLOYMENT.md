@@ -15,7 +15,8 @@ Status (2026-11-12, recovery session): both Vercel projects are deployed. Health
 | `NEAR_INTENTS_JWT` | Required for authenticated quotes/status | Required for genuine dry-quote demonstration | Server secret |
 | `APP_ORIGIN` | Actual production HTTPS origin | Actual demo HTTPS origin | Nonsecret server configuration |
 | `ENABLE_JUDGE_DEMO` | `false` | `true` | Server configuration |
-| `ENABLE_LIVE_PAYMENTS` | `false` until owner enables the funded trial | Always `false` | Server configuration |
+| `ENABLE_LIVE_PAYMENTS` | `false` until owner enables the restricted funded trial | Always `false` | Server configuration |
+| `LIVE_PAYMENT_TRIAL` | Absent while disabled; one exact order/policy binding when separately approved | Absent | Server-only configuration; no signing or spending authority |
 | `JUDGE_ACCESS_CODE` | Absent | Required, at least 32 characters | Server secret; share privately with judges |
 | `CRON_SECRET` | Required, at least 32 characters | Required, distinct from production | Server secret |
 | `BASE_RPC_URL` | Optional; public Base mainnet default | Optional | Server-only; URL can contain a secret |
@@ -77,7 +78,7 @@ An active buyer also triggers bounded 15-second checks (60 foreground ticks). An
 
 ## Funded trial gate
 
-Buyer Rabby Account 1 on Arbitrum; a separate owner-controlled Account 2 receives Base USDC; refund equals buyer. Validate the public addresses and selected providers again in the deployed app. Verify merchant ownership with a nonce-bound message, create the actual product and human-approved policy, then enable live quote execution deliberately. Preparing instructions sends no funds.
+Deploy and independently verify the reviewed [single-purchase mainnet trial guard](MAINNET_TRIAL.md) with payments disabled first. Buyer Rabby Account 1 on Arbitrum; a separate owner-controlled Account 2 receives Base USDC; refund equals buyer. Validate the public addresses and selected providers again in the deployed app. Verify merchant ownership with a nonce-bound message, create the actual product and a fresh human-approved policy, then configure that exact order and fingerprint after separate owner approval. The feature flag alone cannot authorize execution. Preparing instructions consumes the approval but sends no funds. Do not reuse or extend an expired policy.
 
 The final packet must show signed executable quote, exact deposit/token/calldata, source amount, merchant amount and wallet, refund, expiry, independent source balances/gas, route costs, and nonrecoverable risks. **Stop for explicit human payment authorization.** The owner confirms in Rabby. Only then register the confirmed source transaction, monitor provider status, independently observe finalized Base receipt/log evidence, count one entitlement, export the Passport and run the independent verifier with a trusted RPC. Mainnet settlement remains UNVERIFIED until this succeeds.
 
