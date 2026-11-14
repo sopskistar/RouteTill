@@ -17,6 +17,7 @@ import {assertDeploymentMode,defaultMode,deploymentMode,publicRuntime} from '@/c
 import {paymentPreflight} from '@/services/payment-preflight';
 import {guestSession,guestScope,guestBudget} from '@/services/guest';
 import {enforceLiveTrial} from '@/core/live-trial';
+import {verifiedPurchase} from '@/core/verified-purchase';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const evm=z.string().refine(x=>isAddress(x),'Enter a valid EVM address');
 const idSchema=z.string().min(1).max(100);
@@ -27,7 +28,7 @@ async function handle(request:NextRequest,{params}: {params:Promise<{path:string
  const requestStartedAt=Date.now();
  try{
   const path=(await params).path;const [resource,id,action]=path;const method=request.method;
-  if(resource==='health')return response({service:'RouteTill',deployment:deploymentMode(),mainnetSettlement:'UNVERIFIED',livePayments:deploymentMode()!=='demo'&&process.env.ENABLE_LIVE_PAYMENTS==='true',...publicRuntime()});
+  if(resource==='health')return response({service:'RouteTill',deployment:deploymentMode(),mainnetSettlement:deploymentMode()==='live'?'VERIFIED_RECORDED_PURCHASE':'DEMO_ONLY',mainnetEvidence:{status:'VERIFIED',scope:'recorded production purchase',orderId:verifiedPurchase.orderId,passportUrl:verifiedPurchase.passportUrl},livePayments:deploymentMode()!=='demo'&&process.env.ENABLE_LIVE_PAYMENTS==='true',...publicRuntime()});
   if(resource==='keys'&&method==='GET'){const mode=request.nextUrl.searchParams.get('mode')||defaultMode();requireThat(mode==='live'||mode==='demo','MODE','Unknown evidence environment.');assertDeploymentMode(mode);return new NextResponse(publicKeyPem(mode),{headers:{'Content-Type':'application/x-pem-file','Cache-Control':'public, max-age=300'}});}
   if(resource==='cron'){
    requireThat(process.env.CRON_SECRET&&safeEqual(request.headers.get('authorization')||'','Bearer '+process.env.CRON_SECRET),'CRON_AUTH','Invalid reconciliation credential.',401);

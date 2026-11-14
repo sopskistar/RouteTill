@@ -1,0 +1,291 @@
+{
+  "recordedAt": "2026-11-13T04:06:11.851239+00:00",
+  "failure": {
+    "runId": 43350271571,
+    "step": "Wake the authenticated database-backed worker",
+    "error": "Configure APP_ORIGIN and CRON_SECRET in this GitHub environment.",
+    "exitCode": 1,
+    "before": {
+      "production": {
+        "APP_ORIGIN": false,
+        "CRON_SECRET": false
+      },
+      "demo": {
+        "APP_ORIGIN": false,
+        "CRON_SECRET": false
+      }
+    }
+  },
+  "correction": {
+    "repairedAt": "2026-11-13T03:59:21.238Z",
+    "changes": [
+      {
+        "environment": "production",
+        "originConfigured": true,
+        "cronSecretConfigured": true,
+        "existingVercelCredentialReused": true
+      },
+      {
+        "environment": "demo",
+        "originConfigured": true,
+        "cronSecretConfigured": true,
+        "existingVercelCredentialReused": true
+      }
+    ],
+    "workflowChanged": false,
+    "scheduleChanged": false,
+    "secretsRegenerated": false
+  },
+  "endpointChecks": {
+    "checkedAt": "2026-11-13T03:58:03.109Z",
+    "rows": [
+      {
+        "environment": "production",
+        "status": 200,
+        "existingLocalCronSecretAccepted": true,
+        "livePayments": false,
+        "checked": 0,
+        "failedChecks": 0
+      },
+      {
+        "environment": "demo",
+        "status": 200,
+        "existingLocalCronSecretAccepted": true,
+        "livePayments": false,
+        "checked": 0,
+        "syntheticOnly": true,
+        "outboxJobs": 0
+      }
+    ]
+  },
+  "successfulManualRun": {
+    "conclusion": "success",
+    "createdAt": "2026-11-13T04:00:35Z",
+    "headSha": "ebeb14b941e06840416fa23b7eeb8b6a331ad1ed",
+    "jobs": [
+      {
+        "completedAt": "2026-11-13T04:00:43Z",
+        "conclusion": "success",
+        "databaseId": 131679586588,
+        "name": "reconcile (demo)",
+        "startedAt": "2026-11-13T04:00:40Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Wake the authenticated database-backed worker",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 3,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/sopskistar/RouteTill/actions/runs/43362659074/job/131679586588"
+      },
+      {
+        "completedAt": "2026-11-13T04:00:42Z",
+        "conclusion": "success",
+        "databaseId": 131679586796,
+        "name": "reconcile (production)",
+        "startedAt": "2026-11-13T04:00:40Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Wake the authenticated database-backed worker",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 3,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/sopskistar/RouteTill/actions/runs/43362659074/job/131679586796"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-11-13T04:00:44Z",
+    "url": "https://github.com/sopskistar/RouteTill/actions/runs/43362659074"
+  },
+  "productionReadiness": {
+    "checkedAt": "2026-11-13T04:00:05.603Z",
+    "readOnly": true,
+    "recipient": "0x66A7694A7e88edd9C22847e422c00c1d4053d288",
+    "buyer": "0x8e45AE32aBA44B0fa90EBa821818ceEdE726026f",
+    "changesMade": false,
+    "database": {
+      "merchant_accounts": 0,
+      "verified_wallets": 0,
+      "matching_recipient_accounts": 0,
+      "verified_recipient_accounts": 0,
+      "matching_recipient_products": 0,
+      "completed_recipient_challenges": 0,
+      "live_purchase_orders": 0
+    },
+    "health": {
+      "status": 200,
+      "livePayments": false,
+      "mode": "live"
+    },
+    "catalog": {
+      "status": 200,
+      "products": 0,
+      "matchingProducts": 0
+    },
+    "unauthenticatedMerchant": {
+      "status": 401
+    }
+  },
+  "livePaymentsEnabled": false,
+  "mainnetSettlement": "UNVERIFIED",
+  "readOnlyPaymentPreflight": {
+    "checkedAt": "2026-11-13T04:04:52.423Z",
+    "readOnly": true,
+    "fundsMoved": false,
+    "depositCreated": false,
+    "registeredPurchase": false,
+    "buyer": {
+      "address": "0x8e45AE32aBA44B0fa90EBa821818ceEdE726026f",
+      "checksumValid": true,
+      "chainId": 42161,
+      "ownership": "UNVERIFIED; no signature requested"
+    },
+    "merchant": {
+      "address": "0x66A7694A7e88edd9C22847e422c00c1d4053d288",
+      "checksumValid": true,
+      "chainId": 8453,
+      "ownership": "UNVERIFIED; verify in merchant settings"
+    },
+    "refund": {
+      "address": "0x8e45AE32aBA44B0fa90EBa821818ceEdE726026f",
+      "equalsBuyer": true,
+      "chainId": 42161,
+      "type": "ORIGIN_CHAIN"
+    },
+    "source": {
+      "asset": "nep141:arb-0xaf88d065e77c8cc2239327c5edb3a432268e5831.omft.near",
+      "token": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+      "amountUsdc": "10.105478",
+      "minimumUsdc": "10.004423",
+      "balanceUsdc": "10.912413",
+      "ethBalance": "0.00008642303891",
+      "sufficientUsdc": true,
+      "proposalCapUsdc": "11"
+    },
+    "destination": {
+      "asset": "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
+      "token": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "expectedReceiptUsdc": "10"
+    },
+    "quote": {
+      "signatureVerified": true,
+      "catalogCount": 230,
+      "quotedAt": "2026-11-13T04:04:50.244Z",
+      "priceFreshnessUntil": "2026-11-13T04:06:20.244Z",
+      "requestedDeadline": "2026-11-13T04:24:50.539Z",
+      "executableExpiry": null,
+      "depositAddress": null,
+      "timeEstimateSeconds": 27,
+      "freshAtObservation": true
+    },
+    "fees": {
+      "quotedInputMinusOutputUsdc": "0.105478",
+      "interpretation": "Aggregate quoted USDC input/output difference, including route costs/spread; not an independently itemized protocol fee.",
+      "providerRefundFeeUsdc": "0.0053",
+      "providerWithdrawalFeeUsdc": "0.0024",
+      "appFees": [
+        {
+          "recipient": "5880ad2b362620fadf759cbceb1cd5737ce8c6ed7fb8e9942881e6731f9247dd",
+          "fee": 1
+        }
+      ],
+      "feeFieldLimit": "Provider-reported fee/time fields may be unsigned. Do not add the quoted withdrawal fee a second time. Refund fees apply only if the provider refunds."
+    },
+    "gas": {
+      "indicativeOnly": true,
+      "simulation": "Native USDC transfer on Arbitrum to the supplied merchant address FOR GAS ESTIMATION ONLY; a dry quote has no actual deposit address.",
+      "units": "63334",
+      "gasPriceWei": "20000000",
+      "estimatedEth": "0.00000126668",
+      "bufferedReserveEth": "0.000001900025",
+      "sufficientEth": true
+    },
+    "networkChecks": {
+      "sourceChainCorrect": true,
+      "destinationChainCorrect": true,
+      "sourceDecimalsCorrect": true,
+      "destinationDecimalsCorrect": true
+    },
+    "rpcEvidence": {
+      "sourceChain": {
+        "verified": true,
+        "value": "0xa4b1"
+      },
+      "destinationChain": {
+        "verified": true,
+        "value": "0x2105"
+      },
+      "sourceDecimals": {
+        "verified": true,
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000006"
+      },
+      "destinationDecimals": {
+        "verified": true,
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000006"
+      },
+      "sourceUsdcBalance": {
+        "verified": true,
+        "value": "0x0000000000000000000000000000000000000000000000000000000000a6829d"
+      },
+      "sourceEthBalance": {
+        "verified": true,
+        "value": "0x4e99ee88de30"
+      },
+      "sourceGasPrice": {
+        "verified": true,
+        "value": "0x1312d00"
+      },
+      "indicativeTransferGas": {
+        "verified": true,
+        "value": "0xf766"
+      },
+      "sourceAccountCode": {
+        "verified": true,
+        "value": "0x"
+      },
+      "merchantAccountCode": {
+        "verified": true,
+        "value": "0x"
+      }
+    },
+    "transactionReady": false,
+    "mainnetSettlement": "UNVERIFIED",
+    "remaining": [
+      "Owner must register the production merchant account; do not share credentials.",
+      "Owner must separately authorize and complete recipient ownership verification in the intended wallet.",
+      "Create the intended product and validate production checkout and human approval.",
+      "Keep live payments disabled pending explicit owner enablement approval; a dry quote has no executable deposit instructions.",
+      "After those gates, refresh the executable quote and exact-deposit gas packet before separate explicit payment authorization."
+    ],
+    "productionMerchantConfigured": false
+  }
+}

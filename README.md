@@ -4,25 +4,53 @@
 
 An AI agent buying a paid developer resource needs to receive the exact approved file from the intended merchant. RouteTill connects a human-approved purchase to NEAR Intents cross-chain settlement, one durable entitlement, and independently checkable payment and file evidence.
 
+![RouteTill buyer experience with the verified mainnet Purchase Passport](docs/screenshots/home-hero-desktop.png)
+
 **NEAR Intents** supplies authenticated exact-output quotes, quote-specific deposits and cross-chain execution; this is essential to paying from Arbitrum while the merchant receives Base USDC. **ProofFlow** joins that execution to approval and digital delivery: a shareable Purchase Passport, an independent verifier, and a Break-It Lab that lets judges attack the real backend.
 
-**Live:** [Production](https://routetill.vercel.app) · [No-funds judge demo](https://routetill-demo.vercel.app/lab) · [Source](https://github.com/sopskistar/RouteTill) · [Verified Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live).
+**Live:** [Production](https://routetill.vercel.app) · [No-funds buyer demo](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Source](https://github.com/sopskistar/RouteTill) · [Verified Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live).
 
 **Mainnet proof — VERIFIED, November 13, 2026:** RouteTill completed a funded native Arbitrum USDC → native Base USDC purchase. NEAR Intents returned SUCCESS; an independent Base receipt confirmed exactly 10 USDC to the verified merchant; ordinary reconciliation created **one entitlement and one signed Purchase Passport**. [Public verification manifest](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/verification-manifest.json) · [Standalone verifier result](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/cli-verification.json). This is real chain evidence, separate from the Lab's no-funds challenges.
 
-**Deployment and scope:** The verified reconciliation fix was deployed to both isolated Vercel projects; the release reported healthy APIs and working production/demo Passport public keys. Live payment preparation is **disabled by default** on both; the single-purchase mainnet trial has ended. The demo uses separate Neon resources and signing identity. No general-purpose production payment service or escrow service is claimed. The old ~80-second video at `video/output/routetill-demo.mp4` covers an earlier **synthetic** flow and needs replacement before public submission.
+**Deployment and scope:** The verified reconciliation fix was deployed to both isolated Vercel projects; the release reported healthy APIs and working production/demo Passport public keys. Live payment preparation is **disabled by default** on both; the single-purchase mainnet trial has ended. The demo uses separate Neon resources and signing identity. No general-purpose production payment service or escrow service is claimed. A new narrated review video follows the same Meet John story and real payment evidence; publication awaits the owner’s review. The old silent video is preserved as a historical fallback, not current mainnet footage.
 
-## Judges: start here
+## Try RouteTill in 30 seconds
 
 The public judge challenge requires **no wallet, funds or owner access code**. Merchant/agent administration is a separate protected area, not required for these checks.
 
-1. **DO** Open the [Break-It Lab](https://routetill-demo.vercel.app/lab). **SEE** the prepared approved product and its protected terms.
-2. **DO** Run the five security checks. **SEE** merchant substitution, excessive price and approval reuse rejected by the backend.
-3. **DO** Inspect replay protection. **SEE** 20 notifications (15 concurrent) produce **one persisted demo entitlement** on the isolated Neon database.
-4. **DO** Inspect Passport tampering. **SEE** the original signed record verify while a modified recipient or file fails.
-5. **DO** Inspect the [real verified purchase](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) and its [reproducible public proof](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt). **SEE** independent chain observations and the verified delivered-file hash.
+1. **DO** Open the [public buyer checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo), review the prepared product and select **Review purchase proposal**. **SEE** the merchant’s 10 USDC price, 11 USDC source cap, test refund wallet and exact file digest.
+2. **DO** Review and authorize this no-funds purchase, then select **Simulate payment & deliver**. **SEE** one entitlement and a working, hash-checked digital download. No registration, wallet or owner code is required.
+3. **DO** Open [Break-It Lab](https://routetill-demo.vercel.app/lab) and select **Run 5 security checks**. **SEE** merchant substitution, excessive price and approval reuse rejected; 20 notifications (15 concurrent) produce one persisted Neon entitlement; altered Passport/file evidence fails.
+4. **DO** Inspect the [real verified Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) and its [public proof](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt). **SEE** the genuine source transfer, merchant receipt, matching artifact and 12 independent checks.
 
 **Evidence distinction:** Break-It Lab runs real policy/database checks against **simulated payment evidence** and sends no money. Its payment simulation is not mainnet settlement proof; the separate completed purchase below is real mainnet evidence.
+
+<details>
+<summary>Meet John — the experience behind our first paying purchase</summary>
+
+### Agent finds it — John needs a dataset.
+
+His AI agent finds a useful developer dataset for $10. John wants the file, but he doesn't want to hand over control of his wallet.
+
+### No blank check — His money. His decision.
+
+An agent shouldn't have unrestricted spending power. John wants to buy this one file, not give an agent permission to spend whenever it wants.
+
+### John says yes — One file. One approval.
+
+John sees the seller, the $10 price and the file he's getting. He sets a maximum source spend of 11 USDC and approves this one purchase.
+
+### Payment verified — Paid on Arbitrum. Received on Base.
+
+John sends about $10.11 from his Arbitrum wallet. NEAR Intents handles the cross-chain payment, and RouteTill verifies that the merchant received exactly $10 on Base.
+
+### File + proof — Delivered. With proof.
+
+RouteTill verifies the merchant payment, delivers the correct dataset exactly once, and issues a signed Purchase Passport anyone can check.
+
+Agent discovery is visualized. The financial and delivery claims above refer to the genuine completed purchase. Arbitrum ETH gas is additional to the 11 USDC source ceiling.
+
+</details>
 
 ## One real completed purchase
 
@@ -141,7 +169,7 @@ Tokens cannot approve purchases. A fulfilled run downloads the actual resource, 
 
 Next.js 16 / React / TypeScript / Tailwind, parameterized typed PostgreSQL queries, official 1Click signature SDK, viem EVM wallet/chain helpers, Vitest and Playwright. Unique constraints and row locks bind approvals, attempts, transfers and entitlements. A transactional outbox and authenticated scheduled reconciliation survive retries. All financial arithmetic uses integer atomic units.
 
-Production: two Vercel projects connect to separate Neon resources. Production uses `DATABASE_URL`; the demo uses `DEMO_DATABASE_URL`; each signs Passports with its own key. Both hosted projects have their database variables configured, and their URLs are present in ignored local release files. The local verifier rejects accidental URL reuse and refuses a PGlite fallback. Both databases accepted migrations over real Neon TCP connections. Intermittent external connections previously blocked the full dedicated remote-Neon locking/contention suite; do not infer that suite passed from local PGlite. Separately, the hosted Neon Break-It Lab replay did persist one entitlement across 20 notifications, and the real funded production order reconciled to one entitlement and one Passport. `npm run release:init` prepares private configuration without printing secrets. Vercel Hobby recovery and the best-effort scheduled wake-up are documented in the deployment guide. [Environment and deployment guide](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), [.env.example](.env.example).
+Production and demo use two existing Vercel projects, separate Neon resources and distinct unchanged Passport signing identities. The [real Neon transaction report](docs/evidence/neon-verification.json) records 12 concurrent approval attempts accepting one, rollback, isolation and reconnect persistence using generated test schemas; public migrations were not repeated. Hosted replay also verified 20 notifications to one durable entitlement. WSL networking can be intermittent, so unavailable RPC/database evidence is reported honestly. Both GitHub reconciliation jobs were repaired; [dated workflow evidence](docs/RECONCILIATION.md). [Deployment guide](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), [.env.example](.env.example).
 
 Live deposits are disabled by default after the owner-controlled, completed single-purchase trial. The funded source transaction, merchant settlement, buyer refund and Passport linked above are real evidence from the approved purchase. Do not initiate another transfer without explicit wallet approval.
 

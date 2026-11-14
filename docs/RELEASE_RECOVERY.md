@@ -1,6 +1,8 @@
-# Release recovery — 12 November 2026
+# Historical release recovery — 12 November 2026
 
-Release status: **NO-GO for final submission or funded settlement**. Safe diagnostic deployment is ready for owner review, with payments disabled. This session reconstructed the handoff from repository files; it did not access the previous conversation.
+> Historical snapshot. The key APIs, Neon verification, reconciliation and genuine mainnet payment were subsequently completed. Current judge instructions are in [JUDGE_WALKTHROUGH.md](JUDGE_WALKTHROUGH.md); genuine funded evidence is in [NEAR_PROOF.md](NEAR_PROOF.md). The NO-GO statements below describe the original recovery date.
+
+Historical release status: **NO-GO for final submission or funded settlement**. The owner-approved push and deployments completed at `ebeb14b`; the subsequent approved restoration of the existing signing keys resolved both key APIs and the full hosted judge flow passed. Payments remain disabled. The sections below preserve the initial recovery observations; [post-deployment verification](HOSTED_VERIFICATION.md) supersedes their readiness status. This session reconstructed the handoff from repository files; it did not access the previous conversation.
 
 ## Preserved work
 

@@ -1,0 +1,88 @@
+{
+  "testedAt": "2026-11-13T04:49:01.904Z",
+  "backend": "Real Neon PostgreSQL",
+  "transport": "node-postgres TCP with interactive transactions",
+  "publicMigrationsApplied": false,
+  "productionOrdersTouched": false,
+  "mainnetSettlement": "UNVERIFIED",
+  "stores": [
+    {
+      "name": "production",
+      "identityHash": "a724dee03cf2ddd385c45ed32927677eb093e48ccbde64ef5bde8f7fb4bf1d39",
+      "version": "PostgreSQL 18.7 (a21afb5) on aarch64-unknown-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit",
+      "migrations": "PASS",
+      "concurrentApprovalRequests": 12,
+      "acceptedApprovals": 1,
+      "rollback": "PASS",
+      "merchantIsolation": "PASS",
+      "persistentEntitlementCount": 1,
+      "attacks": [
+        {
+          "attack": "merchant",
+          "passed": true
+        },
+        {
+          "attack": "price",
+          "passed": true
+        },
+        {
+          "attack": "reuse",
+          "passed": true
+        },
+        {
+          "attack": "replay",
+          "passed": true,
+          "storedEntitlements": 1,
+          "deliveries": 20,
+          "concurrentDeliveries": 15
+        },
+        {
+          "attack": "tamper",
+          "passed": true,
+          "storedEntitlements": 1,
+          "deliveries": 20,
+          "concurrentDeliveries": 15
+        }
+      ]
+    },
+    {
+      "name": "demo",
+      "identityHash": "a90e5180c0c0136c954cd3c04725c12ff2400faa60efd2b093b9433f02dcfce5",
+      "version": "PostgreSQL 18.7 (a21afb5) on aarch64-unknown-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit",
+      "migrations": "PASS",
+      "concurrentApprovalRequests": 12,
+      "acceptedApprovals": 1,
+      "rollback": "PASS",
+      "merchantIsolation": "PASS",
+      "persistentEntitlementCount": 1,
+      "attacks": [
+        {
+          "attack": "merchant",
+          "passed": true
+        },
+        {
+          "attack": "price",
+          "passed": true
+        },
+        {
+          "attack": "reuse",
+          "passed": true
+        },
+        {
+          "attack": "replay",
+          "passed": true,
+          "storedEntitlements": 1,
+          "deliveries": 20,
+          "concurrentDeliveries": 15
+        },
+        {
+          "attack": "tamper",
+          "passed": true,
+          "storedEntitlements": 1,
+          "deliveries": 20,
+          "concurrentDeliveries": 15
+        }
+      ]
+    }
+  ]
+}

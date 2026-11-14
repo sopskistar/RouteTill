@@ -1,6 +1,6 @@
 # One-purchase mainnet trial
 
-Implementation status: local security correction, not deployed or enabled. Mainnet settlement remains **UNVERIFIED**. The production and judge-demo feature flags remain false. No release environment file, signing identity, database schema or existing purchase is changed by this correction.
+Implementation status: deployed and used for the genuine, independently verified FULFILLED purchase on November 13, 2026. The one-purchase trial has ended; its configuration is absent and payment preparation is disabled. The guard remains in the authoritative execution path. The production and judge-demo feature flags remain false. No release environment file, signing identity, database schema or existing purchase is changed by this correction.
 
 ## Runtime restriction
 

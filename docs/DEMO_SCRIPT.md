@@ -1,37 +1,33 @@
-# 80-second demo
+# Meet John — narrated review video
 
-Format: caption-led product walkthrough with restrained title motion, genuine app recordings and actual independent CLI results. 1920×1080 at 30 fps. Silent by design; no unlicensed music or invented narration. Editable source: `video/src/index.tsx`; capture source: `scripts/capture-demo.mjs`. Final output: `video/output/routetill-demo.mp4`.
+Target: **91 seconds**, 1920×1080, 30 fps, spoken narration and sentence-aligned captions. Editable composition: `video/src/index.tsx`. Approved homepage story: `src/core/john-story.ts`. The first five entries in `video/narration-script.json` must match it exactly; a regression test enforces that.
 
-| Time | Actual visual | Caption / optional narration |
-|---|---|---|
-| 0–6 | Original RouteTill title | “A payment isn’t a purchase proof. Did the intended merchant receive it? Were the approved digital bytes delivered?” |
-| 6–20 | Real checkout, proposal and explicit human authorization | “One precise purchase. One human approval. Merchant, product, route, limit, expiry and digest are pinned.” |
-| 20–34 | Authenticated live 1Click dry quote and verified signature | “A genuine NEAR Intents quote. No funds moved. The backend checks the signature and source cap.” |
-| 34–54 | Separate isolated synthetic Break-It Lab order, all five attacks | “Now try to break it. Substitution, overpricing and reuse are blocked. Twenty notifications produce one durable entitlement.” |
-| 54–68 | Actual synthetic Passport, browser integrity pass/fail and export | “The Passport carries its evidence and its limits. A modified recipient invalidates the signature.” |
-| 68–74 | Visual presentation of actual CLI JSON results | “Verify outside the frontend: original PASS, tampered FAIL. Synthetic fixture; mainnet settlement UNVERIFIED.” |
-| 74–80 | Brand close and concrete NEAR role | “NEAR Intents routes the cross-chain payment. RouteTill binds it to the approved purchase and digital delivery.” |
+| Time | Shared scene / headline | Actual visual and evidence boundary |
+| --- | --- | --- |
+| 0–10.5 | **Agent finds it — John needs a dataset.** | Original cartoon John in a developer workspace; agent discovery explicitly illustrated. |
+| 10.5–21 | **No blank check — His money. His decision.** | Original character animation explains the boundary between one purchase and unrestricted spending. |
+| 21–34 | **John says yes — One file. One approval.** | Actual application approval interface, recorded with no-funds demo data and labeled reenactment. Seller, price and 11 USDC cap visible; ETH gas additional. |
+| 34–56 | **Payment verified — Paid on Arbitrum. Received on Base.** | Actual recorded Arbitrum/Base receipt JSON, NEAR Intents SUCCESS, exact source/output/refund facts. Explorer automation was blocked; no counterfeit explorer screen is used. Real explorer links remain available in the app and submission guide. |
+| 56–71 | **File + proof — Delivered. With proof.** | Actual production Purchase Passport, entitlement/digest evidence, correct file verification and 12 independent checks. The private buyer order is not accessed by bypassing authentication. |
+| 71–85 | **Break-It Lab — Five security checks. No real funds.** | Genuine hosted Lab backend outcomes, 20 notifications → one entitlement; no-funds label visible. |
+| 85–91 | **RouteTill — One purchase. The proof to keep.** | John, the resource and Passport; production, public demo, source and concrete NEAR Intents role. |
 
-The quote preview and settlement challenge are separate orders and clearly labeled throughout. Playback is paced for readability. No funded transaction, live settlement or autonomous spending is fabricated.
+## Approved five-scene narration
 
-The capture also saves the original/tampered exports, downloaded product, development public key and real CLI outputs under `artifacts/demo-video/`. These artifacts are local; never treat the bundled development key as an independent production trust anchor.
+The narration uses the exact scene bodies in `src/core/john-story.ts`, not an alternate John storyline. The on-screen headlines and five navigation labels also match. Detailed token amounts and hashes appear in the payment-evidence scene rather than being read repeatedly.
 
-## Live demonstration fallback
+The final two narration segments:
 
-If quote service access fails, show the timestamped original live evidence file and explain it is a recorded dry quote. Do not mark a failed request successful. The no-funds backend challenges remain runnable without the API credential. If any challenge fails, report the actual error and stop that demonstration.
+“Judges can also try five security checks. RouteTill rejects changed recipients, over-limit payments and reused approvals. Twenty notifications produce one entitlement. Tampered evidence fails verification.”
 
-## X draft for owner review
+“John got the right file. The seller got paid. And RouteTill has the proof.”
 
-An agent can pay for something without proving it bought the approved product from the intended merchant.
+## Review files and publication
 
-Built RouteTill at NEAR HACKATHON: a human-approved purchase, NEAR Intents cross-chain payment path, exactly-once digital entitlement and a checkable Purchase Passport.
+- MP4: `video/output/routetill-meet-john-narrated-review.mp4`
+- Captions: `video/captions-narrated.srt`
+- Timing/scene metadata: `video/timeline.json`
+- Original silent fallback: `video/output/routetill-demo.mp4` — preserved; earlier simulated evidence, not the final funded demonstration.
+- [Asset and voice provenance](ASSET_LICENSES.md).
 
-Try Break-It Lab: change the recipient, raise the price, replay 20 notifications, or tamper with the receipt.
-
-Demo includes a live signed dry quote and explicitly synthetic settlement tests. Mainnet settlement is still UNVERIFIED.
-
-Source: https://github.com/sopskistar/RouteTill
-
-@NEARProtocol #NEARHackathon
-
-Attach the verified final MP4 (or real screenshots) and the eventual owner-approved demo link. The owner publishes the post and supplies its public URL; no posting or submission has been performed.
+The owner must watch and approve the new video before uploading it. No public URL, X post or submission is claimed. The [submission copy](SUBMISSION.md) contains the X draft and owner-entered form guidance.

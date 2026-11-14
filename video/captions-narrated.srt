@@ -1,0 +1,63 @@
+1
+00:00:00,450 --> 00:00:04,931
+His AI agent finds a useful developer dataset for $10.
+
+2
+00:00:04,931 --> 00:00:09,204
+John wants the file, but he doesn't want to hand over control of his wallet.
+
+3
+00:00:10,950 --> 00:00:13,887
+An agent shouldn't have unrestricted spending power.
+
+4
+00:00:13,887 --> 00:00:19,309
+John wants to buy this one file, not give an agent permission to spend whenever it wants.
+
+5
+00:00:21,450 --> 00:00:25,467
+John sees the seller, the $10 price and the file he's getting.
+
+6
+00:00:25,467 --> 00:00:30,401
+He sets a maximum source spend of 11 USDC and approves this one purchase.
+
+7
+00:00:34,450 --> 00:00:38,316
+John sends about $10.11 from his Arbitrum wallet.
+
+8
+00:00:38,316 --> 00:00:45,212
+NEAR Intents handles the cross-chain payment, and RouteTill verifies that the merchant received exactly $10 on Base.
+
+9
+00:00:56,450 --> 00:01:04,426
+RouteTill verifies the merchant payment, delivers the correct dataset exactly once, and issues a signed Purchase Passport anyone can check.
+
+10
+00:01:11,450 --> 00:01:14,190
+Judges can also try five security checks.
+
+11
+00:01:14,190 --> 00:01:18,892
+RouteTill rejects changed recipients, over-limit payments and reused approvals.
+
+12
+00:01:18,892 --> 00:01:21,469
+Twenty notifications produce one entitlement.
+
+13
+00:01:21,469 --> 00:01:23,745
+Tampered evidence fails verification.
+
+14
+00:01:25,450 --> 00:01:26,832
+John got the right file.
+
+15
+00:01:26,832 --> 00:01:28,039
+The seller got paid.
+
+16
+00:01:28,039 --> 00:01:29,560
+And RouteTill has the proof.

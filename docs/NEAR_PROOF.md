@@ -1,4 +1,16 @@
-# NEAR evidence — quote verified, mainnet settlement UNVERIFIED
+# NEAR evidence — genuine mainnet purchase verified
+
+## Current completed purchase — November 13, 2026
+
+Order `655d4cc9-0eaf-41b7-a7bf-05fc73286eea` is **FULFILLED** through normal reconciliation. The actual Arbitrum source transfer was 10.105156 native USDC; NEAR Intents reported SUCCESS; exactly 10 native Base USDC reached the verified merchant. A separate 0.095729 USDC refund returned to the buyer on Arbitrum. ETH gas was additional to the source USDC cap.
+
+One payment attempt produced one durable entitlement, the approved 1,613-byte resource and one signed Purchase Passport. All 12 independent verifier checks passed; altered recipient/file evidence fails. See the [public manifest and explorer links](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/verification-manifest.json), [Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live), [provider SUCCESS](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/provider-status.json) and [reproduction command](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt).
+
+Unrestricted production payment preparation remains disabled; the public judge experience uses separately labeled simulated payment evidence. A verified completed purchase is not an assertion that general public payments are enabled.
+
+## Historical quote/preflight observations — superseded for payment readiness
+
+The remaining dated notes preserve development history. “UNVERIFIED” and “no funds moved” below describe those earlier probes, not the completed order above. Old quotes must never be funded or reused.
 
 Latest generic authenticated probe: **2026-11-12T00:32:50.537Z**. Original sanitized [quote evidence](evidence/live-dry-quote-2026-11-12.json) is included; the earlier [11 November observation](evidence/live-dry-quote-2026-11-11.json) remains preserved.
 
@@ -50,7 +62,7 @@ A first network attempt timed out; one retry succeeded and produced the reported
 
 ## Real payment gate and evidence record
 
-Status (2026-11-12, recovery session): both Vercel applications are deployed; local design, guest-demo and diagnostic improvements await owner-approved publication. Both health APIs return 200 with payments disabled. Production's demo-only product returns 404 and the demo product now returns 200. Both public Passport-key endpoints still return 503. Both actual Neon databases accepted migrations 001–003; individual queries succeeded, but the full concurrency/locking suite still fails on intermittent network connections. Local signing keys are valid, distinct Ed25519 identities; sensitive deployed values cannot be read back. Hosted signed Passport issuance and mainnet settlement remain **UNVERIFIED**. No source transaction has been signed, broadcast or transferred. [Recovery evidence](RELEASE_RECOVERY.md).
+Status (2026-11-13, approved key repair): both projects are READY on `ebeb14b`, payments disabled. Restoring their existing signing identities resolved both key APIs; fingerprints match the unchanged local sources. All five hosted Neon challenges pass, including 20 notifications to one entitlement and signed Passport/artifact tamper checks. Independent reads confirm the tested demo purchase is absent from production. Migrations were not repeated. The separate full transaction suite and genuine mainnet settlement remain UNVERIFIED. No payment was initiated. [Hosted verification](HOSTED_VERIFICATION.md).
 
 Remaining proof path: resolve deployed signing-key failures and complete real PostgreSQL concurrency and hosted workflow verification → confirm merchant wallet ownership → prepare a fresh executable quote and exact-deposit gas preflight → **separate explicit owner authorization and manual Rabby confirmation** → source receipt registration → provider success and independent finalized Base settlement → SQL entitlement count one → real Passport and independent verification.
 

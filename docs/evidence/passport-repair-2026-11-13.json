@@ -1,0 +1,473 @@
+{
+  "verifiedAt": "2026-11-13T03:13:27.659822+00:00",
+  "commit": "ebeb14b941e06840416fa23b7eeb8b6a331ad1ed",
+  "scope": "Two existing Passport variables restored from existing local identities; two existing Vercel projects redeployed; hosted synthetic workflow verified",
+  "localReleaseFilesByteForByteUnchanged": true,
+  "newSigningKeysGenerated": false,
+  "publicMigrationsExecuted": false,
+  "walletTransactionsSigned": false,
+  "fundsTransferred": false,
+  "mainnetSettlement": "UNVERIFIED",
+  "fullNeonTransactionSuite": "UNVERIFIED; prior WSL network failures",
+  "publicKeyFingerprintFormat": "SHA-256 of UTF-8 SPKI PEM response",
+  "publicKeyFingerprints": {
+    "routetill": "84a160fb109bbd108883adb71f30669d82ede4d945c97bfe22172c5d1e30e354",
+    "routetill-demo": "a9ee137c3054beeaf42b280c8e3d5125a3946324924fca1c2ea0c9ca15239554"
+  },
+  "deployments": {
+    "checkedAt": "2026-11-12T19:09:10.661Z",
+    "deployments": [
+      {
+        "project": "routetill",
+        "id": "dpl_AJ95gDHWAkmTQ6ZNRr4gMYnKFysf",
+        "state": "READY",
+        "sha": "ebeb14b941e06840416fa23b7eeb8b6a331ad1ed",
+        "target": "production",
+        "alias": [
+          "routetill.vercel.app",
+          "routetill-sopskistars-projects.vercel.app",
+          "routetill-git-main-sopskistars-projects.vercel.app"
+        ]
+      },
+      {
+        "project": "routetill-demo",
+        "id": "dpl_8UobZMGHFkjuT7Sg4wiS5uDHSsMS",
+        "state": "READY",
+        "sha": "ebeb14b941e06840416fa23b7eeb8b6a331ad1ed",
+        "target": "production",
+        "alias": [
+          "routetill-demo.vercel.app",
+          "routetill-demo-sopskistars-projects.vercel.app",
+          "routetill-demo-git-main-sopskistars-projects.vercel.app"
+        ]
+      }
+    ]
+  },
+  "hostedApi": {
+    "checkedAt": "2026-11-13T03:04:54.515Z",
+    "commit": "ebeb14b941e06840416fa23b7eeb8b6a331ad1ed",
+    "synthetic": true,
+    "mainnetSettlement": "UNVERIFIED",
+    "checks": [
+      {
+        "name": "public-key:live",
+        "status": 200
+      },
+      {
+        "name": "payment-gate:live",
+        "status": 200,
+        "livePayments": false
+      },
+      {
+        "name": "public-key:demo",
+        "status": 200
+      },
+      {
+        "name": "payment-gate:demo",
+        "status": 200,
+        "livePayments": false
+      },
+      {
+        "name": "demo-product",
+        "status": 200
+      },
+      {
+        "name": "guest-session",
+        "status": 200
+      },
+      {
+        "name": "guest-identity",
+        "status": 200
+      },
+      {
+        "name": "prepare",
+        "status": 200
+      },
+      {
+        "name": "persisted-order",
+        "status": 200
+      },
+      {
+        "name": "public-passport",
+        "status": 200
+      },
+      {
+        "name": "session-reuse",
+        "status": 200
+      },
+      {
+        "name": "guest-scope:auth/api-key",
+        "status": 403,
+        "error": "GUEST_SCOPE"
+      },
+      {
+        "name": "guest-scope:orders/9f085e4a-5439-411d-97d1-ef4525e41dac/quote",
+        "status": 403,
+        "error": "GUEST_SCOPE"
+      },
+      {
+        "name": "guest-scope:merchant",
+        "status": 403,
+        "error": "GUEST_SCOPE"
+      },
+      {
+        "name": "production-isolation:products/purchase-vectors?mode=live",
+        "status": 404,
+        "error": "PRODUCT_NOT_FOUND"
+      },
+      {
+        "name": "production-isolation:products/purchase-vectors?mode=demo",
+        "status": 403,
+        "error": "ENVIRONMENT_DISABLED"
+      },
+      {
+        "name": "production-isolation:passports/9f085e4a-5439-411d-97d1-ef4525e41dac?mode=live",
+        "status": 404,
+        "error": "PASSPORT_PENDING"
+      },
+      {
+        "name": "production-isolation:auth/guest",
+        "status": 403,
+        "error": "ENVIRONMENT_DISABLED"
+      },
+      {
+        "name": "logout",
+        "status": 200
+      },
+      {
+        "name": "after-logout",
+        "status": 401,
+        "error": "AUTH_REQUIRED"
+      }
+    ],
+    "attacks": [
+      {
+        "attack": "merchant",
+        "status": 200,
+        "passed": true,
+        "code": "MERCHANT_SUBSTITUTION"
+      },
+      {
+        "attack": "price",
+        "status": 200,
+        "passed": true,
+        "code": "PRICE_LIMIT"
+      },
+      {
+        "attack": "reuse",
+        "status": 200,
+        "passed": true,
+        "code": "APPROVAL_REUSED"
+      },
+      {
+        "attack": "replay",
+        "status": 200,
+        "passed": true,
+        "deliveries": 20,
+        "concurrentDeliveries": 15,
+        "storedEntitlements": 1,
+        "originalIntegrity": "PASS",
+        "tamperedIntegrity": "FAIL",
+        "artifactTamperIntegrity": "FAIL"
+      },
+      {
+        "attack": "tamper",
+        "status": 200,
+        "passed": true,
+        "deliveries": 20,
+        "concurrentDeliveries": 15,
+        "storedEntitlements": 1,
+        "originalIntegrity": "PASS",
+        "tamperedIntegrity": "FAIL",
+        "artifactTamperIntegrity": "FAIL"
+      }
+    ],
+    "keyFingerprintsMatch": true,
+    "keysDistinct": true,
+    "guestExpiry": "2026-11-13T03:35:06.425Z",
+    "orderId": "9f085e4a-5439-411d-97d1-ef4525e41dac",
+    "afterTwentyNotifications": {
+      "state": "FULFILLED",
+      "entitlements": 1
+    },
+    "entitlementId": "bc962d39-ebb8-4b44-9c8b-536ee2250cd2",
+    "independentOriginal": {
+      "integrity": "PASS",
+      "settlement": "UNVERIFIED",
+      "checks": [
+        {
+          "name": "Issuer key pinned",
+          "pass": true,
+          "detail": "Obtain the issuer key through a separate trusted channel."
+        },
+        {
+          "name": "Application signature",
+          "pass": true,
+          "detail": "Ed25519 protects the exported application assertions."
+        },
+        {
+          "name": "Purchase fingerprint",
+          "pass": true,
+          "detail": "Canonical SHA-256 of approved terms."
+        },
+        {
+          "name": "Environment binding",
+          "pass": true,
+          "detail": "Synthetic evidence is never live evidence."
+        },
+        {
+          "name": "Delivery binding",
+          "pass": true,
+          "detail": "Delivered digest must equal the approved digest."
+        },
+        {
+          "name": "Settlement binding",
+          "pass": true,
+          "detail": "Transaction, recipient, asset, chain, and amounts stay linked."
+        },
+        {
+          "name": "Synthetic disclosure",
+          "pass": true,
+          "detail": "No blockchain payment is represented by this fixture."
+        },
+        {
+          "name": "Artifact SHA-256",
+          "pass": true,
+          "detail": "Checks the actual delivered bytes."
+        }
+      ],
+      "synthetic": true
+    },
+    "independentTampered": {
+      "integrity": "FAIL",
+      "settlement": "UNVERIFIED",
+      "checks": [
+        {
+          "name": "Issuer key pinned",
+          "pass": true,
+          "detail": "Obtain the issuer key through a separate trusted channel."
+        },
+        {
+          "name": "Application signature",
+          "pass": false,
+          "detail": "Ed25519 protects the exported application assertions."
+        },
+        {
+          "name": "Purchase fingerprint",
+          "pass": true,
+          "detail": "Canonical SHA-256 of approved terms."
+        },
+        {
+          "name": "Environment binding",
+          "pass": true,
+          "detail": "Synthetic evidence is never live evidence."
+        },
+        {
+          "name": "Delivery binding",
+          "pass": true,
+          "detail": "Delivered digest must equal the approved digest."
+        },
+        {
+          "name": "Settlement binding",
+          "pass": false,
+          "detail": "Transaction, recipient, asset, chain, and amounts stay linked."
+        },
+        {
+          "name": "Synthetic disclosure",
+          "pass": true,
+          "detail": "No blockchain payment is represented by this fixture."
+        },
+        {
+          "name": "Artifact SHA-256",
+          "pass": true,
+          "detail": "Checks the actual delivered bytes."
+        }
+      ],
+      "synthetic": true
+    },
+    "independentArtifactTamper": {
+      "integrity": "FAIL",
+      "settlement": "UNVERIFIED",
+      "checks": [
+        {
+          "name": "Issuer key pinned",
+          "pass": true,
+          "detail": "Obtain the issuer key through a separate trusted channel."
+        },
+        {
+          "name": "Application signature",
+          "pass": true,
+          "detail": "Ed25519 protects the exported application assertions."
+        },
+        {
+          "name": "Purchase fingerprint",
+          "pass": true,
+          "detail": "Canonical SHA-256 of approved terms."
+        },
+        {
+          "name": "Environment binding",
+          "pass": true,
+          "detail": "Synthetic evidence is never live evidence."
+        },
+        {
+          "name": "Delivery binding",
+          "pass": true,
+          "detail": "Delivered digest must equal the approved digest."
+        },
+        {
+          "name": "Settlement binding",
+          "pass": true,
+          "detail": "Transaction, recipient, asset, chain, and amounts stay linked."
+        },
+        {
+          "name": "Synthetic disclosure",
+          "pass": true,
+          "detail": "No blockchain payment is represented by this fixture."
+        },
+        {
+          "name": "Artifact SHA-256",
+          "pass": false,
+          "detail": "Checks the actual delivered bytes."
+        }
+      ],
+      "synthetic": true
+    },
+    "passed": true
+  },
+  "persistence": {
+    "checkedAt": "2026-11-13T03:11:38.833Z",
+    "orderId": "9f085e4a-5439-411d-97d1-ef4525e41dac",
+    "readOnly": true,
+    "migrationsExecuted": false,
+    "rows": [
+      {
+        "label": "production",
+        "orders": 0,
+        "attempts": 0,
+        "entitlements": 0,
+        "passports": 0,
+        "uniqueNotificationEvents": 0,
+        "deliveredOutboxJobs": 0
+      },
+      {
+        "label": "demo",
+        "orders": 1,
+        "attempts": 1,
+        "entitlements": 1,
+        "passports": 1,
+        "uniqueNotificationEvents": 20,
+        "deliveredOutboxJobs": 1
+      }
+    ],
+    "localFilesUnchanged": true,
+    "passed": true
+  },
+  "browser": {
+    "checkedAt": "2026-11-13T03:11:39.935Z",
+    "commit": "ebeb14b",
+    "synthetic": true,
+    "mainnetSettlement": "UNVERIFIED",
+    "attacks": [
+      {
+        "status": 200,
+        "passed": true,
+        "code": "MERCHANT_SUBSTITUTION"
+      },
+      {
+        "status": 200,
+        "passed": true,
+        "code": "PRICE_LIMIT"
+      },
+      {
+        "status": 200,
+        "passed": true,
+        "code": "APPROVAL_REUSED"
+      },
+      {
+        "status": 200,
+        "passed": true,
+        "deliveries": 20,
+        "concurrentDeliveries": 15,
+        "storedEntitlements": 1,
+        "originalIntegrity": "PASS",
+        "tamperedIntegrity": "FAIL"
+      },
+      {
+        "status": 200,
+        "passed": true,
+        "deliveries": 20,
+        "concurrentDeliveries": 15,
+        "storedEntitlements": 1,
+        "originalIntegrity": "PASS",
+        "tamperedIntegrity": "FAIL"
+      }
+    ],
+    "screens": [
+      {
+        "route": "lab",
+        "label": "desktop",
+        "overflow": false,
+        "axeViolations": []
+      },
+      {
+        "route": "lab",
+        "label": "phone",
+        "overflow": false,
+        "axeViolations": []
+      }
+    ],
+    "fiveChallengesPassed": true,
+    "orderId": "b4f5cc56-741a-4f32-a350-d614a54e1530",
+    "originalPass": true,
+    "tamperDetected": true,
+    "artifactDigestVerified": true,
+    "passed": true
+  },
+  "independentCli": {
+    "integrity": "PASS",
+    "settlement": "UNVERIFIED",
+    "checks": [
+      {
+        "name": "Issuer key pinned",
+        "pass": true,
+        "detail": "Obtain the issuer key through a separate trusted channel."
+      },
+      {
+        "name": "Application signature",
+        "pass": true,
+        "detail": "Ed25519 protects the exported application assertions."
+      },
+      {
+        "name": "Purchase fingerprint",
+        "pass": true,
+        "detail": "Canonical SHA-256 of approved terms."
+      },
+      {
+        "name": "Environment binding",
+        "pass": true,
+        "detail": "Synthetic evidence is never live evidence."
+      },
+      {
+        "name": "Delivery binding",
+        "pass": true,
+        "detail": "Delivered digest must equal the approved digest."
+      },
+      {
+        "name": "Settlement binding",
+        "pass": true,
+        "detail": "Transaction, recipient, asset, chain, and amounts stay linked."
+      },
+      {
+        "name": "Synthetic disclosure",
+        "pass": true,
+        "detail": "No blockchain payment is represented by this fixture."
+      },
+      {
+        "name": "Artifact SHA-256",
+        "pass": true,
+        "detail": "Checks the actual delivered bytes."
+      }
+    ],
+    "synthetic": true
+  }
+}

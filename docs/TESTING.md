@@ -1,3 +1,13 @@
+# Final verification scope
+
+Current presentation result: 224 unit/integration tests and nine browser journeys passed, including the added story-consistency test. Typecheck, lint and production build passed. Full app and production dependency audits reported zero vulnerabilities. Final hosted buyer/Lab and deployment evidence are recorded separately, rather than inferred from local PGlite.
+
+Real Neon suite: the dated [report](evidence/neon-verification.json) passed on both distinct resources using isolated generated schemas: 12 simultaneous approval consumptions accepted one, rollback preserved approval on failed insert, all five challenges passed, replay persisted one entitlement after reconnect, and ownership isolation passed. Public migrations were not rerun. No need to rerun this financial-infrastructure suite for copy/layout changes.
+
+Genuine mainnet result: [12 independent verifier checks](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/cli-verification.json) and exactly one entitlement for the FULFILLED purchase. The older entries below preserve what was known on their dates, including simulated records whose mainnet settlement correctly remains UNVERIFIED.
+
+---
+
 # Actual release verification
 
 Executed 11–12 November 2026 with Node 22.23.1, Next.js 16.4.6, Vitest 5.1.0 and Playwright Chromium 158. Counts are completed local runs. None constitutes a funded transaction or real Neon verification.
@@ -65,3 +75,9 @@ The local judge works without external credentials. Add `NEAR_INTENTS_JWT` only 
 The first release browser run found a stale exact-label locator after the description textarea gained initial content. The query was corrected to its accessible textbox role/name, and the full seven-journey run passed. Turbopack could not bind its compiler port in the execution sandbox, including an escalated retry; the supported Webpack build passed and is the declared release build command. Dependency audit initially found an advisory through an unused WalletConnect UI tree; replacing it with official Universal Provider removed that tree and the final audit reported zero known vulnerabilities.
 
 Captures and CLI evidence live in ignored `artifacts/`; browser traces/reports are under `test-results/` and `playwright-report/`. For real Neon migrations, concurrent row-lock testing and deployment checks after the Vercel integration exists, follow [DEPLOYMENT](DEPLOYMENT.md). The verification command refuses PGlite fallback and has not run against missing credentials.
+
+## Hosted Passport repair verification — 13 November 2026
+
+No application source changed in this repair. Both existing projects redeployed the approved `ebeb14b` commit after only their corresponding existing Passport key values were restored. Both key APIs return 200 and match the unchanged, distinct local identities; both payment gates remain false.
+
+The hosted API and independent browser journeys passed all five real backend challenges against Neon. Replay reported 20 deliveries (15 concurrent) and one entitlement before the tamper challenge. Direct read-only Neon queries subsequently found one order/attempt/entitlement/Passport and delivered outbox job in demo, zero matching records in production. The independent CLI verified all eight original integrity checks; modified recipient and artifact checks failed as expected. All settlement evidence remains synthetic and mainnet UNVERIFIED. Desktop/mobile Lab axe scans and overflow checks passed. No public migrations were repeated. The separate full transaction suite is still unverified following earlier WSL network failures. [Detailed evidence](HOSTED_VERIFICATION.md).

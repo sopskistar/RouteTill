@@ -1,0 +1,156 @@
+{
+  "duration": 91.0,
+  "fps": 30,
+  "scenes": [
+    {
+      "name": "Agent finds it",
+      "title": "John needs a dataset.",
+      "body": "His AI agent finds a useful developer dataset for $10. John wants the file, but he doesn't want to hand over control of his wallet.",
+      "start": 0,
+      "duration": 10.5,
+      "audio": "narration/scene-01.wav",
+      "captions": [
+        {
+          "text": "His AI agent finds a useful developer dataset for $10.",
+          "start": 0.45,
+          "end": 4.931451247165533
+        },
+        {
+          "text": "John wants the file, but he doesn't want to hand over control of his wallet.",
+          "start": 4.931451247165533,
+          "end": 9.20392290249433
+        }
+      ]
+    },
+    {
+      "name": "No blank check",
+      "title": "His money. His decision.",
+      "body": "An agent shouldn't have unrestricted spending power. John wants to buy this one file, not give an agent permission to spend whenever it wants.",
+      "start": 10.5,
+      "duration": 10.5,
+      "audio": "narration/scene-02.wav",
+      "captions": [
+        {
+          "text": "An agent shouldn't have unrestricted spending power.",
+          "start": 0.45,
+          "end": 3.3873242630385487
+        },
+        {
+          "text": "John wants to buy this one file, not give an agent permission to spend whenever it wants.",
+          "start": 3.3873242630385487,
+          "end": 8.809183673469388
+        }
+      ]
+    },
+    {
+      "name": "John says yes",
+      "title": "One file. One approval.",
+      "body": "John sees the seller, the $10 price and the file he's getting. He sets a maximum source spend of 11 USDC and approves this one purchase.",
+      "start": 21.0,
+      "duration": 13,
+      "audio": "narration/scene-03.wav",
+      "captions": [
+        {
+          "text": "John sees the seller, the $10 price and the file he's getting.",
+          "start": 0.45,
+          "end": 4.467052154195011
+        },
+        {
+          "text": "He sets a maximum source spend of 11 USDC and approves this one purchase.",
+          "start": 4.467052154195011,
+          "end": 9.401292517006802
+        }
+      ]
+    },
+    {
+      "name": "Payment verified",
+      "title": "Paid on Arbitrum. Received on Base.",
+      "body": "John sends about $10.11 from his Arbitrum wallet. NEAR Intents handles the cross-chain payment, and RouteTill verifies that the merchant received exactly $10 on Base.",
+      "start": 34.0,
+      "duration": 22,
+      "audio": "narration/scene-04.wav",
+      "captions": [
+        {
+          "text": "John sends about $10.11 from his Arbitrum wallet.",
+          "start": 0.45,
+          "end": 4.316122448979592
+        },
+        {
+          "text": "NEAR Intents handles the cross-chain payment, and RouteTill verifies that the merchant received exactly $10 on Base.",
+          "start": 4.316122448979592,
+          "end": 11.212448979591837
+        }
+      ]
+    },
+    {
+      "name": "File + proof",
+      "title": "Delivered. With proof.",
+      "body": "RouteTill verifies the merchant payment, delivers the correct dataset exactly once, and issues a signed Purchase Passport anyone can check.",
+      "start": 56.0,
+      "duration": 15,
+      "audio": "narration/scene-05.wav",
+      "captions": [
+        {
+          "text": "RouteTill verifies the merchant payment, delivers the correct dataset exactly once, and issues a signed Purchase Passport anyone can check.",
+          "start": 0.45,
+          "end": 8.426054421768708
+        }
+      ]
+    },
+    {
+      "name": "Break-It Lab",
+      "title": "Five security checks. No real funds.",
+      "body": "Judges can also try five security checks. RouteTill rejects changed recipients, over-limit payments and reused approvals. Twenty notifications produce one entitlement. Tampered evidence fails verification.",
+      "start": 71.0,
+      "duration": 14,
+      "audio": "narration/scene-06.wav",
+      "captions": [
+        {
+          "text": "Judges can also try five security checks.",
+          "start": 0.45,
+          "end": 3.1899546485260775
+        },
+        {
+          "text": "RouteTill rejects changed recipients, over-limit payments and reused approvals.",
+          "start": 3.1899546485260775,
+          "end": 7.8919954648526085
+        },
+        {
+          "text": "Twenty notifications produce one entitlement.",
+          "start": 7.8919954648526085,
+          "end": 10.469410430839003
+        },
+        {
+          "text": "Tampered evidence fails verification.",
+          "start": 10.469410430839003,
+          "end": 12.74496598639456
+        }
+      ]
+    },
+    {
+      "name": "RouteTill",
+      "title": "One purchase. The proof to keep.",
+      "body": "John got the right file. The seller got paid. And RouteTill has the proof.",
+      "start": 85.0,
+      "duration": 6,
+      "audio": "narration/scene-07.wav",
+      "captions": [
+        {
+          "text": "John got the right file.",
+          "start": 0.45,
+          "end": 1.8315873015873017
+        },
+        {
+          "text": "The seller got paid.",
+          "start": 1.8315873015873017,
+          "end": 3.0390249433106575
+        },
+        {
+          "text": "And RouteTill has the proof.",
+          "start": 3.0390249433106575,
+          "end": 4.559931972789116
+        }
+      ]
+    }
+  ]
+}

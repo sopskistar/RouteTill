@@ -1,0 +1,550 @@
+{
+  "checkedAt": "2026-11-12T18:35:01.624075+00:00",
+  "commit": "ebeb14b941e06840416fa23b7eeb8b6a331ad1ed",
+  "releaseStatus": "NO-GO",
+  "livePaymentsEnabled": false,
+  "keysChanged": false,
+  "publicMigrationsRerun": false,
+  "mainnetSettlement": "UNVERIFIED",
+  "endpoints": {
+    "checkedAt": "2026-11-12T17:46:56.826Z",
+    "commit": "ebeb14b941e06840416fa23b7eeb8b6a331ad1ed",
+    "mainnetSettlement": "UNVERIFIED",
+    "checks": [
+      {
+        "project": "routetill",
+        "path": "/api/health",
+        "status": 200,
+        "health": {
+          "service": "RouteTill",
+          "deployment": "live",
+          "mainnetSettlement": "UNVERIFIED",
+          "livePayments": false,
+          "mode": "live",
+          "demoUrl": "https://routetill-demo.vercel.app",
+          "walletConnectProjectId": null
+        }
+      },
+      {
+        "project": "routetill",
+        "path": "/api/keys?mode=live",
+        "status": 503,
+        "error": "PASSPORT_KEY_CONFIGURATION"
+      },
+      {
+        "project": "routetill",
+        "path": "/api/products/purchase-vectors?mode=live",
+        "status": 404,
+        "error": "PRODUCT_NOT_FOUND"
+      },
+      {
+        "project": "routetill-demo",
+        "path": "/api/health",
+        "status": 200,
+        "health": {
+          "service": "RouteTill",
+          "deployment": "demo",
+          "mainnetSettlement": "UNVERIFIED",
+          "livePayments": false,
+          "mode": "demo",
+          "demoUrl": null,
+          "walletConnectProjectId": null
+        }
+      },
+      {
+        "project": "routetill-demo",
+        "path": "/api/keys?mode=demo",
+        "status": 503,
+        "error": "PASSPORT_KEY_CONFIGURATION"
+      },
+      {
+        "project": "routetill-demo",
+        "path": "/api/products/purchase-vectors?mode=demo",
+        "status": 200
+      }
+    ]
+  },
+  "guest": {
+    "checkedAt": "2026-11-12T17:48:15.962Z",
+    "commit": "ebeb14b",
+    "environment": "hosted demo / actual configured Neon",
+    "synthetic": true,
+    "mainnetSettlement": "UNVERIFIED",
+    "checks": [
+      {
+        "label": "product",
+        "status": 200
+      },
+      {
+        "label": "guest-session",
+        "status": 200,
+        "role": "guest"
+      },
+      {
+        "label": "guest-identity",
+        "status": 200,
+        "role": "guest",
+        "storage": "PostgreSQL",
+        "limits": {
+          "order_count": 0,
+          "challenge_count": 0,
+          "expires_at": "2026-11-12T18:18:17.274Z"
+        }
+      },
+      {
+        "label": "prepare",
+        "status": 200,
+        "orderId": "0a29e558-47a1-469b-b936-72cd2cb52227"
+      },
+      {
+        "label": "merchant",
+        "status": 200,
+        "passed": true,
+        "code": "MERCHANT_SUBSTITUTION"
+      },
+      {
+        "label": "price",
+        "status": 200,
+        "passed": true,
+        "code": "PRICE_LIMIT"
+      },
+      {
+        "label": "reuse",
+        "status": 200,
+        "passed": true,
+        "code": "APPROVAL_REUSED"
+      },
+      {
+        "label": "replay",
+        "status": 503,
+        "error": "PASSPORT_KEY_CONFIGURATION"
+      },
+      {
+        "label": "tamper",
+        "status": 503,
+        "error": "PASSPORT_KEY_CONFIGURATION"
+      },
+      {
+        "label": "order-persistence",
+        "status": 200,
+        "state": "FULFILLED",
+        "entitlements": 1,
+        "viewerRole": "guest"
+      },
+      {
+        "label": "guest-session-reuse",
+        "status": 200,
+        "reused": true
+      },
+      {
+        "label": "guest-denial:auth/api-key",
+        "status": 403,
+        "error": "GUEST_SCOPE"
+      },
+      {
+        "label": "guest-denial:orders/0a29e558-47a1-469b-b936-72cd2cb52227/quote",
+        "status": 403,
+        "error": "GUEST_SCOPE"
+      },
+      {
+        "label": "guest-denial:merchant",
+        "status": 403,
+        "error": "GUEST_SCOPE"
+      },
+      {
+        "label": "public-passport",
+        "status": 404,
+        "error": "PASSPORT_PENDING"
+      },
+      {
+        "label": "entitled-download",
+        "status": 200,
+        "artifactDigestHeaderPresent": true
+      }
+    ],
+    "orderId": "0a29e558-47a1-469b-b936-72cd2cb52227"
+  },
+  "schema": {
+    "checkedAt": "2026-11-12T17:56:06.884Z",
+    "migrationsExecuted": false,
+    "rows": [
+      {
+        "label": "production",
+        "readOnly": true,
+        "schema": {
+          "migration_001": true,
+          "migration_002": true,
+          "migration_003": true
+        },
+        "hostedGuestPersistence": {
+          "hosted_guest_orders": 0,
+          "hosted_guest_entitlements": 0,
+          "unique_notification_events": 0,
+          "hosted_guest_passports": 0
+        }
+      },
+      {
+        "label": "demo",
+        "readOnly": true,
+        "schema": {
+          "migration_001": true,
+          "migration_002": true,
+          "migration_003": true
+        },
+        "hostedGuestPersistence": {
+          "hosted_guest_orders": 1,
+          "hosted_guest_entitlements": 1,
+          "unique_notification_events": 20,
+          "hosted_guest_passports": 0
+        }
+      }
+    ]
+  },
+  "browser": {
+    "checkedAt": "2026-11-12T18:13:12.222Z",
+    "commit": "ebeb14b",
+    "scope": "Hosted homepage/navigation and demo lab entry; signed Passport blocked by key configuration",
+    "captures": [
+      {
+        "project": "routetill",
+        "label": "desktop",
+        "width": 1440,
+        "overflow": false,
+        "axeViolations": [],
+        "screenshot": "artifacts/release-hosted/routetill-desktop.png"
+      },
+      {
+        "project": "routetill",
+        "label": "tablet",
+        "width": 768,
+        "overflow": false,
+        "axeViolations": [],
+        "screenshot": "artifacts/release-hosted/routetill-tablet.png"
+      },
+      {
+        "project": "routetill",
+        "label": "phone",
+        "width": 390,
+        "overflow": false,
+        "axeViolations": [],
+        "screenshot": "artifacts/release-hosted/routetill-phone.png",
+        "mobileNavigation": true,
+        "reducedMotion": true
+      },
+      {
+        "project": "routetill-demo",
+        "label": "desktop",
+        "width": 1440,
+        "overflow": false,
+        "axeViolations": [],
+        "screenshot": "artifacts/release-hosted/routetill-demo-desktop.png"
+      },
+      {
+        "project": "routetill-demo",
+        "label": "tablet",
+        "width": 768,
+        "overflow": false,
+        "axeViolations": [],
+        "screenshot": "artifacts/release-hosted/routetill-demo-tablet.png"
+      },
+      {
+        "project": "routetill-demo",
+        "label": "phone",
+        "width": 390,
+        "overflow": false,
+        "axeViolations": [],
+        "screenshot": "artifacts/release-hosted/routetill-demo-phone.png",
+        "mobileNavigation": true,
+        "reducedMotion": true
+      }
+    ],
+    "demoLabEntryShell": true
+  },
+  "network": {
+    "checkedAt": "2026-11-12T17:51:01.112Z",
+    "rows": [
+      {
+        "label": "control",
+        "attempt": 1,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 4,
+        "families": [
+          4,
+          6
+        ]
+      },
+      {
+        "label": "control",
+        "attempt": 1,
+        "kind": "A",
+        "resolved": true,
+        "records": 2
+      },
+      {
+        "label": "control",
+        "attempt": 1,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 2
+      },
+      {
+        "label": "control",
+        "attempt": 2,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 4,
+        "families": [
+          4,
+          6
+        ]
+      },
+      {
+        "label": "control",
+        "attempt": 2,
+        "kind": "A",
+        "resolved": true,
+        "records": 2
+      },
+      {
+        "label": "control",
+        "attempt": 2,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 2
+      },
+      {
+        "label": "control",
+        "attempt": 3,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 4,
+        "families": [
+          4,
+          6
+        ]
+      },
+      {
+        "label": "control",
+        "attempt": 3,
+        "kind": "A",
+        "resolved": true,
+        "records": 2
+      },
+      {
+        "label": "control",
+        "attempt": 3,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 2
+      },
+      {
+        "label": "production",
+        "attempt": 1,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 6,
+        "families": [
+          4,
+          6
+        ]
+      },
+      {
+        "label": "production",
+        "attempt": 1,
+        "kind": "A",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "production",
+        "attempt": 1,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "production",
+        "attempt": 2,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 6,
+        "families": [
+          4,
+          6
+        ]
+      },
+      {
+        "label": "production",
+        "attempt": 2,
+        "kind": "A",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "production",
+        "attempt": 2,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "production",
+        "attempt": 3,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 6,
+        "families": [
+          4,
+          6
+        ]
+      },
+      {
+        "label": "production",
+        "attempt": 3,
+        "kind": "A",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "production",
+        "attempt": 3,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "production",
+        "kind": "public-DNS-A",
+        "server": "1.1.1.1",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "production",
+        "kind": "public-DNS-A",
+        "server": "8.8.8.8",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "production",
+        "kind": "IPv4-TCP",
+        "port": 443,
+        "connected": true
+      },
+      {
+        "label": "production",
+        "kind": "IPv4-TCP",
+        "port": 5432,
+        "connected": true
+      },
+      {
+        "label": "demo",
+        "attempt": 1,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 3,
+        "families": [
+          6
+        ]
+      },
+      {
+        "label": "demo",
+        "attempt": 1,
+        "kind": "A",
+        "resolved": false,
+        "code": "ENODATA"
+      },
+      {
+        "label": "demo",
+        "attempt": 1,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "demo",
+        "attempt": 2,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 6,
+        "families": [
+          4,
+          6
+        ]
+      },
+      {
+        "label": "demo",
+        "attempt": 2,
+        "kind": "A",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "demo",
+        "attempt": 2,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "demo",
+        "attempt": 3,
+        "kind": "lookup",
+        "resolved": true,
+        "records": 6,
+        "families": [
+          4,
+          6
+        ]
+      },
+      {
+        "label": "demo",
+        "attempt": 3,
+        "kind": "A",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "demo",
+        "attempt": 3,
+        "kind": "AAAA",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "demo",
+        "kind": "public-DNS-A",
+        "server": "1.1.1.1",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "demo",
+        "kind": "public-DNS-A",
+        "server": "8.8.8.8",
+        "resolved": true,
+        "records": 3
+      },
+      {
+        "label": "demo",
+        "kind": "IPv4-TCP",
+        "port": 443,
+        "connected": true
+      },
+      {
+        "label": "demo",
+        "kind": "IPv4-TCP",
+        "port": 5432,
+        "connected": true
+      }
+    ]
+  },
+  "labBrowser": {
+    "checkedAt": "2026-11-12T18:29:21.233Z",
+    "responses": [],
+    "preparedGuestVisible": false,
+    "errorType": "Error"
+  }
+}
