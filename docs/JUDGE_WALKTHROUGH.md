@@ -11,7 +11,7 @@ RouteTill connects one human-approved purchase to NEAR Intents settlement, one d
 
 ## Start without a wallet or access code
 
-1. **DO** Open [Try the demo / buyer checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo). **SEE** Agent Purchase Test Vectors, the merchant-set 10 Base USDC price, Arbitrum USDC source, prepared 11 USDC cap and test refund wallet. This is a no-funds walkthrough, with simulated payment evidence.
+1. **DO** Open [Try buyer checkout — no funds](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo). **SEE** Agent Purchase Test Vectors, the merchant-set 10 Base USDC price, Arbitrum USDC source, prepared 11 USDC cap and test refund wallet. This is a no-funds walkthrough, with simulated payment evidence.
 2. **DO** Select **Review purchase proposal**. **SEE** a PROPOSED purchase with exact terms, artifact SHA-256, immutable policy fingerprint and expiry. No registration, merchant workspace or owner code is required.
 3. **DO** Review the terms, tick the approval box and select **Authorize this purchase**. **SEE** the single-use human approval recorded. This grants no wallet access.
 4. **DO** Select **Simulate payment & deliver**. **SEE** the actual backend settlement validator and transactional delivery produce one entitlement from repeated demo notifications. No wallet signature or transfer is requested.

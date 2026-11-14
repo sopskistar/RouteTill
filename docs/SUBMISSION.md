@@ -12,15 +12,17 @@ Human-approved agent purchases, verified cross-chain payment, and the right digi
 
 ## Description — paste into the `idea` field
 
-RouteTill helps people buy digital resources through an agent without handing over control of their wallet. The agent can find and propose a purchase; the human approves the exact product, merchant recipient, spending cap, refund wallet and deadline, then personally confirms any payment.
+NEAR Intents 1Click is the cross-chain payment engine behind RouteTill: a buyer pays in native USDC on Arbitrum while the merchant receives native USDC on Base.
 
-NEAR Intents is essential: it quotes and executes an exact-output cross-chain payment from the buyer’s native Arbitrum USDC to the merchant’s native Base USDC. RouteTill independently checks the merchant’s chain receipt, asset, recipient, amount and finality before creating one durable digital entitlement. A signed Purchase Passport links the approved terms, settlement evidence and delivered file hash for independent verification.
+An AI agent can suggest a paid developer dataset, but should not receive unrestricted access to the user's money. RouteTill lets the human authorize one precise purchase: the product, merchant recipient, source-spending ceiling, refund wallet, expected file hash and deadline. The buyer separately confirms any wallet payment.
 
-Our first funded purchase is complete and FULFILLED: 10.105156 Arbitrum USDC deposited, NEAR Intents SUCCESS, exactly 10 Base USDC received, and 0.095729 USDC refunded to the buyer. One attempt created one entitlement, the correct 1,613-byte dataset and one signed Passport. Twelve independent verifier checks passed.
+NEAR Intents provides authenticated exact-output quotes and executes the cross-chain route. RouteTill then checks the provider outcome and independently observes the Base merchant receipt, token, recipient, amount and finality. Only qualifying evidence can unlock one durable digital entitlement. The signed Purchase Passport links the approved terms, settlement evidence and matching file digest for independent inspection.
 
-Judges can complete a public no-funds buyer walkthrough without registration or an owner code, then run five backend security checks: changed recipient, over-limit payment, reused approval, 20 repeated notifications producing one entitlement, and tampered evidence.
+On November 13, RouteTill completed a genuine mainnet purchase: 10.105156 Arbitrum USDC funded; NEAR Intents SUCCESS; exactly 10 USDC received on Base; 0.095729 USDC refunded; one entitlement, the correct 1,613-byte dataset and one signed Passport. Twelve independent verification checks passed.
 
-The included agent is deterministic, not an LLM or autonomous wallet. General production payment preparation remains disabled behind the existing exact-order guard. The public demo uses isolated Neon data and simulated payment evidence; genuine mainnet proof is published separately.
+Judges can try a no-funds checkout without registration or an owner code, run five actual backend security checks—including recipient substitution, over-limit payment, approval reuse, 20 replayed notifications producing one entitlement and Passport tampering—and inspect separate public mainnet proof.
+
+The demonstration uses simulated payment evidence in an isolated environment. The example agent is deterministic, not an LLM or unrestricted wallet signer; general public live-payment activation remains disabled.
 
 ## Recommended tracks
 
@@ -58,11 +60,12 @@ The focus is the connected chain of evidence: a human-controlled purchase → in
 
 ## X post draft — attach the owner-approved narrated MP4
 
-Your agent finds the dataset. You approve one purchase.
+Your agent finds a dataset. You approve one purchase.
 
-Built RouteTill at NEAR HACKATHON: NEAR Intents moved Arbitrum USDC to Base; verified receipt unlocked one file + signed proof.
+Built RouteTill at NEAR HACKATHON: NEAR Intents settles Arbitrum USDC to Base; verified receipt unlocks the file + proof.
 
-Try it: https://routetill.vercel.app
+https://routetill.vercel.app
+https://github.com/sopskistar/RouteTill
 
 @NEARProtocol #NEARHackathon
 
@@ -72,7 +75,7 @@ Attach the approved video directly; the site links to the public demo, source an
 
 - Project name: **RouteTill**
 - Project URL: **https://github.com/sopskistar/RouteTill**
-- Description / idea: paste the description above (1,595 characters; limit 2,000).
+- Description / idea: paste the description above (1,728 characters including paragraph breaks; limit 2,000).
 - Tracks: recommended `realworld`, `security`, `agents`; choose your final selection.
 - Demo post URL: enter your own public X post URL after approving and attaching the narrated video. The website and local MP4 are not substitutes for that field.
 - Tagline: use the optional tagline wherever the form or post supports it; do not invent additional official API fields.
