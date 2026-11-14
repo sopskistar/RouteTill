@@ -6,7 +6,9 @@ Built with NEAR Intents 1Click for Arbitrum USDC → Base USDC settlement. Route
 
 The agent proposes. You authorize. RouteTill verifies payment and delivery.
 
-John is an illustrative developer who needs a dataset. A deterministic example agent proposes the merchant’s 10 USDC product; it is not an LLM browsing the internet. John holds USDC on Arbitrum; the merchant wants USDC on Base. John reviews and authorizes the exact terms, then **separately confirms the wallet transfer himself**. The merchant lists the file, sets the price and shares checkout: buyer and merchant are two sides of one transaction.
+John needs a dataset for his project. His agent proposes a merchant’s 10 USDC product, but his funds are on Arbitrum while the merchant accepts USDC on Base.
+
+With RouteTill, John reviews the seller, product and spending limit, authorizes that specific purchase, then confirms the payment in his wallet. NEAR Intents handles the cross-chain settlement. RouteTill independently verifies the merchant’s payment and checks the delivered file against the approved digest before issuing a signed Purchase Passport.
 
 ![Actual RouteTill application screen showing the buyer actions and the completed mainnet Purchase Passport, including 10 Base USDC received and the verified delivered file](docs/screenshots/home-hero-desktop.png)
 
