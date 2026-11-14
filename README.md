@@ -133,7 +133,7 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-The communication pass recorded **224 unit/integration tests and 12 browser journeys**, with lint, typecheck and build passing. Dated hosted checkout, agent, concurrency, mainnet-verification and media checks are documented in the [final readiness report](docs/FINAL_READINESS.md) and [test reports](docs/TESTING.md).
+**Verified November 14, 2026:** 224 unit/integration tests and 12 browser journeys passed, along with lint, typecheck and production build. Dated hosted checkout, agent, concurrency, mainnet-verification and media checks are documented in the [final readiness report](docs/FINAL_READINESS.md) and [test reports](docs/TESTING.md).
 
 The stack is Next.js, React, TypeScript, Tailwind, PostgreSQL/Neon, the official 1Click signature SDK and viem. Row locks, unique constraints and a transactional outbox protect approval consumption and entitlement issuance.
 
@@ -153,6 +153,8 @@ The stack is Next.js, React, TypeScript, Tailwind, PostgreSQL/Neon, the official
 Built at **NEAR HACKATHON**. The November 7 baseline contained only `.gitignore`, `LICENSE` and a two-line README: [baseline commit](https://github.com/sopskistar/RouteTill/commit/67f064e81d004f66462c75e9034b23eb832fce87) · [hackathon implementation diff](https://github.com/sopskistar/RouteTill/compare/67f064e...main).
 
 Work added during the event includes checkout, the database schema, human purchase policies, scoped agent API, NEAR Intents integration, independent settlement checks, replay-protected fulfillment, signed Passports, the standalone verifier and Break-It Lab.
+
+AI-assisted development: Codex assisted implementation and review; design and video tools are credited below and in the [references](docs/REFERENCES.md).
 
 <details>
 <summary>Third-party foundations, tools and licenses</summary>
