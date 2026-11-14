@@ -4,7 +4,7 @@
 
 Built with **NEAR Intents 1Click** for Arbitrum USDC → Base USDC settlement.
 
-**[Watch the demo on X](https://x.com/sopskistar/status/2121630057839968439) · [Try the no-funds checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Inspect the real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live)**
+**[Watch demo](https://routetill.vercel.app/demo#final-video) · [Try the no-funds checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Inspect the real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live)**
 
 Built at **NEAR HACKATHON** · Track fit: **AI Security & Defense · Agent Economy · Real-World Money**
 
@@ -48,9 +48,9 @@ These are controlled no-funds scenarios using backend policy checks and database
 
 ## Demo and screenshots
 
-[![Play the narrated RouteTill demonstration](public/demo/final-demo-thumbnail.jpg)](https://x.com/sopskistar/status/2121630057839968439)
+[![Play the narrated RouteTill demonstration](public/demo/final-demo-thumbnail.jpg)](https://routetill.vercel.app/demo#final-video)
 
-[Watch on X](https://x.com/sopskistar/status/2121630057839968439) · [Download MP4 — 2:04](https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4)
+[Watch on X](https://x.com/sopskistar/status/2121630057839968439) · [Download MP4](https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4)
 
 ![Purchase Passport showing approval, settlement evidence and digital-delivery verification](docs/screenshots/passport-desktop.png)
 

@@ -2,7 +2,8 @@
 
 The owner selected **RouteTill_Judge_Demo_Final_Updated_Frontend.mp4**. Older cuts are historical backups and are not the selected film.
 
-- [Watch/download the final demo — original MP4](https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4)
+- [Watch the final demo in the browser](https://routetill.vercel.app/demo#final-video)
+- [Download MP4](https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4)
 - [Public GitHub media release and checksum file](https://github.com/sopskistar/RouteTill/releases/tag/judge-demo-final-2026-11-14)
 - [Separate interactive guided walkthrough](https://routetill.vercel.app/demo)
 - [Separate hands-on no-funds checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo)

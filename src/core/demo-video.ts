@@ -1,5 +1,6 @@
 /** Owner-approved original; public hosting verified byte-for-byte. No transcode. */
 export const finalDemoVideo={
+ playerPath:'/demo#final-video',
  url:'https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4',
  releaseUrl:'https://github.com/sopskistar/RouteTill/releases/tag/judge-demo-final-2026-11-14',
  poster:'/demo/final-demo-thumbnail.jpg',
