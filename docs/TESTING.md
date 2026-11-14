@@ -6,9 +6,11 @@ Real Neon suite: the dated [report](evidence/neon-verification.json) passed on b
 
 Genuine mainnet result: [12 independent verifier checks](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/cli-verification.json) and exactly one entitlement for the FULFILLED purchase. The older entries below preserve what was known on their dates, including simulated records whose mainnet settlement correctly remains UNVERIFIED.
 
+Fresh-clone README reproduction, public incognito walkthrough and standalone original/tampered Passport results are recorded in [README_VERIFICATION.md](README_VERIFICATION.md), dated November 14.
+
 ---
 
-# Actual release verification
+# Historical release verification — November 11–12, 2026
 
 Executed 11–12 November 2026 with Node 22.23.1, Next.js 16.4.6, Vitest 5.1.0 and Playwright Chromium 158. Counts are completed local runs. None constitutes a funded transaction or real Neon verification.
 
@@ -34,6 +36,8 @@ Executed 11–12 November 2026 with Node 22.23.1, Next.js 16.4.6, Vitest 5.1.0 a
 Fresh checks against the preserved working tree: **145 tests in five files passed**, **seven browser journeys passed** in 30.2 seconds, lint and typecheck passed, and the production build passed on Node 22.23.1 outside the execution sandbox. The sandbox caused empty TypeScript subprocess output during builds and terminated Chromium before journeys started; the outside-sandbox runs passed. Secret scan with history and public bundles: **165 inputs, zero findings**. Full and production-only dependency audits: **zero vulnerabilities**. Both private release preflight commands passed with live deposits disabled.
 
 Both real Neon databases accepted migrations 001–003. This is distinct from transaction verification: the full real-Neon suite still failed on connection timeouts over pooled/direct TCP and on a WebSocket connection attempt. Individual production TCP and demo HTTPS/WebSocket queries succeeded; connectivity is intermittent. No successful Neon concurrency report or funded settlement is claimed. [Recovery details](RELEASE_RECOVERY.md).
+
+The preceding PENDING observations are historical. The full Neon suite subsequently passed on November 13 ([report](evidence/neon-verification.json)), and the funded purchase subsequently reached FULFILLED ([proof](NEAR_PROOF.md)).
 
 ## Persistence and adversarial coverage
 
@@ -80,4 +84,4 @@ Captures and CLI evidence live in ignored `artifacts/`; browser traces/reports a
 
 No application source changed in this repair. Both existing projects redeployed the approved `ebeb14b` commit after only their corresponding existing Passport key values were restored. Both key APIs return 200 and match the unchanged, distinct local identities; both payment gates remain false.
 
-The hosted API and independent browser journeys passed all five real backend challenges against Neon. Replay reported 20 deliveries (15 concurrent) and one entitlement before the tamper challenge. Direct read-only Neon queries subsequently found one order/attempt/entitlement/Passport and delivered outbox job in demo, zero matching records in production. The independent CLI verified all eight original integrity checks; modified recipient and artifact checks failed as expected. All settlement evidence remains synthetic and mainnet UNVERIFIED. Desktop/mobile Lab axe scans and overflow checks passed. No public migrations were repeated. The separate full transaction suite is still unverified following earlier WSL network failures. [Detailed evidence](HOSTED_VERIFICATION.md).
+The hosted API and independent browser journeys passed all five real backend challenges against Neon. Replay reported 20 deliveries (15 concurrent) and one entitlement before the tamper challenge. Direct read-only Neon queries subsequently found one order/attempt/entitlement/Passport and delivered outbox job in demo, zero matching records in production. The independent CLI verified all eight original integrity checks; modified recipient and artifact checks failed as expected. All settlement evidence remains synthetic and mainnet UNVERIFIED. Desktop/mobile Lab axe scans and overflow checks passed. No public migrations were repeated. At this earlier hosted-check observation, the separate full transaction suite was still unverified following WSL network failures. The later November 13 [full-suite report](evidence/neon-verification.json) supersedes that limitation. [Detailed evidence](HOSTED_VERIFICATION.md).

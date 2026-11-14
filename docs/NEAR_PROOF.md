@@ -60,7 +60,9 @@ node --env-file=.env.local --import tsx scripts/read-only-preflight.ts \
 
 A first network attempt timed out; one retry succeeded and produced the reported evidence. Scripts save no API credential. Fixture dry quotes can be inspected offline; a fresh executable quote is required after an approved purchase for a funded trial.
 
-## Real payment gate and evidence record
+## Historical payment gate — November 13, before funding
+
+This subsection records the earlier key-repair checkpoint and its then-remaining work. The full Neon suite and funded purchase subsequently passed; see the current result at the top. Its absent hashes and UNVERIFIED wording are historical, not current status.
 
 Status (2026-11-13, approved key repair): both projects are READY on `ebeb14b`, payments disabled. Restoring their existing signing identities resolved both key APIs; fingerprints match the unchanged local sources. All five hosted Neon challenges pass, including 20 notifications to one entitlement and signed Passport/artifact tamper checks. Independent reads confirm the tested demo purchase is absent from production. Migrations were not repeated. The separate full transaction suite and genuine mainnet settlement remain UNVERIFIED. No payment was initiated. [Hosted verification](HOSTED_VERIFICATION.md).
 

@@ -85,7 +85,7 @@ Local captures and exported evidence are in ignored `artifacts/release-hosted/`,
 
 [Sanitized repair and verification evidence](evidence/passport-repair-2026-11-13.json). [Pre-repair observations](evidence/hosted-verification-2026-11-12.json) remain historical evidence; their key-failure status is superseded by this report.
 
-## Remaining release gates
+## Historical remaining release gates — before the November 13 funded result
 
 1. **Full Neon transaction suite:** still UNVERIFIED. Hosted notification concurrency now passes, but the separate 12-approval contention, rollback and broader reconnect suite previously failed over WSL DNS/TCP/TLS-read errors. No public migrations should be repeated to diagnose this. A process-only IPv4 workaround previously connected but later timed out, so DNS ordering alone did not establish reliable transport. A full-suite runner outside this WSL path remains an option requiring separate approval if publication or credential configuration is needed.
 2. **Production merchant and buyer workflow:** validate the real merchant account, Base recipient ownership, product/checkout, human authorization and a fresh authenticated dry quote on production. Earlier local merchant tests do not prove this hosted owner workflow. Wallet ownership signing requires the owner's explicit authorization; none was performed here.
