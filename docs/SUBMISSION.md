@@ -47,7 +47,7 @@ The focus is the connected chain of evidence: a human-controlled purchase → in
 - Base merchant receipt: https://basescan.org/tx/0x8cc1225a938538842a42db97b5e3592fb37ede94632872d626dd91d1acafe121
 - Arbitrum refund: https://arbiscan.io/tx/0x040de1f0e88378fcabcaa141480c5fa5499c329a8d899e4b4426fa7c8a6965a6
 - [Provider SUCCESS, receipts, entitlement, artifact and reproducible verification](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/)
-- Private video review file: `video/output/routetill-meet-john-narrated-review.mp4`. Do not describe it as publicly available until the owner approves and uploads it.
+- Private video review file: `video/output/routetill-guided-product-review.mp4`. Do not describe it as publicly available until the owner approves and uploads it.
 
 ## Judge walkthrough — DO → SEE
 

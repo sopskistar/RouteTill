@@ -40,3 +40,9 @@ The final unit/integration rerun passed all 224 tests in nine files in 32.31 sec
 The rendered MP4 is 99.349 seconds, 1920×1080 H.264 at 30 fps with AAC 48 kHz speech, 7,299,973 bytes. Full FFmpeg decode returned zero errors. Mean audio level was -21.7 dB, peak -2.8 dB, with no clipping. The contact-sheet review covers the full sequence and the closing frame; the typing, receipt and Passport frames were inspected at full size. Captions stay within each scene's audio/timing bounds. The earlier narrated MP4 and its backup remain the same size and are preserved.
 
 Fresh read-only mainnet verification still reports FULFILLED, one 1,613-byte entitlement and one valid Passport with independent settlement observations. No financial state or signed evidence was changed. Public hosted verification is run after the approved Git integration deployment; the final report records those results separately.
+
+## Hosted startup hardening
+
+The first fast hosted check clicked a server-rendered scene button before its JavaScript initialized. A later network-idle inspection had no browser errors and confirmed the scene worked. Controls now render disabled until client initialization completes, with a short loading status, so slow connections cannot silently lose an initial click. No payment or backend request is introduced by readiness. Targeted playback/guest tests and the production build are rerun for this correction.
+
+All three final guided tests passed after readiness hardening, including a deliberately blocked JavaScript load that verifies disabled SSR controls become usable once scripts are released. Manual navigation and complete automatic playback passed again without mutating API calls. The existing hands-on guest journey passed separately; readiness changes only the guided controls.
