@@ -1,0 +1,8 @@
+/** Approved editorial source shared by the homepage and narrated demonstration. */
+export const johnStory=[
+ {name:'Agent finds it',title:'John needs a dataset.',body:"His AI agent finds a useful developer dataset for $10. John wants the file, but he doesn't want to hand over control of his wallet."},
+ {name:'No blank check',title:'His money. His decision.',body:"An agent shouldn't have unrestricted spending power. John wants to buy this one file, not give an agent permission to spend whenever it wants."},
+ {name:'John says yes',title:'One file. One approval.',body:"John sees the seller, the $10 price and the file he's getting. He sets a maximum source spend of 11 USDC and approves this one purchase."},
+ {name:'Payment verified',title:'Paid on Arbitrum. Received on Base.',body:'John sends about $10.11 from his Arbitrum wallet. NEAR Intents handles the cross-chain payment, and RouteTill verifies that the merchant received exactly $10 on Base.'},
+ {name:'File + proof',title:'Delivered. With proof.',body:'RouteTill verifies the merchant payment, delivers the correct dataset exactly once, and issues a signed Purchase Passport anyone can check.'}
+] as const;

@@ -23,7 +23,7 @@ test('merchant onboarding, product creation and hosted checkout',async({page})=>
  const product=page.locator('article').filter({has:page.getByRole('heading',{name:'Judge digital handbook'})});await product.getByRole('link',{name:'Open checkout'}).click();await expect(page.getByRole('heading',{name:'A purchase with a paper trail.'})).toBeVisible();await capture(page,{path:captures+'/checkout-desktop.png',fullPage:true});
  await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Review purchase proposal'}).click();await expect(page.getByRole('heading',{name:'Approve one precise purchase.'})).toBeVisible();
  await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Authorize this purchase'}).click();await expect(page.getByRole('heading',{name:'Follow the purchase.'})).toBeVisible();await capture(page,{path:captures+'/approval-desktop.png',fullPage:true});
- await page.getByRole('button',{name:'Run synthetic settlement & deliver'}).click();await expect(page.getByRole('heading',{name:'Your purchase, accounted for.'})).toBeVisible();await page.getByRole('link',{name:'Get your digital product'}).click();await page.getByRole('button',{name:'Verify delivered file'}).click();await expect(page.getByText('Downloaded bytes match the approved SHA-256.')).toBeVisible();await capture(page,{path:captures+'/delivery-desktop.png',fullPage:true});
+ await page.getByRole('button',{name:'Simulate payment & deliver'}).click();await expect(page.getByRole('heading',{name:'Your purchase, accounted for.'})).toBeVisible();await page.getByRole('link',{name:'Get your digital product'}).click();await page.getByRole('button',{name:'Verify delivered file'}).click();await expect(page.getByText('Downloaded bytes match the approved SHA-256.')).toBeVisible();await capture(page,{path:captures+'/delivery-desktop.png',fullPage:true});
  await page.getByRole('link',{name:'Open associated Purchase Passport'}).click();await page.getByRole('button',{name:'Check original record'}).click();await expect(page.getByText('Record integrity passes',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Test a modified recipient'}).click();await expect(page.getByText('Record integrity fails',{exact:true})).toBeVisible();
 });
 test('five real backend attacks, Passport export, local tamper verification and mobile',async({page})=>{
@@ -99,9 +99,9 @@ test('injected Rabby, MetaMask, Coinbase and OKX selection with legacy deduplica
 });
 
 test('John story stays distinct from verified payment and respects reduced motion',async({page})=>{
- await page.goto('/');const story=page.locator('.john-story');const chapters=story.getByRole('group',{name:'Explore John’s five story chapters'}).getByRole('button');await expect(chapters).toHaveCount(5);
+ await page.goto('/');const story=page.locator('.john-story');const chapters=story.getByRole('group',{name:'Explore John’s five purchase scenes'}).getByRole('button');await expect(chapters).toHaveCount(5);
  for(let i=0;i<5;i++){await chapters.nth(i).click();await expect(chapters.nth(i)).toHaveAttribute('aria-pressed','true');}
- await expect(story.getByText(/Fictional example/)).toBeVisible();await expect(page.getByRole('article',{name:'Verified mainnet Purchase Passport'}).getByText('Fulfilled',{exact:true})).toBeVisible();
+ await expect(story.getByText(/Based on RouteTill’s first verified purchase/)).toBeVisible();await expect(page.getByRole('article',{name:'Verified mainnet Purchase Passport'}).getByText('Fulfilled',{exact:true})).toBeVisible();
  await expect(page.getByRole('link',{name:'Arbitrum payment',exact:true})).toHaveAttribute('href','https://arbiscan.io/tx/0x1afadae771327b11deb4132df51953bd307e2d13c57a8e276ec95f420e5a4a81');
  await page.emulateMedia({reducedMotion:'reduce'});await expect(story.getByRole('button',{name:'Play story'})).toBeDisabled();await chapters.nth(2).focus();await page.keyboard.press('Enter');await expect(chapters.nth(2)).toHaveAttribute('aria-pressed','true');
  expect(await story.evaluate(e=>e.getAnimations({subtree:true}).filter(a=>a.playState==='running').length)).toBe(0);

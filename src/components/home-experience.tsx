@@ -1,6 +1,8 @@
 'use client';
 import {useEffect,useState,useSyncExternalStore} from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import {johnStory} from '@/core/john-story';
 import {ArrowRight,FileCheck2,Fingerprint,LockKeyhole,ShieldCheck,Route,FileJson,ArrowUpRight,Play,Pause,Check,UserRound} from 'lucide-react';
 import {Badge,Hash,Mark} from './ui';
 import {verifiedPurchase as proof,proofLinks} from '@/core/verified-purchase';
@@ -13,27 +15,21 @@ export function VerifiedPassport(){return <article className="hero-passport proo
  <div className="receipt-file"><Fingerprint size={23}/><div><strong>1,613 bytes, matched to the approved file</strong><Hash value={proof.artifactSha256} short/></div><Badge tone="good">Signed</Badge></div></div>
  <div className="passport-preview-bottom"><Link href={proof.passportUrl}>Open signed Passport<ArrowUpRight size={15}/></Link><Link href="#verified-purchase">Inspect the payment<ArrowRight size={15}/></Link></div>
  </article>;}
-const story=[
- {name:'The person',title:'John needs a dataset.',body:'His AI agent finds a useful digital resource. John wants the file, without handing over unrestricted control of his money.',icon:UserRound},
- {name:'The problem',title:'“Buy it” needs boundaries.',body:'Which merchant? Which file? How much? A helpful agent should not get to change the answers after John says yes.',icon:LockKeyhole},
- {name:'The approval',title:'John approves one precise purchase.',body:'RouteTill locks the product, merchant recipient, spending limit and deadline. The agent can prepare the purchase; only John can authorize it.',icon:ShieldCheck},
- {name:'The payment',title:'Cross chains. Keep the promise.',body:'John personally confirms the transfer in his wallet. NEAR Intents routes Arbitrum USDC to Base USDC. RouteTill independently checks that the merchant was paid.',icon:Route},
- {name:'The result',title:'The right file. A record to keep.',body:'A qualifying settlement creates one entitlement. John gets the digital resource and a signed Purchase Passport linking the approval, receipt and exact file.',icon:FileCheck2}
-];
+const story=johnStory.map((chapter,index)=>({...chapter,icon:[UserRound,LockKeyhole,ShieldCheck,Route,FileCheck2][index]}));
 function subscribeReducedMotion(callback:()=>void){const q=window.matchMedia('(prefers-reduced-motion: reduce)');q.addEventListener('change',callback);return()=>q.removeEventListener('change',callback);}
 export function JohnStory(){
  const [active,setActive]=useState(0),[playing,setPlaying]=useState(false);
  const reduced=useSyncExternalStore(subscribeReducedMotion,()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches,()=>true);
  const chapter=story[active],Icon=chapter.icon;
  useEffect(()=>{if(!playing||reduced)return;const timer=setTimeout(()=>{if(active===4)setPlaying(false);else setActive(active+1);},5000);const pause=()=>{if(document.hidden)setPlaying(false);};document.addEventListener('visibilitychange',pause);return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',pause);};},[active,playing,reduced]);
- return <div className="john-story" data-proof-reveal><div className="story-index"><div className="story-person"><UserRound size={21}/><strong>Meet John</strong><span>An illustrative story</span></div><div className="story-chapters" role="group" aria-label="Explore John’s five story chapters">{story.map((s,i)=><button type="button" key={s.name} aria-pressed={active===i} aria-controls="john-story-panel" onClick={()=>{setPlaying(false);setActive(i);}}><span>{i+1}</span>{s.name}<ArrowRight size={15}/></button>)}</div><button className="proof-play" type="button" disabled={reduced} aria-label={playing?'Pause story':'Play story'} aria-pressed={playing} onClick={()=>{if(active===4)setActive(0);setPlaying(!playing);}}>{playing?<Pause size={15}/>:<Play size={15}/>}<span>{reduced?'Choose a chapter':playing?'Pause story':'Play the story'}</span></button></div>
+ return <div className="john-story" data-proof-reveal><div className="story-index"><div className="story-person"><Image src="/illustrations/john.svg" width={60} height={60} alt="John, a developer with his laptop"/><strong>John stays in control.</strong></div><div className="story-chapters" role="group" aria-label="Explore John’s five purchase scenes">{story.map((s,i)=><button type="button" key={s.name} aria-pressed={active===i} aria-controls="john-story-panel" onClick={()=>{setPlaying(false);setActive(i);}}><span>{i+1}</span>{s.name}<ArrowRight size={15}/></button>)}</div><button className="proof-play" type="button" disabled={reduced} aria-label={playing?'Pause story':'Play story'} aria-pressed={playing} onClick={()=>{if(active===4)setActive(0);setPlaying(!playing);}}>{playing?<Pause size={15}/>:<Play size={15}/>}<span>{reduced?'Choose a chapter':playing?'Pause story':'Play the story'}</span></button></div>
  <div className="story-stage" id="john-story-panel" onMouseEnter={()=>setPlaying(false)}><div key={active} className="story-content"><div className="story-step"><Icon size={20}/><span>{active+1} of 5</span></div><div aria-live="polite" aria-atomic="true"><h3>{chapter.title}</h3><p>{chapter.body}</p></div><div className="story-object" aria-hidden="true">
  {active===0&&<div className="story-discovery"><UserRound size={29}/><span>John’s agent finds</span><ArrowRight size={23}/><div><FileJson size={29}/><strong>A digital dataset</strong></div></div>}
  {active===1&&<div className="story-boundary"><LockKeyhole size={32}/><strong>One purchase.<br/>No open-ended permission.</strong></div>}
- {active===2&&<dl className="story-policy"><div><dt>Merchant gets</dt><dd>10 Base USDC</dd></div><div><dt>Source spending cap</dt><dd>11 Arbitrum USDC</dd></div><div><dt>Wallet confirmation</dt><dd>Always personal</dd></div></dl>}
+ {active===2&&<dl className="story-policy"><div><dt>Merchant gets</dt><dd>10 Base USDC</dd></div><div><dt>Source spending cap</dt><dd>11 USDC + ETH gas</dd></div><div><dt>Wallet confirmation</dt><dd>Always personal</dd></div></dl>}
  {active===3&&<div className="story-payment-route"><div><strong>Arbitrum</strong><span>John’s USDC</span></div><div className="story-route-line"><Route size={24}/><span>NEAR Intents</span><i/></div><div><strong>Base</strong><span>Merchant’s USDC</span></div></div>}
  {active===4&&<div className="story-finish"><Mark size={42}/><div><strong>Purchase Passport</strong><span>Human approval → receipt → exact file</span></div><ShieldCheck size={27}/></div>}
- </div></div><p className="story-fiction">Fictional example. It explains the purchase flow; it is not a record of a payment by John.</p></div></div>;
+ </div></div><div className="story-evidence-link"><p>Based on RouteTill’s first verified purchase. Agent discovery is visualized; the payment and delivery evidence are real.</p>{active>=3&&<Link className="text-link" href={active===4?proof.passportUrl:proofLinks.merchant}>{active===4?'Inspect the signed Passport':'Inspect the verified merchant receipt'}<ArrowUpRight size={15}/></Link>}</div></div></div>;
 }
 const challenges=[
  {title:'Changed merchant recipient',approved:'Intended merchant wallet',attempted:'Different settlement wallet',condition:'RouteTill rejects a recipient that differs from the approved policy.'},

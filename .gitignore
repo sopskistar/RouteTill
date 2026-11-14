@@ -53,3 +53,9 @@ next-env.d.ts
 /video/public/*.woff2
 
 /.impeccable/hook.cache.json
+
+# Private narrated-video review assets (publish only after owner approval)
+/video/public/narration/
+/video/public/final-captures/
+/video/public/developer-workspace.webp
+/video/public/john.svg
