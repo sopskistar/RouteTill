@@ -1,5 +1,7 @@
 # RouteTill communication and video handoff
 
+**Final selection:** the owner has approved `RouteTill_Judge_Demo_Final_Updated_Frontend.mp4` (124 seconds). [Public original and preservation record](FINAL_VIDEO.md). The editorial material below is retained as a handoff; it does not select or authorize a replacement video.
+
 This is an editorial handoff, not a new render or review of existing MP4s. Preserve all existing video files. [Locked positioning and claims](POSITIONING.md) is authoritative for future editing.
 
 ## Locked opening

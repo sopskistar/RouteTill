@@ -3,6 +3,7 @@ import {useEffect,useState,useSyncExternalStore} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {ArrowLeft,ArrowRight,Check,FileCheck2,FileJson,LockKeyhole,Pause,Play,RotateCcw,Route,ShieldCheck} from 'lucide-react';
+import {finalDemoVideo} from '@/core/demo-video';
 import {johnStory} from '@/core/john-story';
 import {verifiedPurchase,proofLinks} from '@/core/verified-purchase';
 import {DEMO_WALLET} from '@/core/constants';
@@ -23,8 +24,9 @@ export function GuidedDemo(){
  function go(i:number){setPlaying(false);setStage(Math.max(0,Math.min(4,i)));setElapsed(0);}
  const chapter=johnStory[stage],progress=(lengths.slice(0,stage).reduce((a,b)=>a+b,0)+elapsed)/lengths.reduce((a,b)=>a+b,0)*100;
  const moment=reduced&&!playing?lengths[stage]:elapsed;
- return <div className="guided-demo" onKeyDown={e=>{if(e.target instanceof HTMLInputElement)return;if(e.key==='ArrowRight'){e.preventDefault();go(stage+1);}if(e.key==='ArrowLeft'){e.preventDefault();go(stage-1);}}}>
+ return <div className="guided-demo" onKeyDown={e=>{if(e.target instanceof HTMLInputElement||e.target instanceof HTMLMediaElement)return;if(e.key==='ArrowRight'){e.preventDefault();go(stage+1);}if(e.key==='ArrowLeft'){e.preventDefault();go(stage-1);}}}>
  <div className="guided-intro"><div><h1>Meet John. See RouteTill work.</h1><p>The agent proposes. You authorize. RouteTill verifies payment and delivery.</p></div><Link className="text-link" href={checkout}>Try buyer checkout<ArrowRight size={17}/></Link></div>
+ <details className="panel margin-bottom" id="final-video"><summary>Watch the final narrated demo · 2:04</summary><p className="terms-description margin-top">The approved film shows a no-funds walkthrough and separate historical mainnet evidence. English captions are burned into the original video. The interactive guided demo continues below.</p><video controls playsInline preload="none" poster={finalDemoVideo.poster} aria-label="Final narrated RouteTill demo with burned-in English captions" style={{width:'100%',height:'auto',display:'block',marginTop:16}}><source src={finalDemoVideo.url} type="video/mp4"/>Your browser can download the original MP4 using the link below.</video><a className="text-link margin-top" href={finalDemoVideo.url}>Watch or download the unchanged original MP4<ArrowRight size={15}/></a></details>
  <div className="guided-disclosure"><Badge tone="warn">Guided reenactment · no funds</Badge><span>John is an illustrative buyer. This reenactment creates no purchases and requests no wallet access; the example agent is deterministic.</span><Link href={verifiedPurchase.passportUrl}>View real payment proof<ArrowRight size={15}/></Link></div>
  <div className="guided-controls"><div className="actions"><button className="button" disabled={!ready} aria-label={playing?'Pause demo':'Play demo'} onClick={()=>{if(stage===4&&elapsed>=lengths[4]){setStage(0);setElapsed(0);}setPlaying(p=>!p);}}>{playing?<Pause size={17}/>:<Play size={17}/>} {playing?'Pause':'Play'}</button><button className="icon-button" aria-label="Replay demo" disabled={!ready} onClick={()=>{setStage(0);setElapsed(0);setPlaying(!reduced);}}><RotateCcw size={18}/></button></div><div className="guided-progress"><progress max={100} value={progress} aria-label="Demo progress"/><span>{stage+1} / 5 · {chapter.name}</span></div><div className="actions"><button className="icon-button" aria-label="Previous scene" disabled={!ready||stage===0} onClick={()=>go(stage-1)}><ArrowLeft size={18}/></button><button className="button button-quiet" aria-label="Next scene" disabled={!ready||stage===4} onClick={()=>go(stage+1)}>Next<ArrowRight size={17}/></button></div></div>
 

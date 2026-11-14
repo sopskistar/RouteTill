@@ -8,6 +8,8 @@ John is an illustrative buyer: his agent proposes a dataset, he authorizes exact
 
 ## Watch, try, inspect
 
+- [Watch the final narrated video — 2:04, original MP4](https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4): approved film with the updated homepage. The no-funds reenactment and recorded November 13 mainnet evidence are labeled separately. [Original-byte verification](FINAL_VIDEO.md).
+
 - [Watch the guided demo](https://routetill.vercel.app/demo): five John scenes with play/pause/replay and previous/next controls. Keyboard arrows and reduced-motion alternatives are supported. The checkout typing is a labeled reenactment; it creates no purchase and moves no funds.
 - [Try buyer checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo): operate the real no-funds guest workflow yourself. The protected prepared cap/refund terms remain fixed.
 - [Run 5 security checks](https://routetill-demo.vercel.app/lab): actual policy/database scenarios, separate from the guided story.

@@ -1,5 +1,7 @@
 # Current communication handoff
 
+The owner-selected final film is **RouteTill_Judge_Demo_Final_Updated_Frontend.mp4**, 124 seconds. [Public original and preservation verification](FINAL_VIDEO.md). The older cut and timing below remain historical production records, not the final selection.
+
 Use [VIDEO_HANDOFF.md](VIDEO_HANDOFF.md) for the current locked positioning, illustrative John story, 30-second explanation, verified source paths and simulation labels. Website scene copy is shared in `src/core/john-story.ts`. Human application authorization and personal wallet confirmation are separate; the agent can do neither.
 
 The following is the **historical script for an existing private video**, preserved as a production record. It is not a claim that the older video’s editorial wording is current. No MP4, narration, captions or video source was edited or rendered in this communication pass.

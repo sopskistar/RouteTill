@@ -1,6 +1,6 @@
 # RouteTill — owner submission copy
 
-**Draft for owner review.** The owner will publish the approved video/X post and personally submit the official form. No application payload, personal information or submission request is prepared here.
+**Draft for owner review.** The owner-approved video is publicly hosted unchanged. The owner will publish the X post and personally submit the official form. No application payload, personal information or submission request is prepared here.
 
 ## Project name
 
@@ -51,7 +51,8 @@ The focus is the connected chain of evidence: a human-controlled purchase → in
 - Base merchant receipt: https://basescan.org/tx/0x8cc1225a938538842a42db97b5e3592fb37ede94632872d626dd91d1acafe121
 - Arbitrum refund: https://arbiscan.io/tx/0x040de1f0e88378fcabcaa141480c5fa5499c329a8d899e4b4426fa7c8a6965a6
 - [Provider SUCCESS, receipts, entitlement, artifact and reproducible verification](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/)
-- Private video review file: `video/output/routetill-guided-product-review.mp4`. Do not describe it as publicly available until the owner approves and uploads it.
+- Approved final video (original MP4): https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4
+- [Video preservation and hosted-original verification](FINAL_VIDEO.md). Local file: `video/output/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4`. Older cuts are historical, not the selected final film.
 
 ## Judge walkthrough — DO → SEE
 
@@ -62,16 +63,16 @@ The focus is the connected chain of evidence: a human-controlled purchase → in
 
 ## X post draft — attach the owner-approved narrated MP4
 
-The agent proposes. You authorize. RouteTill verifies payment and delivery.
+Your agent can find a dataset without controlling your wallet.
 
-Built at NEAR HACKATHON. NEAR Intents routes Arbitrum USDC to Base USDC.
+Built RouteTill at NEAR HACKATHON. NEAR Intents: Arbitrum USDC → Base USDC; verified receipt unlocks the file.
 
-https://routetill.vercel.app
+https://routetill.vercel.app/demo
 https://github.com/sopskistar/RouteTill
 
 @NEARProtocol #NEARHackathon
 
-Attach the approved video directly; the site links to the public demo, source and payment evidence. The form’s `demoUrl` expects your public X post URL, not the website or local MP4. No public video URL or X post is invented here.
+Attach the approved video directly; the site links to the public demo, source and payment evidence. The form’s `demoUrl` expects your public X post URL, not the website or local MP4. The original approved MP4 is available above; no public X post URL has been provided or invented.
 
 ## Non-personal form values
 
@@ -86,7 +87,7 @@ Attach the approved video directly; the site links to the public demo, source an
 
 Use the [official form and current rules](https://nearhackathon.com/HACKATHON.md). The official `idea` limit is 20–2,000 characters; the description above is designed to fit. Enter your own lead name, email, team size, NEAR mainnet payout account and contact consent. The Arbitrum/Base EVM wallets are not substitutes for the requested NEAR prize account. If independently submitting another project, make the required reciprocal README disclosure; at most two independent projects per person are allowed.
 
-Repository must remain public through judging. Publish the owner-approved X demo with @NEARProtocol and #NEARHackathon, then paste its URL into the form. Deadline: November 14, 2026, 23:59 UTC. This document neither submits the form nor authorizes anyone else to do so.
+Repository must remain public through judging. Check your submission history before sending anything. Local records do not establish whether the project has already been submitted. If not submitted, publish your X demo with @NEARProtocol and #NEARHackathon and use its URL in the form. If already submitted and a correction is needed, use [Request changes](https://nearhackathon.com/request-changes), not another application. Deadline: November 14, 2026, 23:59 UTC. This document neither submits the form nor authorizes anyone else to do so.
 
 ## Limitations to disclose
 

@@ -1,28 +1,30 @@
 # RouteTill
 
-**Agent-assisted cross-chain checkout with human approval and verified digital delivery.**
+Agent-assisted cross-chain checkout with human approval and verified digital delivery.
 
-Built with **NEAR Intents 1Click** for Arbitrum USDC → Base USDC settlement.
+Built with NEAR Intents 1Click for Arbitrum USDC → Base USDC settlement. RouteTill binds human approval to one digital purchase, independently checks the merchant’s payment receipt and grants access to the matching file with a signed Purchase Passport.
 
-**The agent proposes. You authorize. RouteTill verifies payment and delivery.**
+The agent proposes. You authorize. RouteTill verifies payment and delivery.
 
-John is an illustrative developer who needs a dataset. An agent proposes a merchant’s 10 USDC product. John holds USDC on Arbitrum; the merchant wants USDC on Base. He wants the file without giving an agent unrestricted access to his wallet. The implemented example agent follows deterministic rules; it is not an LLM browsing the internet.
-
-RouteTill presents the exact seller, product, source-spending cap, refund address, file digest and deadline. John authorizes that purchase in the application, then **separately confirms the wallet transfer himself**. NEAR Intents 1Click provides the authenticated exact-output quote and cross-chain execution. RouteTill independently checks the merchant receipt before granting access to matching bytes and issuing a signed **Purchase Passport**.
-
-The merchant lists the file, sets the price, chooses a supported receiving wallet and shares checkout. Buyer and merchant are two sides of this one purchase. RouteTill is not custodial escrow; general live payment preparation is disabled.
+John is an illustrative developer who needs a dataset. A deterministic example agent proposes the merchant’s 10 USDC product; it is not an LLM browsing the internet. John holds USDC on Arbitrum; the merchant wants USDC on Base. John reviews and authorizes the exact terms, then **separately confirms the wallet transfer himself**. The merchant lists the file, sets the price and shares checkout: buyer and merchant are two sides of one transaction.
 
 ![Actual RouteTill application screen showing the buyer actions and the completed mainnet Purchase Passport, including 10 Base USDC received and the verified delivered file](docs/screenshots/home-hero-desktop.png)
 
 *Actual release-preview application capture, not a concept render: the Purchase Passport summarizes our completed purchase. [Full Passport screen](docs/screenshots/passport-desktop.png) · [Mobile homepage](docs/screenshots/communication-home-mobile.png) · [Mobile checkout](docs/screenshots/buyer-checkout-mobile.png).*
 
-[Production](https://routetill.vercel.app) · [Watch the guided demo](https://routetill.vercel.app/demo) · [Public no-funds buyer demo](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) · [Source](https://github.com/sopskistar/RouteTill)
+**[Watch the final demo — original MP4, 2:04](https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4)**
 
-**Recorded mainnet result — November 13, 2026:** one funded purchase is FULFILLED. NEAR Intents reported SUCCESS; independent chain observations confirmed exactly 10 native Base USDC to the verified merchant. Normal reconciliation issued one entitlement and one signed Passport. General production payment preparation remains disabled; the public demo sends no funds.
+<a href="https://github.com/sopskistar/RouteTill/releases/download/judge-demo-final-2026-11-14/RouteTill_Judge_Demo_Final_Updated_Frontend.mp4"><img src="public/demo/final-demo-thumbnail.jpg" width="640" alt="Watch the approved narrated RouteTill demo: the updated homepage and real mainnet Purchase Passport, captured from the unchanged final video"></a>
+
+The owner-approved film is publicly hosted as its original bytes, with narration and burned-in English captions. [File size, SHA-256 and download comparison](docs/FINAL_VIDEO.md). It is separate from the interactive guided walkthrough; the MP4 is a GitHub Release asset, not a Git source blob.
+
+[Production](https://routetill.vercel.app) · [Interactive guided walkthrough](https://routetill.vercel.app/demo) · [Hands-on no-funds checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Run 5 security checks](https://routetill-demo.vercel.app/lab) · [Recorded mainnet Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) · [Source](https://github.com/sopskistar/RouteTill)
+
+**Recorded mainnet result — November 13, 2026:** one funded purchase is FULFILLED, with exactly 10 native Base USDC received, one entitlement, matching delivered bytes and a signed Passport. The public checkout sends no funds; general live payment preparation remains disabled.
 
 ## Judges: Start Here
 
-Start with [Watch the demo](https://routetill.vercel.app/demo): a play/pause walkthrough of the same five John scenes, with typed inputs and a clearly labeled no-funds reenactment. Then choose the separate hands-on checkout, security checks or real proof below.
+Start with [Explore the interactive guided walkthrough](https://routetill.vercel.app/demo): a play/pause walkthrough of the same five John scenes, with typed inputs and a clearly labeled no-funds reenactment. Then choose the separate hands-on checkout, security checks or real proof below.
 
 No wallet, registration or owner code is needed for A or B. Merchant and agent administration remain protected. [Detailed walkthrough](docs/JUDGE_WALKTHROUGH.md).
 
@@ -43,23 +45,7 @@ No wallet, registration or owner code is needed for A or B. Merchant and agent a
 2. **DO →** Select **Check original record**, then **Test a modified recipient**. **SEE →** original integrity passes and modified evidence fails. Use the standalone commands below for independent chain verification: a browser signature check alone does not establish settlement.
 3. **DO →** Follow the [reproduction instructions](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt). **SEE →** the signed Passport and the saved 12-check independent result. The [original order page](https://routetill.vercel.app/orders/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) and actual entitled download require the purchasing account; the public manifest, Passport and CC0 artifact copy require no buyer credentials.
 
-## Why NEAR Intents is part of the purchase
-
-The buyer and merchant use different chains in one purchase: the buyer paid from Arbitrum while the merchant received USDC on Base. NEAR Intents provided the cross-chain execution; RouteTill did not replace it with a database payment flag or a home-grown bridge.
-
-| NEAR Intents provides | RouteTill builds around it |
-| --- | --- |
-| Authenticated `POST /v0/quote` with `EXACT_OUTPUT`, native Arbitrum USDC → native Base USDC | [Quote integration](src/integrations/near.ts) binds recipient, refund, assets and exact output to the approved policy and checks input against the spending cap |
-| Provider-signed quote fields, verified with the pinned [official SDK](https://github.com/defuse-protocol/one-click-sdk-typescript) | Signature verification plus separate validation of amounts, freshness and terms; optional response metadata is not assumed signed |
-| Executable quote-specific deposit address and payment routing | [Approval consumption/execution](src/services/orders.ts), [single-order guard](src/core/live-trial.ts), and [transaction preflight](src/services/payment-preflight.ts); the human confirms the exact ERC-20 transfer in their wallet |
-| `GET /v0/status` execution status and transaction references | [Reconciliation](src/services/reconcile.ts) requires SUCCESS and [independently inspects chain receipts](src/integrations/settlement.ts): correct token, merchant, exact amount, canonical block, at least 12 confirmations and finalized Base block; an additional reference must qualify as an origin-chain refund |
-| Cross-chain transfer execution | [Transactional delivery](src/services/fulfillment.ts) creates one entitlement, checks the artifact digest and issues a signed Passport; missing or ambiguous settlement evidence prevents delivery |
-
-Official documentation: [quote API](https://docs.near-intents.org/api-reference/oneclick/request-a-swap-quote), [quote signatures](https://docs.near-intents.org/integration/distribution-channels/1click-api/verify-quote-signature), [execution status](https://docs.near-intents.org/api-reference/oneclick/check-swap-execution-status). [Implementation/evidence notes](docs/NEAR_PROOF.md).
-
-This project does not deploy its own NEAR smart contract or implement Chain Signatures, NEAR AI inference or AP2 compatibility. The deterministic example agent proposes purchases; it cannot approve or spend autonomously.
-
-## What connects the purchase
+## Capability and evidence checklist
 
 | Mechanism | What it means for the buyer and merchant |
 | --- | --- |
@@ -68,7 +54,7 @@ This project does not deploy its own NEAR smart contract or implement Chain Sign
 | Entitlement and matching artifact | One durable access entitlement; repeat authorized downloads are allowed. SHA-256 checks approved bytes, not quality. |
 | Signed Purchase Passport | A signed record linking what you approved, the merchant payment evidence and the file you received. Signature integrity is separate from independent settlement checks. |
 
-[Canonical positioning and claim-to-evidence table](docs/POSITIONING.md) · [30-second explanation and video handoff](docs/VIDEO_HANDOFF.md). ProofFlow is the underlying verification engine, not a separate product.
+[Canonical positioning and claim-to-evidence table](docs/POSITIONING.md) · [Approved final video and preservation record](docs/FINAL_VIDEO.md) · [Historical editorial handoff](docs/VIDEO_HANDOFF.md). ProofFlow is the underlying verification engine, not a separate product.
 
 ## One real completed purchase
 
@@ -86,6 +72,22 @@ This project does not deploy its own NEAR smart contract or implement Chain Sign
 [Complete verification manifest](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/verification-manifest.json) · [Passport JSON](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/purchase-passport.json) · [Reproduction instructions](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt)
 
 The provider's association between source deposit and destination transaction is not itself a cryptographic causal proof. RouteTill independently checks the applicable chain receipt, asset, recipient, amount and finality before granting access. The actual download requires the purchasing session; public evidence and a CC0 artifact copy are provided for independent verification.
+
+## Why NEAR Intents is part of the purchase
+
+The buyer and merchant use different chains in one purchase: the buyer paid from Arbitrum while the merchant received USDC on Base. NEAR Intents provided the cross-chain execution; RouteTill did not replace it with a database payment flag or a home-grown bridge.
+
+| NEAR Intents provides | RouteTill builds around it |
+| --- | --- |
+| Authenticated `POST /v0/quote` with `EXACT_OUTPUT`, native Arbitrum USDC → native Base USDC | [Quote integration](src/integrations/near.ts) binds recipient, refund, assets and exact output to the approved policy and checks input against the spending cap |
+| Provider-signed quote fields, verified with the pinned [official SDK](https://github.com/defuse-protocol/one-click-sdk-typescript) | Signature verification plus separate validation of amounts, freshness and terms; optional response metadata is not assumed signed |
+| Executable quote-specific deposit address and payment routing | [Approval consumption/execution](src/services/orders.ts), [single-order guard](src/core/live-trial.ts), and [transaction preflight](src/services/payment-preflight.ts); the human confirms the exact ERC-20 transfer in their wallet |
+| `GET /v0/status` execution status and transaction references | [Reconciliation](src/services/reconcile.ts) requires SUCCESS and [independently inspects chain receipts](src/integrations/settlement.ts): correct token, merchant, exact amount, canonical block, at least 12 confirmations and finalized Base block; an additional reference must qualify as an origin-chain refund |
+| Cross-chain transfer execution | [Transactional delivery](src/services/fulfillment.ts) creates one entitlement, checks the artifact digest and issues a signed Passport; missing or ambiguous settlement evidence prevents delivery |
+
+Official documentation: [quote API](https://docs.near-intents.org/api-reference/oneclick/request-a-swap-quote), [quote signatures](https://docs.near-intents.org/integration/distribution-channels/1click-api/verify-quote-signature), [execution status](https://docs.near-intents.org/api-reference/oneclick/check-swap-execution-status). [Implementation/evidence notes](docs/NEAR_PROOF.md).
+
+This project does not deploy its own NEAR smart contract or implement Chain Signatures, NEAR AI inference or AP2 compatibility. The deterministic example agent proposes purchases; it cannot approve or spend autonomously.
 
 ## Run from a fresh clone without private credentials
 
@@ -153,6 +155,8 @@ npm run verify -- docs/evidence/demo-passport.json \
 For a live Passport, add `--rpc https://your-trusted-base-rpc`; missing independent evidence stays UNVERIFIED and exits 2. Obtain and pin the issuer key independently: a key packaged with a receipt does not establish issuer identity. [Format and trust boundaries](docs/PROOFFLOW.md).
 
 ## Test and build
+
+[Final readiness checks — November 14, 2026](docs/FINAL_READINESS.md) distinguish fresh hosted/clone/media verification from previously completed suite results.
 
 ```sh
 npm test
@@ -222,7 +226,7 @@ The application uses the following third-party foundations and assisted-developm
 | PGlite, TypeScript, Playwright | Local PostgreSQL, compiler and browser tests; Apache-2.0 |
 | WalletConnect Universal Provider | Optional wallet pairing; WalletConnect Community License ([upstream text](https://github.com/WalletConnect/walletconnect-monorepo/blob/v2.0/LICENSE.md)); not required for injected Rabby |
 | Manrope / Lucide | Font under SIL OFL / icons under ISC |
-| Remotion and offline narration tools | Separate video project; [tool/asset attribution and license boundaries](video/README.md). Reusable video tooling is not payment evidence |
+| Remotion and offline narration tools | Earlier video prototypes; [tool/asset attribution and license boundaries](video/README.md). The owner-selected final MP4 is tracked separately by its [preservation record](docs/FINAL_VIDEO.md); its production pipeline is not inferred from those prototypes |
 | Codex and installed design/video skills | Assisted implementation and review; shared creative tooling and public references are credited in [REFERENCES](docs/REFERENCES.md). No proprietary site template was copied |
 
 Exact dependency versions are pinned by the root and video lockfiles; upstream license texts remain with their packages. Repository code retains the [MIT LICENSE](LICENSE). The original sample resource is CC0; the public evidence copy is intentional, while actual buyer download permissions remain protected.
@@ -234,5 +238,10 @@ Exact dependency versions are pinned by the root and video lockfiles; upstream l
 - **Human control:** the deterministic agent proposes; the buyer approves the purchase and separately signs the wallet transfer. RouteTill does not custody funds. Network gas is additional to the USDC spending cap.
 - **Delivery and evidence:** one entitlement permits authorized repeat downloads. File hashes check the agreed bytes; Passport signatures protect the record. Independent settlement verification relies on the configured chain RPCs and a trusted issuer key.
 - **Access:** buyer downloads require the purchasing session. Judges can inspect the public Passport and evidence without buyer credentials.
+
+- Keep the repository public through judging and both demos online through **November 18**, preferably **November 25, 2026**; this is an ongoing hosting obligation, not a future uptime guarantee.
+- If **SilentSourcing** is independently submitted, both READMEs must name the other project under Q-015. Its submission is not asserted here; confirm and add reciprocal disclosure before submitting a second project.
+
+The approved original video is public; the owner publishes the X post and submits the form personally. [Copy-ready submission/X drafts](docs/SUBMISSION.md) distinguish those actions and require checking existing submission records first.
 
 [Full limitations](docs/LIMITATIONS.md) · [Security model](docs/SECURITY.md).
