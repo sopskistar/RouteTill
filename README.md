@@ -26,6 +26,8 @@ John needs a dataset for his project. His agent proposes a merchant’s 10 USDC 
 4. **RouteTill verifies:** the merchant’s token, recipient, amount and finality before granting file access.
 5. **John receives:** the matching file and a signed Purchase Passport linking approval, payment evidence and delivery.
 
+John authorized a maximum source spend of 11 USDC. For the recorded purchase, he deposited 10.105156 USDC, the merchant received exactly 10 USDC on Base, and 0.095729 USDC was returned to the approved Arbitrum refund address. His net USDC spend was 10.009427, plus network gas.
+
 The merchant lists the product, sets the price and receiving wallet, and shares checkout. Buyer and merchant participate in the same transaction.
 
 **The agent proposes. You authorize. RouteTill verifies payment and delivery.**
@@ -78,6 +80,7 @@ The recorded November 13, 2026 purchase reached **FULFILLED** through the normal
 | Buyer deposited 10.105156 native USDC on Arbitrum | [Source transaction](https://arbiscan.io/tx/0x1afadae771327b11deb4132df51953bd307e2d13c57a8e276ec95f420e5a4a81) |
 | NEAR Intents reported SUCCESS | [Provider status](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/provider-status.json) |
 | Merchant received exactly 10 native USDC on Base | [Merchant transaction](https://basescan.org/tx/0x8cc1225a938538842a42db97b5e3592fb37ede94632872d626dd91d1acafe121) |
+| 0.095729 USDC returned to the approved Arbitrum refund address | [Refund transaction](https://arbiscan.io/tx/0x040de1f0e88378fcabcaa141480c5fa5499c329a8d899e4b4426fa7c8a6965a6) |
 | One entitlement and signed Passport; matching 1,613-byte file | [Manifest](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/verification-manifest.json) · [Artifact](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/agent-purchase-test-vectors.md) |
 | Twelve standalone verification checks passed | [Saved result](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/cli-verification.json) · [Reproduce](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt) |
 
