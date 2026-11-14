@@ -6,17 +6,19 @@ An AI agent can suggest a dataset, but the buyer needs control over spending and
 
 **NEAR's role:** NEAR Intents supplies the authenticated exact-output quote and payment route from native Arbitrum USDC to native Base USDC. RouteTill adds purchase-policy enforcement, independent receipt verification and delivery. It is not a custodial escrow service.
 
-![Actual RouteTill production screen showing the buyer actions and the completed mainnet Purchase Passport, including 10 Base USDC received and the verified delivered file](docs/screenshots/home-hero-desktop.png)
+![Actual RouteTill application screen showing the buyer actions and the completed mainnet Purchase Passport, including 10 Base USDC received and the verified delivered file](docs/screenshots/home-hero-desktop.png)
 
-*Actual application capture, not a concept render: the Purchase Passport summarizes our completed purchase. [Full Passport screen](docs/screenshots/passport-desktop.png) · [Mobile checkout](docs/screenshots/buyer-checkout-mobile.png).*
+*Actual release-preview application capture, not a concept render: the Purchase Passport summarizes our completed purchase. [Full Passport screen](docs/screenshots/passport-desktop.png) · [Mobile checkout](docs/screenshots/buyer-checkout-mobile.png).*
 
-[Production](https://routetill.vercel.app) · [Public no-funds buyer demo](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) · [Source](https://github.com/sopskistar/RouteTill)
+[Production](https://routetill.vercel.app) · [Watch the guided demo](https://routetill.vercel.app/demo) · [Public no-funds buyer demo](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) · [Source](https://github.com/sopskistar/RouteTill)
 
 **Recorded mainnet result — November 13, 2026:** one funded purchase is FULFILLED. NEAR Intents reported SUCCESS; independent chain observations confirmed exactly 10 native Base USDC to the verified merchant. Normal reconciliation issued one entitlement and one signed Passport. General production payment preparation remains disabled; the public demo sends no funds.
 
-**Demo video:** the 91-second narrated Meet John video is rendered for private review. Its public link will be added after owner approval and publication; the older silent video is not presented as current mainnet footage. [Narration and footage plan](docs/DEMO_SCRIPT.md).
+**Demo video:** the revised 99-second narrated Meet John video is rendered for private review. Its public link will be added after owner approval and publication; the older silent video is not presented as current mainnet footage. [Narration and footage plan](docs/DEMO_SCRIPT.md).
 
 ## Judges: Start Here
+
+Start with [Watch the demo](https://routetill.vercel.app/demo): a play/pause walkthrough of the same five John scenes, with typed inputs and a clearly labeled no-funds reenactment. Then choose the separate hands-on checkout, security checks or real proof below.
 
 No wallet, registration or owner code is needed for A or B. Merchant and agent administration remain protected. [Detailed walkthrough](docs/JUDGE_WALKTHROUGH.md).
 
@@ -175,7 +177,7 @@ npm audit
 npm run test:browser
 ```
 
-**Completed checks:** the final presentation release passed **224 unit/integration tests**, **nine Playwright journeys**, typecheck, lint and production build. A credential-free clean clone passed all 224 tests. Hosted fresh-session checkout/delivery and all five Neon-backed Lab checks passed separately; they are not inferred from local PGlite. The full real Neon concurrency/rollback/reconnect report is [here](docs/evidence/neon-verification.json). [Dated results and historical failures](docs/TESTING.md) · [final engineering/security review](docs/FINAL_AUDIT.md) · [README reproduction results](docs/README_VERIFICATION.md).
+**Completed checks:** the final presentation release passed **224 unit/integration tests**, **nine Playwright journeys**, typecheck, lint and production build. A credential-free clean clone passed all 224 tests. Hosted fresh-session checkout/delivery and all five Neon-backed Lab checks passed separately; they are not inferred from local PGlite. The full real Neon concurrency/rollback/reconnect report is [here](docs/evidence/neon-verification.json). [Dated results and historical failures](docs/TESTING.md) · [final engineering/security review](docs/FINAL_AUDIT.md) · [guided-demo and revised-video checks](docs/PRESENTATION_QA.md) · [README reproduction results](docs/README_VERIFICATION.md).
 
 Browser tests require Chromium: run `npx playwright install chromium` once if absent, keep the local server running, then `npm run test:browser`. On minimal Linux hosts, `npx playwright install --with-deps chromium` also installs required system libraries and may need administrator rights ([Playwright documentation](https://playwright.dev/docs/browsers#install-system-dependencies)). Set `PLAYWRIGHT_BASE_URL=http://localhost:3005` for the alternate port. Physical devices, Safari/Firefox and real WalletConnect pairing were not tested; wallet simulations are identified as mocks. A network/RPC failure is an unavailable check, never proof of settlement.
 

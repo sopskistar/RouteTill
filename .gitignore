@@ -59,3 +59,7 @@ next-env.d.ts
 /video/public/final-captures/
 /video/public/developer-workspace.webp
 /video/public/john.svg
+
+# Updated private narration and genuine demonstration recordings
+/video/public/narration-v2/
+/video/public/product-captures/

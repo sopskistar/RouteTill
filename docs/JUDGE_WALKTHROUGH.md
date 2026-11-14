@@ -2,6 +2,13 @@
 
 RouteTill connects one human-approved purchase to NEAR Intents settlement, one digital entitlement and a signed Purchase Passport. John’s five scenes on the homepage explain the experience behind our first paying purchase. Agent discovery is visualized; the recorded financial and delivery evidence is genuine.
 
+## Watch, try, inspect
+
+- [Watch the guided demo](https://routetill.vercel.app/demo): five John scenes with play/pause/replay and previous/next controls. Keyboard arrows and reduced-motion alternatives are supported. The checkout typing is a labeled reenactment; it creates no purchase and moves no funds.
+- [Try buyer checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo): operate the real no-funds guest workflow yourself. The protected prepared cap/refund terms remain fixed.
+- [Run 5 security checks](https://routetill-demo.vercel.app/lab): actual policy/database scenarios, separate from the guided story.
+- [View real payment proof](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live): the original completed purchase, not a payment made by the walkthrough.
+
 ## Start without a wallet or access code
 
 1. **DO** Open [Try the demo / buyer checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo). **SEE** Agent Purchase Test Vectors, the merchant-set 10 Base USDC price, Arbitrum USDC source, prepared 11 USDC cap and test refund wallet. This is a no-funds walkthrough, with simulated payment evidence.

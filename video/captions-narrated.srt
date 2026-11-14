@@ -1,63 +1,99 @@
 1
-00:00:00,450 --> 00:00:04,931
-His AI agent finds a useful developer dataset for $10.
+00:00:00,450 --> 00:00:02,563
+John's agent finds a dataset.
 
 2
-00:00:04,931 --> 00:00:09,204
-John wants the file, but he doesn't want to hand over control of his wallet.
+00:00:02,563 --> 00:00:07,161
+With RouteTill, John controls the purchase, and payment and delivery are verified.
 
 3
-00:00:10,950 --> 00:00:13,887
-An agent shouldn't have unrestricted spending power.
+00:00:07,161 --> 00:00:09,076
+The seller's price is ten dollars.
 
 4
-00:00:13,887 --> 00:00:19,309
-John wants to buy this one file, not give an agent permission to spend whenever it wants.
+00:00:11,450 --> 00:00:16,106
+An agent can suggest the purchase, but it cannot approve it or control John's wallet.
 
 5
-00:00:21,450 --> 00:00:25,467
-John sees the seller, the $10 price and the file he's getting.
+00:00:16,106 --> 00:00:16,849
+One file.
 
 6
-00:00:25,467 --> 00:00:30,401
-He sets a maximum source spend of 11 USDC and approves this one purchase.
+00:00:16,849 --> 00:00:17,882
+No blank check.
 
 7
-00:00:34,450 --> 00:00:38,316
-John sends about $10.11 from his Arbitrum wallet.
+00:00:19,450 --> 00:00:22,736
+John reviews the seller's ten USDC price.
 
 8
-00:00:38,316 --> 00:00:45,212
-NEAR Intents handles the cross-chain payment, and RouteTill verifies that the merchant received exactly $10 on Base.
+00:00:22,736 --> 00:00:27,507
+He types eleven into his source spending limit, then enters his refund wallet.
 
 9
-00:00:56,450 --> 00:01:04,426
-RouteTill verifies the merchant payment, delivers the correct dataset exactly once, and issues a signed Purchase Passport anyone can check.
+00:00:27,507 --> 00:00:29,330
+ETH gas is separate.
 
 10
-00:01:11,450 --> 00:01:14,190
-Judges can also try five security checks.
+00:00:29,330 --> 00:00:31,942
+He reviews and approves this purchase only.
 
 11
-00:01:14,190 --> 00:01:18,892
-RouteTill rejects changed recipients, over-limit payments and reused approvals.
+00:00:39,450 --> 00:00:43,281
+For our completed mainnet purchase, John paid from Arbitrum.
 
 12
-00:01:18,892 --> 00:01:21,469
-Twenty notifications produce one entitlement.
+00:00:43,281 --> 00:00:49,226
+NEAR Intents settled across chains so the merchant received ten USDC on Base.
 
 13
-00:01:21,469 --> 00:01:23,745
-Tampered evidence fails verification.
+00:00:49,226 --> 00:00:50,932
+SUCCESS alone is not enough.
 
 14
-00:01:25,450 --> 00:01:26,832
-John got the right file.
+00:00:50,932 --> 00:00:55,704
+RouteTill independently checked the recipient, token, amount and finalized receipt.
 
 15
-00:01:26,832 --> 00:01:28,039
-The seller got paid.
+00:01:01,450 --> 00:01:06,257
+Only after the merchant receipt was verified did RouteTill deliver the file.
 
 16
-00:01:28,039 --> 00:01:29,560
-And RouteTill has the proof.
+00:01:06,257 --> 00:01:07,348
+One entitlement.
+
+17
+00:01:07,348 --> 00:01:09,031
+The exact approved bytes.
+
+18
+00:01:09,031 --> 00:01:13,687
+The signed Purchase Passport connects the approval, payment and file digest.
+
+19
+00:01:13,687 --> 00:01:16,438
+Its independent verifier passed twelve checks.
+
+20
+00:01:19,450 --> 00:01:21,958
+Try five no-funds security checks.
+
+21
+00:01:21,958 --> 00:01:26,509
+Changed recipients, excess spending and reused approval are rejected.
+
+22
+00:01:26,509 --> 00:01:30,805
+Twenty notifications produce one entitlement, and tampered proof fails.
+
+23
+00:01:31,905 --> 00:01:33,078
+The seller was paid.
+
+24
+00:01:33,078 --> 00:01:34,529
+John got the right file.
+
+25
+00:01:34,529 --> 00:01:38,662
+Explore the demo, try checkout, and inspect RouteTill's proof.

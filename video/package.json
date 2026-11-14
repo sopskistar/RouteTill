@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "studio": "remotion studio src/index.tsx --port=3002 --no-open",
-    "render": "remotion render src/index.tsx RouteTillNarrated output/routetill-meet-john-narrated-review.mp4 --concurrency=2",
-    "render:narrated": "remotion render src/index.tsx RouteTillNarrated output/routetill-meet-john-narrated-review.mp4 --concurrency=2"
+    "render": "remotion render src/index.tsx RouteTillNarrated output/routetill-guided-product-review.mp4 --concurrency=2",
+    "render:narrated": "remotion render src/index.tsx RouteTillNarrated output/routetill-guided-product-review.mp4 --concurrency=2"
   },
   "dependencies": {
     "@remotion/cli": "4.0.541",

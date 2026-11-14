@@ -13,7 +13,7 @@ export function VerifiedPassport(){return <article className="hero-passport proo
  <div className="receipt-route"><div><span>Buyer deposited</span><strong>{proof.sourceUsdc} USDC</strong><span>Arbitrum</span></div><div className="receipt-bridge"><Route size={19}/><span>NEAR Intents</span><ArrowRight size={17}/></div><div><span>Merchant received</span><strong>10 USDC</strong><span>Base</span></div></div>
  <ol className="receipt-checks"><li><Check size={16}/><span>Exact purchase approved by a human</span></li><li><Check size={16}/><span>Merchant receipt independently verified</span></li><li><Check size={16}/><span>One entitlement. Exact file delivered.</span></li></ol>
  <div className="receipt-file"><Fingerprint size={23}/><div><strong>1,613 bytes, matched to the approved file</strong><Hash value={proof.artifactSha256} short/></div><Badge tone="good">Signed</Badge></div></div>
- <div className="passport-preview-bottom"><Link href={proof.passportUrl}>Open signed Passport<ArrowUpRight size={15}/></Link><Link href="#verified-purchase">Inspect the payment<ArrowRight size={15}/></Link></div>
+ <div className="passport-preview-bottom"><Link href={proof.passportUrl}>Open signed Passport<ArrowUpRight size={15}/></Link><Link href="#verified-purchase">View real payment proof<ArrowRight size={15}/></Link></div>
  </article>;}
 const story=johnStory.map((chapter,index)=>({...chapter,icon:[UserRound,LockKeyhole,ShieldCheck,Route,FileCheck2][index]}));
 function subscribeReducedMotion(callback:()=>void){const q=window.matchMedia('(prefers-reduced-motion: reduce)');q.addEventListener('change',callback);return()=>q.removeEventListener('change',callback);}
@@ -29,7 +29,7 @@ export function JohnStory(){
  {active===2&&<dl className="story-policy"><div><dt>Merchant gets</dt><dd>10 Base USDC</dd></div><div><dt>Source spending cap</dt><dd>11 USDC + ETH gas</dd></div><div><dt>Wallet confirmation</dt><dd>Always personal</dd></div></dl>}
  {active===3&&<div className="story-payment-route"><div><strong>Arbitrum</strong><span>John’s USDC</span></div><div className="story-route-line"><Route size={24}/><span>NEAR Intents</span><i/></div><div><strong>Base</strong><span>Merchant’s USDC</span></div></div>}
  {active===4&&<div className="story-finish"><Mark size={42}/><div><strong>Purchase Passport</strong><span>Human approval → receipt → exact file</span></div><ShieldCheck size={27}/></div>}
- </div></div><div className="story-evidence-link"><p>Based on RouteTill’s first verified purchase. Agent discovery is visualized; the payment and delivery evidence are real.</p>{active>=3&&<Link className="text-link" href={active===4?proof.passportUrl:proofLinks.merchant}>{active===4?'Inspect the signed Passport':'Inspect the verified merchant receipt'}<ArrowUpRight size={15}/></Link>}</div></div></div>;
+ </div></div><div className="story-evidence-link"><Link className="text-link" href="/demo">Watch John use RouteTill<ArrowRight size={16}/></Link><p>Based on RouteTill’s first verified purchase. Agent discovery is visualized; the payment and delivery evidence are real.</p>{active>=3&&<Link className="text-link" href={active===4?proof.passportUrl:proofLinks.merchant}>{active===4?'Inspect the signed Passport':'Inspect the verified merchant receipt'}<ArrowUpRight size={15}/></Link>}</div></div></div>;
 }
 const challenges=[
  {title:'Changed merchant recipient',approved:'Intended merchant wallet',attempted:'Different settlement wallet',condition:'RouteTill rejects a recipient that differs from the approved policy.'},
