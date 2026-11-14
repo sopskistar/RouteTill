@@ -6,11 +6,42 @@ An AI agent buying a paid developer resource needs to receive the exact approved
 
 **NEAR Intents** supplies authenticated exact-output quotes, quote-specific deposits and cross-chain execution; this is essential to paying from Arbitrum while the merchant receives Base USDC. **ProofFlow** joins that execution to approval and digital delivery: a shareable Purchase Passport, an independent verifier, and a Break-It Lab that lets judges attack the real backend.
 
-**Live URLs:** [Production](https://routetill.vercel.app) · [Judge demo](https://routetill-demo.vercel.app) · [GitHub](https://github.com/sopskistar/RouteTill). Both health APIs respond and live payments are disabled. The production lookup for the demo-only sample returns 404. The demo product API now returns 200; both public Passport-key endpoints still return 503. Both real Neon databases accepted migrations 001–003, but the full transaction/concurrency suite remains blocked by intermittent network failures. Deployed key-format verification remains unresolved. [Current release recovery](docs/RELEASE_RECOVERY.md). Local changes below are not yet pushed or redeployed.
+**Live:** [Production](https://routetill.vercel.app) · [No-funds judge demo](https://routetill-demo.vercel.app/lab) · [Source](https://github.com/sopskistar/RouteTill) · [Verified Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live).
 
-**Evidence status:** authenticated production dry quote verified; local synthetic PostgreSQL fulfillment demonstrated; real Neon concurrency and mainnet settlement **UNVERIFIED**. No funded mainnet transaction or hackathon submission is claimed. [Evidence and limitations](docs/NEAR_PROOF.md). Existing 80-second demonstration: `video/output/routetill-demo.mp4` (local rendered asset; explicitly synthetic settlement).
+**Mainnet proof — VERIFIED, November 13, 2026:** RouteTill completed a funded native Arbitrum USDC → native Base USDC purchase. NEAR Intents returned SUCCESS; an independent Base receipt confirmed exactly 10 USDC to the verified merchant; ordinary reconciliation created **one entitlement and one signed Purchase Passport**. [Public verification manifest](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/verification-manifest.json) · [Standalone verifier result](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/cli-verification.json). This is real chain evidence, separate from the Lab's no-funds challenges.
 
-## Try the judge challenge
+**Deployment and scope:** The verified reconciliation fix was deployed to both isolated Vercel projects; the release reported healthy APIs and working production/demo Passport public keys. Live payment preparation is **disabled by default** on both; the single-purchase mainnet trial has ended. The demo uses separate Neon resources and signing identity. No general-purpose production payment service or escrow service is claimed. The old ~80-second video at `video/output/routetill-demo.mp4` covers an earlier **synthetic** flow and needs replacement before public submission.
+
+## Judges: start here
+
+The public judge challenge requires **no wallet, funds or owner access code**. Merchant/agent administration is a separate protected area, not required for these checks.
+
+1. **DO** Open the [Break-It Lab](https://routetill-demo.vercel.app/lab). **SEE** the prepared approved product and its protected terms.
+2. **DO** Run the five security checks. **SEE** merchant substitution, excessive price and approval reuse rejected by the backend.
+3. **DO** Inspect replay protection. **SEE** 20 notifications (15 concurrent) produce **one persisted demo entitlement** on the isolated Neon database.
+4. **DO** Inspect Passport tampering. **SEE** the original signed record verify while a modified recipient or file fails.
+5. **DO** Inspect the [real verified purchase](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) and its [reproducible public proof](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt). **SEE** independent chain observations and the verified delivered-file hash.
+
+**Evidence distinction:** Break-It Lab runs real policy/database checks against **simulated payment evidence** and sends no money. Its payment simulation is not mainnet settlement proof; the separate completed purchase below is real mainnet evidence.
+
+## One real completed purchase
+
+| Verified fact | Evidence |
+| --- | --- |
+| Human-approved digital product | Agent Purchase Test Vectors; one exact-order approval |
+| Buyer funded on Arbitrum One | [10.105156 native USDC transfer](https://arbiscan.io/tx/0x1afadae771327b11deb4132df51953bd307e2d13c57a8e276ec95f420e5a4a81) |
+| NEAR Intents settlement | `SUCCESS` in the saved provider response |
+| Merchant paid on Base | [Exactly 10 native USDC received](https://basescan.org/tx/0x8cc1225a938538842a42db97b5e3592fb37ede94632872d626dd91d1acafe121) |
+| Other provider reference | [0.095729 USDC refunded to the buyer on Arbitrum](https://arbiscan.io/tx/0x040de1f0e88378fcabcaa141480c5fa5499c329a8d899e4b4426fa7c8a6965a6) |
+| Delivery | One payment attempt, one entitled 1,613-byte file, one signed Passport |
+| Delivered SHA-256 | `f7ecb13c8d1b1576b17311ad3eb3a18848f44bdac3a742dbc66e0ba726f65643` |
+| Independent verification | [12 standalone checks passed](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/cli-verification.json), including tamper rejection |
+
+[Complete verification manifest](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/verification-manifest.json) · [Passport JSON](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/purchase-passport.json) · [Reproduction instructions](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt)
+
+The provider's association between source deposit and destination transaction is not itself a cryptographic causal proof. RouteTill independently checks the applicable chain receipt, asset, recipient, amount and finality before granting access. The actual download requires the purchasing session; public evidence and a CC0 artifact copy are provided for independent verification.
+
+## Run the judge challenge locally
 
 Requires Node 22.13+ (22.x) and npm. On a fresh clone:
 
@@ -25,12 +56,12 @@ npm run dev -- --port 3001
 Open **http://localhost:3001/lab**.
 
 1. **DO** Open isolated judge workspace → **SEE** the exact product, recipient, 11 USDC source cap, route, expiry and digest.
-2. **DO** Run all five challenges → **SEE** merchant substitution, over-cap pricing and reused approval rejected by the backend.
+2. **DO** Run all five security checks → **SEE** merchant substitution, over-cap pricing and reused approval rejected by the backend.
 3. **DO** Inspect replay → **SEE** 20 notifications, including 15 concurrent deliveries, produce **one stored entitlement**.
 4. **DO** Inspect tampering → **SEE** the original Passport pass and modified recipient/artifact fail.
 5. **DO** Open the Passport and entitled download → **SEE** the actual file, SHA-256 check, original signed JSON and explicit synthetic settlement label.
 
-The local database is PostgreSQL through persistent PGlite, not an in-memory demo. **Stop the app before running seed/migration scripts**; a process lock enforces one local owner. The updated local judge challenge creates a bounded, isolated synthetic guest session with no code, wallet, or funds; merchant administration and agent setup remain behind the owner’s judge access code. Production and demo use separate Neon projects. [Full walkthrough](docs/JUDGE_WALKTHROUGH.md).
+The local database is PostgreSQL through persistent PGlite, not an in-memory demo. **Stop the app before running seed/migration scripts**; a process lock enforces one local owner. The updated local judge challenge creates a bounded, isolated guest session with no code, wallet or funds; merchant administration and agent setup remain behind the owner's access code. Production and demo use separate Neon projects. [Full walkthrough](docs/JUDGE_WALKTHROUGH.md).
 
 ## One complete flow
 
@@ -42,7 +73,20 @@ NEAR Intents’ authenticated **1Click** API supplies live assets, exact-output 
 
 ## Verify without the frontend
 
-A sanitized [authenticated quote recorded on 12 November](docs/evidence/live-dry-quote-2026-11-12.json) and [signed synthetic Passport](docs/evidence/demo-passport.json) are included for offline inspection. The bundled development public key is a test fixture, not a production trust anchor.
+The actual 2026-11-13 mainnet payment can be checked from a clean clone with public, committed evidence:
+
+```sh
+node --import tsx scripts/verify-passport.ts \
+  docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/purchase-passport.json \
+  --key docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/production-public-key.txt \
+  --artifact docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/agent-purchase-test-vectors.md \
+  --rpc https://mainnet.base.org \
+  --source-rpc https://arb1.arbitrum.io/rpc
+```
+
+Use independently trusted RPC endpoints. The public key must be pinned through a separate trusted source. The saved successful result is [here](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/cli-verification.json). This is the **real** purchase, not the demo fixture.
+
+For a separate **synthetic/offline** exercise, a sanitized [authenticated quote recorded on 12 November](docs/evidence/live-dry-quote-2026-11-12.json) and [signed synthetic Passport](docs/evidence/demo-passport.json) are included for offline inspection. The bundled development public key is a test fixture, not a production trust anchor.
 
 ```sh
 npm run verify -- docs/evidence/demo-passport.json \
@@ -73,7 +117,7 @@ npm audit
 npm run test:browser
 ```
 
-**Latest local checks: 145 unit/persistence tests and 7 browser journeys passed.** Unit/integration tests use real PostgreSQL transactions in isolated temporary PGlite stores. Browser tests drive the actual application, run axe checks and capture desktop/tablet/mobile screenshots. [Actual results and coverage](docs/TESTING.md). Local passing tests do not establish a successful Neon deployment or paid settlement.
+**Reported verification after the payment/reconciliation fixes:** 138 focused reconciliation tests passed, and 12 standalone checks verified the mainnet Passport. A later local frontend work session reported **223 passing unit/integration tests**, typecheck and lint; its browser suite was interrupted by local guest-auth configuration and must **not** be represented as a fully passing browser run. Earlier complete browser journeys and hosted no-funds checks are documented separately. Unit/integration tests use isolated PostgreSQL-compatible PGlite stores. [Test documentation](docs/TESTING.md). The verified mainnet settlement is documented independently above; do not conflate it with synthetic tests.
 
 ## Agent integration
 
@@ -97,9 +141,9 @@ Tokens cannot approve purchases. A fulfilled run downloads the actual resource, 
 
 Next.js 16 / React / TypeScript / Tailwind, parameterized typed PostgreSQL queries, official 1Click signature SDK, viem EVM wallet/chain helpers, Vitest and Playwright. Unique constraints and row locks bind approvals, attempts, transfers and entitlements. A transactional outbox and authenticated scheduled reconciliation survive retries. All financial arithmetic uses integer atomic units.
 
-Production: two Vercel projects connect to separate Neon resources. Production uses `DATABASE_URL`; the demo uses `DEMO_DATABASE_URL`; each signs Passports with its own key. Both hosted projects have their database variables configured, and their URLs are present in ignored local release files. The local verifier rejects accidental URL reuse and refuses a PGlite fallback. Both databases accepted migrations over real Neon TCP connections. Connectivity is intermittent across TCP, HTTPS and WebSocket; the full PostgreSQL locking and replay-persistence suite remains unverified. Do not infer those results from local PGlite tests. `npm run release:init` prepares private configuration without printing secrets. Vercel Hobby recovery and the best-effort scheduled wake-up are documented in the deployment guide. [Environment and deployment guide](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), [.env.example](.env.example).
+Production: two Vercel projects connect to separate Neon resources. Production uses `DATABASE_URL`; the demo uses `DEMO_DATABASE_URL`; each signs Passports with its own key. Both hosted projects have their database variables configured, and their URLs are present in ignored local release files. The local verifier rejects accidental URL reuse and refuses a PGlite fallback. Both databases accepted migrations over real Neon TCP connections. Intermittent external connections previously blocked the full dedicated remote-Neon locking/contention suite; do not infer that suite passed from local PGlite. Separately, the hosted Neon Break-It Lab replay did persist one entitlement across 20 notifications, and the real funded production order reconciled to one entitlement and one Passport. `npm run release:init` prepares private configuration without printing secrets. Vercel Hobby recovery and the best-effort scheduled wake-up are documented in the deployment guide. [Environment and deployment guide](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), [.env.example](.env.example).
 
-Live deposits are disabled by default. Deployment, Git push/publication, owner wallet signing, X posting and submission require human approval. No actual transaction hash is presented as live evidence unless obtained from an approved payment.
+Live deposits are disabled by default after the owner-controlled, completed single-purchase trial. The funded source transaction, merchant settlement, buyer refund and Passport linked above are real evidence from the approved purchase. Do not initiate another transfer without explicit wallet approval.
 
 ## What is—and isn’t—the differentiator
 
