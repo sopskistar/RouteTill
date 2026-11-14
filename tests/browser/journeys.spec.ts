@@ -9,7 +9,7 @@ function localJudgeCode(){if(process.env.JUDGE_ACCESS_CODE)return process.env.JU
 async function capture(page:any,options:any){await page.evaluate(async()=>{(document.activeElement as HTMLElement)?.blur();window.scrollTo({top:0,left:0,behavior:'instant'});await new Promise(requestAnimationFrame);});await page.screenshot(options);}
 async function judge(page:any){await page.goto('/lab');await expect(page.getByRole('heading',{name:'Break-It Lab',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Run 5 security checks'})).toBeEnabled();}
 test('landing navigation, light/dark, responsive layout and keyboard access',async({page})=>{
- await page.goto('/');await expect(page.getByRole('heading',{name:'Your agent finds the product. You approve the purchase.'})).toBeVisible();await capture(page,{path:captures+'/home-desktop.png',fullPage:true});
+ await page.goto('/');await expect(page.getByRole('heading',{name:'Your agent proposes the purchase. You stay in control.'})).toBeVisible();await capture(page,{path:captures+'/home-desktop.png',fullPage:true});
  await page.getByRole('button',{name:'Switch to dark mode'}).click();await expect(page.locator('html')).toHaveAttribute('data-theme','dark');await capture(page,{path:captures+'/home-dark.png',fullPage:true});
  await page.getByRole('button',{name:'Switch to light mode'}).click();
  for(const [name,width,height] of [['tablet',768,1024],['mobile',390,844],['small-phone',360,800]] as const){await page.setViewportSize({width,height});await capture(page,{path:`${captures}/home-${name}.png`,fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}
