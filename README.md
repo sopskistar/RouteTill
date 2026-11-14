@@ -2,6 +2,8 @@
 
 **Agent-assisted cross-chain checkout with human approval and verified digital delivery.**
 
+Built with **NEAR Intents 1Click** for Arbitrum USDC → Base USDC settlement.
+
 **The agent proposes. You authorize. RouteTill verifies payment and delivery.**
 
 John is an illustrative developer who needs a dataset. An agent proposes a merchant’s 10 USDC product. John holds USDC on Arbitrum; the merchant wants USDC on Base. He wants the file without giving an agent unrestricted access to his wallet. The implemented example agent follows deterministic rules; it is not an LLM browsing the internet.
@@ -17,8 +19,6 @@ The merchant lists the file, sets the price, chooses a supported receiving walle
 [Production](https://routetill.vercel.app) · [Watch the guided demo](https://routetill.vercel.app/demo) · [Public no-funds buyer demo](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) · [Source](https://github.com/sopskistar/RouteTill)
 
 **Recorded mainnet result — November 13, 2026:** one funded purchase is FULFILLED. NEAR Intents reported SUCCESS; independent chain observations confirmed exactly 10 native Base USDC to the verified merchant. Normal reconciliation issued one entitlement and one signed Passport. General production payment preparation remains disabled; the public demo sends no funds.
-
-**Demo video:** final selection and publication await owner approval. No final public video URL has been provided. Existing private review cuts are not presented as the published final demo. [Current video handoff](docs/VIDEO_HANDOFF.md) · [Historical script](docs/DEMO_SCRIPT.md).
 
 ## Judges: Start Here
 
@@ -195,11 +195,11 @@ Production and demo use two existing Vercel projects, separate Neon resources an
 
 Live deposits are disabled by default after the owner-controlled, completed single-purchase trial. The funded source transaction, merchant settlement, buyer refund and Passport linked above are real evidence from the approved purchase. Do not initiate another transfer without explicit wallet approval.
 
-## What is—and isn’t—the differentiator
+## Why RouteTill
 
-Coldtill, Weave, Aurora’s Intents Widget, Penstock and other projects already cover checkout, cross-chain routing, signed notifications and agent-readable payment services. AP2 also defines authorization mandates and linked receipts; RouteTill does not claim to have invented them or to implement AP2 compatibility. RouteTill does not claim those features are unique. Its focus is the **connected authorization → independently qualified settlement → exact digital artifact**, with an executable adversarial challenge and evidence that exposes its limits. [Brief primary-source comparison and attribution](docs/REFERENCES.md).
+RouteTill connects **one human-approved purchase → independently checked merchant payment → the matching digital file**. The signed Purchase Passport links the approved terms, settlement evidence and artifact digest, while the Break-It Lab lets judges test changed terms, replayed approvals, repeated notifications and tampered evidence.
 
-Application signatures protect assertions; they do not independently prove blockchain settlement, delivery quality or database-wide uniqueness. RPC observations depend on the selected RPC. Provider execution status associates deposits with destination transactions; this association is not a cryptographic causal proof. [Threat model](docs/SECURITY.md), [known limitations](docs/LIMITATIONS.md).
+The focus is an inspectable purchase-to-delivery workflow, demonstrated with a completed mainnet purchase and reproducible security checks. [Technical references and related work](docs/REFERENCES.md).
 
 ## Documentation and demo assets
 
@@ -209,9 +209,11 @@ Application signatures protect assertions; they do not independently prove block
 
 ## Hackathon work, baseline and attribution
 
-The [official rules](https://nearhackathon.com/HACKATHON.md) permit qualifying development from **October 19 through November 14, 2026**, with submission closing **November 14 at 23:59 UTC**. The repository was initialized November 7. Baseline [`67f064e`](https://github.com/sopskistar/RouteTill/commit/67f064e81d004f66462c75e9034b23eb832fce87) contains only `.gitignore`, `LICENSE` and a two-line README—not an existing payment application. [Hackathon code diff: baseline → main](https://github.com/sopskistar/RouteTill/compare/67f064e...main).
+Built during NEAR HACKATHON. The November 7 baseline contains repository setup only: [baseline commit](https://github.com/sopskistar/RouteTill/commit/67f064e81d004f66462c75e9034b23eb832fce87) · [hackathon implementation diff](https://github.com/sopskistar/RouteTill/compare/67f064e...main).
 
-Work added during the event includes the application and SQL schema; human purchase policies and scoped agent proposals; authenticated NEAR Intents quotes/signature checks; exact transfer and independent settlement verification; transactional, replay-protected delivery; signed Passports and standalone verifier; the five backend security scenarios; and the public no-funds buyer experience. Git history separates the original baseline from this implementation. Next.js/React app scaffolding and framework conventions are third-party foundations, not original hackathon inventions. Third-party code and reusable tools are not claimed as original work.
+Hackathon work includes the checkout and database schema, bounded human approvals, scoped agent API, NEAR Intents integration, independent settlement checks, transactional digital fulfillment, signed Passports, standalone verifier and Break-It Lab.
+
+The application uses the following third-party foundations and assisted-development tools:
 
 | Third-party foundation / reusable tool | Use and license |
 | --- | --- |
@@ -225,14 +227,12 @@ Work added during the event includes the application and SQL schema; human purch
 
 Exact dependency versions are pinned by the root and video lockfiles; upstream license texts remain with their packages. Repository code retains the [MIT LICENSE](LICENSE). The original sample resource is CC0; the public evidence copy is intentional, while actual buyer download permissions remain protected.
 
-## Limitations and publication status
+## Current scope
 
-- **One** genuine mainnet purchase is verified; this is not a claim of broad production readiness. Public checkout demonstrates the full journey with no funds. General unrestricted production payment preparation is disabled; a different secure activation architecture is needed for ordinary live customers.
-- RouteTill is not custodial escrow. A human explicitly approves the purchase and personally confirms any wallet transfer. ETH gas is additional to the USDC spending cap.
-- Provider SUCCESS associates a deposit with reported destination references. Independent RPC observations verify the merchant transfer; that association is not a cryptographic causal proof. Signatures authenticate application assertions, not database-wide uniqueness or product quality. Obtain the issuer key independently and choose trusted RPCs.
-- Buyer order pages and entitled downloads require the purchasing session. Judges can inspect the public Passport, sanitized evidence and CC0 file copy without owner credentials. Guest accounts cannot administer merchants or reach production data.
-- Final video selection and its public link await owner approval. The owner will publish the X post and submit the form personally. [Copy-ready submission/X drafts](docs/SUBMISSION.md) contain no invented personal details.
-- Keep the repository public through judging and both demos online through **November 18**, preferably **November 25, 2026**; ongoing hosting is an owner obligation, not a future uptime guarantee.
-- If **SilentSourcing** is independently submitted, both READMEs must name the other project under Q-015. Its submission is not asserted here; confirm and add reciprocal disclosure before submitting a second project.
+- **Verified route:** Arbitrum USDC → Base USDC, demonstrated by one completed mainnet purchase.
+- **Public evaluation:** seeded no-funds checkout and security tests; general live payment preparation remains disabled.
+- **Human control:** the deterministic agent proposes; the buyer approves the purchase and separately signs the wallet transfer. RouteTill does not custody funds. Network gas is additional to the USDC spending cap.
+- **Delivery and evidence:** one entitlement permits authorized repeat downloads. File hashes check the agreed bytes; Passport signatures protect the record. Independent settlement verification relies on the configured chain RPCs and a trusted issuer key.
+- **Access:** buyer downloads require the purchasing session. Judges can inspect the public Passport and evidence without buyer credentials.
 
-[Full limitations](docs/LIMITATIONS.md) · [security model](docs/SECURITY.md).
+[Full limitations](docs/LIMITATIONS.md) · [Security model](docs/SECURITY.md).
