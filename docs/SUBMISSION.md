@@ -8,7 +8,7 @@ RouteTill
 
 ## Tagline
 
-Human-approved agent purchases, verified cross-chain payment, and the right digital file—with proof.
+Agent-assisted cross-chain checkout with human approval and verified digital delivery.
 
 ## Description — paste into the `idea` field
 
@@ -33,6 +33,8 @@ The demonstration uses simulated payment evidence in an isolated environment. Th
 | Secondary: Agent Economy | `agents` | The deterministic agent discovers/proposes a paid developer resource and retrieves/verifies it after human approval. Do not claim LLM reasoning, negotiation or autonomous signing. |
 
 Autonomous Business is weaker because RouteTill does not autonomously operate a business. DeFi is broader than the product’s merchant-payment purpose. Choose the tracks above that you wish to enter; there is one project submission with an array of track IDs.
+
+[Canonical positioning and evidence boundaries](POSITIONING.md). The agent proposes. You authorize. RouteTill verifies payment and delivery. John is illustrative; the merchant and buyer are two sides of one purchase.
 
 ## What makes RouteTill different
 
@@ -60,9 +62,9 @@ The focus is the connected chain of evidence: a human-controlled purchase → in
 
 ## X post draft — attach the owner-approved narrated MP4
 
-Your agent finds a dataset. You approve one purchase.
+The agent proposes. You authorize. RouteTill verifies payment and delivery.
 
-Built RouteTill at NEAR HACKATHON: NEAR Intents settles Arbitrum USDC to Base; verified receipt unlocks the file + proof.
+Built at NEAR HACKATHON. NEAR Intents routes Arbitrum USDC to Base USDC.
 
 https://routetill.vercel.app
 https://github.com/sopskistar/RouteTill

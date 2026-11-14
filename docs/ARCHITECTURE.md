@@ -1,6 +1,6 @@
 # Architecture
 
-RouteTill has one purchase lifecycle, with an isolated judge mode.
+RouteTill has one agent-assisted purchase lifecycle, with an isolated judge mode. The merchant lists the product and receiving wallet; an agent proposes; the human authorizes exact terms and separately confirms the wallet transfer. Buyer and merchant are two sides of the same purchase. [Positioning and evidence boundaries](POSITIONING.md).
 
 ```mermaid
 sequenceDiagram

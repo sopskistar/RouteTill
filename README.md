@@ -1,20 +1,40 @@
 # RouteTill
 
-**Human-approved digital purchases, verified merchant payment and proof of the file delivered.**
+**Agent-assisted cross-chain checkout with human approval and verified digital delivery.**
 
-An AI agent can suggest a dataset, but the buyer needs control over spending and proof that the intended seller was paid and the correct file arrived. RouteTill binds human approval to one exact purchase, independently checks the merchant's cross-chain receipt, and releases one matching digital entitlement with a signed **Purchase Passport**.
+**The agent proposes. You authorize. RouteTill verifies payment and delivery.**
 
-**NEAR's role:** NEAR Intents supplies the authenticated exact-output quote and payment route from native Arbitrum USDC to native Base USDC. RouteTill adds purchase-policy enforcement, independent receipt verification and delivery. It is not a custodial escrow service.
+John is an illustrative developer who needs a dataset. An agent proposes a merchant’s 10 USDC product. John holds USDC on Arbitrum; the merchant wants USDC on Base. He wants the file without giving an agent unrestricted access to his wallet. The implemented example agent follows deterministic rules; it is not an LLM browsing the internet.
+
+RouteTill presents the exact seller, product, source-spending cap, refund address, file digest and deadline. John authorizes that purchase in the application, then **separately confirms the wallet transfer himself**. NEAR Intents 1Click provides the authenticated exact-output quote and cross-chain execution. RouteTill independently checks the merchant receipt before granting access to matching bytes and issuing a signed **Purchase Passport**.
+
+The merchant lists the file, sets the price, chooses a supported receiving wallet and shares checkout. Buyer and merchant are two sides of this one purchase. RouteTill is not custodial escrow; general live payment preparation is disabled.
 
 ![Actual RouteTill application screen showing the buyer actions and the completed mainnet Purchase Passport, including 10 Base USDC received and the verified delivered file](docs/screenshots/home-hero-desktop.png)
 
-*Actual release-preview application capture, not a concept render: the Purchase Passport summarizes our completed purchase. [Full Passport screen](docs/screenshots/passport-desktop.png) · [Mobile checkout](docs/screenshots/buyer-checkout-mobile.png).*
+*Actual release-preview application capture, not a concept render: the Purchase Passport summarizes our completed purchase. [Full Passport screen](docs/screenshots/passport-desktop.png) · [Mobile homepage](docs/screenshots/communication-home-mobile.png) · [Mobile checkout](docs/screenshots/buyer-checkout-mobile.png).*
 
 [Production](https://routetill.vercel.app) · [Watch the guided demo](https://routetill.vercel.app/demo) · [Public no-funds buyer demo](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) · [Source](https://github.com/sopskistar/RouteTill)
 
 **Recorded mainnet result — November 13, 2026:** one funded purchase is FULFILLED. NEAR Intents reported SUCCESS; independent chain observations confirmed exactly 10 native Base USDC to the verified merchant. Normal reconciliation issued one entitlement and one signed Passport. General production payment preparation remains disabled; the public demo sends no funds.
 
 **Demo video:** the revised 99-second narrated Meet John video is rendered for private review. Its public link will be added after owner approval and publication; the older silent video is not presented as current mainnet footage. [Narration and footage plan](docs/DEMO_SCRIPT.md).
+
+## Why NEAR Intents is part of the purchase
+
+The buyer and merchant use different chains in one purchase: the buyer paid from Arbitrum while the merchant received USDC on Base. NEAR Intents provided the cross-chain execution; RouteTill did not replace it with a database payment flag or a home-grown bridge.
+
+| NEAR Intents provides | RouteTill builds around it |
+| --- | --- |
+| Authenticated `POST /v0/quote` with `EXACT_OUTPUT`, native Arbitrum USDC → native Base USDC | [Quote integration](src/integrations/near.ts) binds recipient, refund, assets and exact output to the approved policy and checks input against the spending cap |
+| Provider-signed quote fields, verified with the pinned [official SDK](https://github.com/defuse-protocol/one-click-sdk-typescript) | Signature verification plus separate validation of amounts, freshness and terms; optional response metadata is not assumed signed |
+| Executable quote-specific deposit address and payment routing | [Approval consumption/execution](src/services/orders.ts), [single-order guard](src/core/live-trial.ts), and [transaction preflight](src/services/payment-preflight.ts); the human confirms the exact ERC-20 transfer in their wallet |
+| `GET /v0/status` execution status and transaction references | [Reconciliation](src/services/reconcile.ts) requires SUCCESS and [independently inspects chain receipts](src/integrations/settlement.ts): correct token, merchant, exact amount, canonical block, at least 12 confirmations and finalized Base block; an additional reference must qualify as an origin-chain refund |
+| Cross-chain transfer execution | [Transactional delivery](src/services/fulfillment.ts) creates one entitlement, checks the artifact digest and issues a signed Passport; missing or ambiguous settlement evidence prevents delivery |
+
+Official documentation: [quote API](https://docs.near-intents.org/api-reference/oneclick/request-a-swap-quote), [quote signatures](https://docs.near-intents.org/integration/distribution-channels/1click-api/verify-quote-signature), [execution status](https://docs.near-intents.org/api-reference/oneclick/check-swap-execution-status). [Implementation/evidence notes](docs/NEAR_PROOF.md).
+
+This project does not deploy its own NEAR smart contract or implement Chain Signatures, NEAR AI inference or AP2 compatibility. The deterministic example agent proposes purchases; it cannot approve or spend autonomously.
 
 ## Judges: Start Here
 
@@ -39,32 +59,16 @@ No wallet, registration or owner code is needed for A or B. Merchant and agent a
 2. **DO →** Select **Check original record**, then **Test a modified recipient**. **SEE →** original integrity passes and modified evidence fails. Use the standalone commands below for independent chain verification: a browser signature check alone does not establish settlement.
 3. **DO →** Follow the [reproduction instructions](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt). **SEE →** the signed Passport and the saved 12-check independent result. The [original order page](https://routetill.vercel.app/orders/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live) and actual entitled download require the purchasing account; the public manifest, Passport and CC0 artifact copy require no buyer credentials.
 
-<details>
-<summary>Meet John — the experience behind our first paying purchase</summary>
+## What connects the purchase
 
-### Agent finds it — John needs a dataset.
+| Mechanism | What it means for the buyer and merchant |
+| --- | --- |
+| Approval bound to exact terms | An agent can propose, but cannot approve or sign. The human reviews this purchase and separately confirms the wallet transfer. |
+| Independent merchant receipt qualification | NEAR Intents SUCCESS alone does not release the file. RouteTill checks the intended token, recipient, amount and finality. |
+| Entitlement and matching artifact | One durable access entitlement; repeat authorized downloads are allowed. SHA-256 checks approved bytes, not quality. |
+| Signed Purchase Passport | A signed record linking what you approved, the merchant payment evidence and the file you received. Signature integrity is separate from independent settlement checks. |
 
-His AI agent finds a useful developer dataset for $10. John wants the file, but he doesn't want to hand over control of his wallet.
-
-### No blank check — His money. His decision.
-
-An agent shouldn't have unrestricted spending power. John wants to buy this one file, not give an agent permission to spend whenever it wants.
-
-### John says yes — One file. One approval.
-
-John sees the seller, the $10 price and the file he's getting. He sets a maximum source spend of 11 USDC and approves this one purchase.
-
-### Payment verified — Paid on Arbitrum. Received on Base.
-
-John sends about $10.11 from his Arbitrum wallet. NEAR Intents handles the cross-chain payment, and RouteTill verifies that the merchant received exactly $10 on Base.
-
-### File + proof — Delivered. With proof.
-
-RouteTill verifies the merchant payment, delivers the correct dataset exactly once, and issues a signed Purchase Passport anyone can check.
-
-Agent discovery is visualized. The financial and delivery claims above refer to the genuine completed purchase. Arbitrum ETH gas is additional to the 11 USDC source ceiling.
-
-</details>
+[Canonical positioning and claim-to-evidence table](docs/POSITIONING.md) · [30-second explanation and video handoff](docs/VIDEO_HANDOFF.md). ProofFlow is the underlying verification engine, not a separate product.
 
 ## One real completed purchase
 
@@ -82,22 +86,6 @@ Agent discovery is visualized. The financial and delivery claims above refer to 
 [Complete verification manifest](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/verification-manifest.json) · [Passport JSON](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/purchase-passport.json) · [Reproduction instructions](docs/evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt)
 
 The provider's association between source deposit and destination transaction is not itself a cryptographic causal proof. RouteTill independently checks the applicable chain receipt, asset, recipient, amount and finality before granting access. The actual download requires the purchasing session; public evidence and a CC0 artifact copy are provided for independent verification.
-
-## Why NEAR Intents is part of the purchase
-
-The buyer paid from Arbitrum while the merchant received USDC on Base. NEAR Intents provided the cross-chain execution; RouteTill did not replace it with a database payment flag or a home-grown bridge.
-
-| NEAR Intents provides | RouteTill builds around it |
-| --- | --- |
-| Authenticated `POST /v0/quote` with `EXACT_OUTPUT`, native Arbitrum USDC → native Base USDC | [Quote integration](src/integrations/near.ts) binds recipient, refund, assets and exact output to the approved policy and checks input against the spending cap |
-| Provider-signed quote fields, verified with the pinned [official SDK](https://github.com/defuse-protocol/one-click-sdk-typescript) | Signature verification plus separate validation of amounts, freshness and terms; optional response metadata is not assumed signed |
-| Executable quote-specific deposit address and payment routing | [Approval consumption/execution](src/services/orders.ts), [single-order guard](src/core/live-trial.ts), and [transaction preflight](src/services/payment-preflight.ts); the human confirms the exact ERC-20 transfer in their wallet |
-| `GET /v0/status` execution status and transaction references | [Reconciliation](src/services/reconcile.ts) requires SUCCESS and [independently inspects chain receipts](src/integrations/settlement.ts): correct token, merchant, exact amount, canonical block, at least 12 confirmations and finalized Base block; an additional reference must qualify as an origin-chain refund |
-| Cross-chain transfer execution | [Transactional delivery](src/services/fulfillment.ts) creates one entitlement, checks the artifact digest and issues a signed Passport; missing or ambiguous settlement evidence prevents delivery |
-
-Official documentation: [quote API](https://docs.near-intents.org/api-reference/oneclick/request-a-swap-quote), [quote signatures](https://docs.near-intents.org/integration/distribution-channels/1click-api/verify-quote-signature), [execution status](https://docs.near-intents.org/api-reference/oneclick/check-swap-execution-status). [Implementation/evidence notes](docs/NEAR_PROOF.md).
-
-This project does not deploy its own NEAR smart contract or implement Chain Signatures, NEAR AI inference or AP2 compatibility. The deterministic example agent proposes purchases; it cannot approve or spend autonomously.
 
 ## Run from a fresh clone without private credentials
 
@@ -177,7 +165,7 @@ npm audit
 npm run test:browser
 ```
 
-**Completed checks:** the final presentation release passed **224 unit/integration tests**, **nine Playwright journeys**, typecheck, lint and production build. A credential-free clean clone passed all 224 tests. Hosted fresh-session checkout/delivery and all five Neon-backed Lab checks passed separately; they are not inferred from local PGlite. The full real Neon concurrency/rollback/reconnect report is [here](docs/evidence/neon-verification.json). [Dated results and historical failures](docs/TESTING.md) · [final engineering/security review](docs/FINAL_AUDIT.md) · [guided-demo and revised-video checks](docs/PRESENTATION_QA.md) · [README reproduction results](docs/README_VERIFICATION.md).
+**Communication pass checks:** **224 unit/integration tests**, **12 Playwright journeys**, typecheck, lint and production build passed. [Current scope and verification](docs/COMMUNICATION_REVIEW.md). Earlier release results remain dated in the reports below. The prior credential-free clean-clone run at `cca1da5` passed 224 tests. Hosted fresh-session checkout/delivery and all five Neon-backed Lab checks passed separately; they are not inferred from local PGlite. The full real Neon concurrency/rollback/reconnect report is [here](docs/evidence/neon-verification.json). [Dated results and historical failures](docs/TESTING.md) · [final engineering/security review](docs/FINAL_AUDIT.md) · [guided-demo and revised-video checks](docs/PRESENTATION_QA.md) · [README reproduction results](docs/README_VERIFICATION.md).
 
 Browser tests require Chromium: run `npx playwright install chromium` once if absent, keep the local server running, then `npm run test:browser`. On minimal Linux hosts, `npx playwright install --with-deps chromium` also installs required system libraries and may need administrator rights ([Playwright documentation](https://playwright.dev/docs/browsers#install-system-dependencies)). Set `PLAYWRIGHT_BASE_URL=http://localhost:3005` for the alternate port. Physical devices, Safari/Firefox and real WalletConnect pairing were not tested; wallet simulations are identified as mocks. A network/RPC failure is an unavailable check, never proof of settlement.
 

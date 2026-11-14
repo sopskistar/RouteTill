@@ -1,3 +1,11 @@
+# Current communication handoff
+
+Use [VIDEO_HANDOFF.md](VIDEO_HANDOFF.md) for the current locked positioning, illustrative John story, 30-second explanation, verified source paths and simulation labels. Website scene copy is shared in `src/core/john-story.ts`. Human application authorization and personal wallet confirmation are separate; the agent can do neither.
+
+The following is the **historical script for an existing private video**, preserved as a production record. It is not a claim that the older video’s editorial wording is current. No MP4, narration, captions or video source was edited or rendered in this communication pass.
+
+---
+
 # Revised narrated demo — private review
 
 The revised cut is 99.3 seconds. The five approved Meet John labels, headlines and editorial bodies remain unchanged; the narration now explains RouteTill earlier and describes visible product actions. Additional voiceover is stored separately from the approved story in `video/narration-script.json`.

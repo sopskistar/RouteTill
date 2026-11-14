@@ -1,8 +1,8 @@
-/** Approved editorial source shared by the homepage and narrated demonstration. */
+/** One illustrative story shared by the homepage and interactive guided demo. */
 export const johnStory=[
- {name:'Agent finds it',title:'John needs a dataset.',body:"His AI agent finds a useful developer dataset for $10. John wants the file, but he doesn't want to hand over control of his wallet."},
- {name:'No blank check',title:'His money. His decision.',body:"An agent shouldn't have unrestricted spending power. John wants to buy this one file, not give an agent permission to spend whenever it wants."},
- {name:'John says yes',title:'One file. One approval.',body:"John sees the seller, the $10 price and the file he's getting. He sets a maximum source spend of 11 USDC and approves this one purchase."},
- {name:'Payment verified',title:'Paid on Arbitrum. Received on Base.',body:'John sends about $10.11 from his Arbitrum wallet. NEAR Intents handles the cross-chain payment, and RouteTill verifies that the merchant received exactly $10 on Base.'},
- {name:'File + proof',title:'Delivered. With proof.',body:'RouteTill verifies the merchant payment, delivers the correct dataset exactly once, and issues a signed Purchase Passport anyone can check.'}
+ {name:'Agent finds it',title:'John needs a dataset.',body:"An agent proposes a merchant’s developer dataset for 10 USDC. John has USDC on Arbitrum; the merchant wants USDC on Base. John wants the file without handing over his wallet."},
+ {name:'No blank check',title:'His money. His decision.',body:"The agent can propose a purchase, but cannot approve it or sign a transfer. John stays in control. The merchant lists the file, sets its price and chooses a supported receiving wallet."},
+ {name:'John says yes',title:'One file. One approval.',body:"John reviews the seller, product, price, refund wallet, expected file hash and deadline. He sets an 11 USDC source cap and authorizes this purchase. Wallet confirmation is a separate, personal step; ETH gas is additional."},
+ {name:'Payment verified',title:'Paid on Arbitrum. Received on Base.',body:'John personally confirms the source payment in his wallet. NEAR Intents 1Click routes Arbitrum USDC to Base USDC. RouteTill checks the intended merchant’s receipt, token, amount and finality before delivery.'},
+ {name:'File + proof',title:'Delivered. With proof.',body:'The merchant receives the payment. John gets one durable entitlement to the matching file and a signed Purchase Passport linking approval, payment evidence and the delivered bytes. The hash checks bytes, not their usefulness.'}
 ] as const;

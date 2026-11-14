@@ -1,5 +1,7 @@
 # Current limits
 
+[Canonical positioning and claim-to-evidence guide](POSITIONING.md). John is an illustrative buyer, not an external customer. The example agent is deterministic, not an LLM shopping or browsing autonomously; its credentials cannot approve a purchase or sign transfers. RouteTill is not custodial escrow, an installed Shopify/WooCommerce plugin, or a proprietary bridge. No AP2, Chain Signatures or NEAR AI inference integration is claimed.
+
 - **Verified achievement:** one genuine restricted Arbitrum USDC → Base USDC purchase reached FULFILLED through normal reconciliation. Exactly 10 Base USDC, one entitlement, 1,613 matching bytes and one signed Passport were independently verified. [Reproduce the proof](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt).
 - **General live checkout is not enabled.** The single-order trial guard still requires exact order/policy/identity/asset/amount/digest bindings and valid human approval. Both deployments keep live preparation disabled. Ordinary public payment activation needs a separately reviewed architecture; the trial’s per-order deployment is not represented as normal customer operation.
 - **Public demo uses no funds.** Guest checkout and the five Lab scenarios exercise actual policy validation, SQL transactions, entitlement access and Passport checks with simulated payment evidence. Demo FULFILLED means demo delivery, not blockchain settlement. Production/demo Neon stores and issuer keys remain distinct.

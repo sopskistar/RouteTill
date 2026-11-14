@@ -1,6 +1,10 @@
 # Judge walkthrough
 
-RouteTill connects one human-approved purchase to NEAR Intents settlement, one digital entitlement and a signed Purchase Passport. John’s five scenes on the homepage explain the experience behind our first paying purchase. Agent discovery is visualized; the recorded financial and delivery evidence is genuine.
+**RouteTill — Agent-assisted cross-chain checkout with human approval and verified digital delivery.**
+
+**The agent proposes. You authorize. RouteTill verifies payment and delivery.**
+
+John is an illustrative buyer: his agent proposes a dataset, he authorizes exact terms and separately confirms a wallet transfer. NEAR Intents routes Arbitrum USDC to Base USDC; RouteTill independently checks the merchant receipt and matching file before delivery. The example agent is deterministic and cannot approve or sign. The recorded November 13 mainnet purchase is separate genuine evidence, not a transfer happening in this demonstration. [Positioning and claims](POSITIONING.md).
 
 ## Watch, try, inspect
 
