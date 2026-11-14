@@ -4,6 +4,8 @@
 
 Order `655d4cc9-0eaf-41b7-a7bf-05fc73286eea` is **FULFILLED** through normal reconciliation. The actual Arbitrum source transfer was 10.105156 native USDC; NEAR Intents reported SUCCESS; exactly 10 native Base USDC reached the verified merchant. A separate 0.095729 USDC refund returned to the buyer on Arbitrum. ETH gas was additional to the source USDC cap.
 
+**Amount clarification — November 14, 2026:** the approved source cap was 11 USDC, not the deposit. Net USDC spent was **10.105156 − 0.095729 = 10.009427 USDC**. Network gas was additional. The 0.009427 USDC difference from the merchant’s 10 USDC receipt is not assigned to a particular fee without supporting evidence. This arithmetic describes the recorded purchase; historical dry quotes below are unchanged.
+
 One payment attempt produced one durable entitlement, the approved 1,613-byte resource and one signed Purchase Passport. All 12 independent verifier checks passed; altered recipient/file evidence fails. See the [public manifest and explorer links](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/verification-manifest.json), [Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live), [provider SUCCESS](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/provider-status.json) and [reproduction command](evidence/mainnet-655d4cc9-0eaf-41b7-a7bf-05fc73286eea/REPRODUCE.txt).
 
 Unrestricted production payment preparation remains disabled; the public judge experience uses separately labeled simulated payment evidence. A verified completed purchase is not an assertion that general public payments are enabled.

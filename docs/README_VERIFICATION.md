@@ -2,6 +2,17 @@
 
 This review checks the current README against the live [official hackathon instructions](https://nearhackathon.com/HACKATHON.md), including Q-001–005, Q-012, Q-014–015 and Procedure 1. It is an engineering reproduction check, not a professional penetration test or a hackathon submission.
 
+## Owner-confirmed status update — November 14, 2026
+
+This dated update supersedes the earlier owner-action statuses below; it does **not** rerun or redate their technical checks.
+
+- Public X demo post: https://x.com/sopskistar/status/2121630057839968439.
+- Owner-selected tracks: **security, agents, realworld, business, open**. RouteTill is the owner's **only project submission**; no second-project disclosure is applicable.
+- The owner confirms: **The hosted application and no-funds demo will remain available through November 25, 2026.** This records the hosting commitment, not a new uptime measurement.
+- Organizer submission status remains **unknown** without an organizer receipt. Check the owner's organizer records; corrections to an existing entry use Request changes, not a duplicate application.
+- README commits through `d7628216dc68808483f9dc839d19262c7693e957` are preserved. The shortened README retains all five selected tracks and dated test attribution.
+- The approved MP4 is unchanged. Website story wording now distinguishes the 11 USDC ceiling from the 10.105156 USDC deposit and 0.095729 USDC refund: net USDC spent **10.009427**, with network gas additional. No particular fee is inferred from the remaining difference.
+
 ## Clean-clone boundary
 
 The executable application at `bdcf0a33accc0f3b25cf922542287863d5f4be80` was cloned with `git clone --no-hardlinks` into a new `/tmp/routetill-readme-compliance` directory. No ignored environment files, data stores, private captures, credentials or production signing keys were copied. Dependencies were installed using the committed lockfile. The only local configuration was a copy of `.env.example`. The public repository and its screenshot URLs were separately fetched without a buyer session.
@@ -56,4 +67,4 @@ Baseline `67f064e81d004f66462c75e9034b23eb832fce87`, dated November 7, contains 
 
 One genuine restricted mainnet purchase is proven; unrestricted customer payment preparation is disabled. Demo settlement is simulated, with actual isolated application/Neon validation. Application signatures do not prove database-wide uniqueness or the provider's causal routing association. RPC trust and independently obtained issuer keys remain necessary.
 
-The narrated MP4 is rendered privately but awaits owner review and publication. Its public link must be added to the README once available. The owner publishes the X post and submits the official form; no personal fields or payload were invented. Keep the repository public and hosting available through November 18, preferably November 25. Reciprocal disclosure is required if SilentSourcing is independently submitted; no second submission is asserted. Physical-device/Safari/Firefox and real WalletConnect pairing remain untested.
+At the time of this historical review, the narrated MP4 awaited owner selection/publication, the X post was not yet supplied, hosting beyond the requested judging period was unconfirmed, and no second-project submission was established. These owner-action observations are superseded by the dated update above and [final video record](FINAL_VIDEO.md). No personal fields or application payload were invented. Physical-device/Safari/Firefox and real WalletConnect pairing remain untested.

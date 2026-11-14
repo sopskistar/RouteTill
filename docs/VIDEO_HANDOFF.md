@@ -4,6 +4,12 @@
 
 This is an editorial handoff, not a new render or review of existing MP4s. Preserve all existing video files. [Locked positioning and claims](POSITIONING.md) is authoritative for future editing.
 
+## Website consistency update — November 14, 2026
+
+The current shared website story in [john-story.ts](../src/core/john-story.ts) clarifies Scene 3’s exact purchase terms, separate wallet confirmation and additional network gas. Scene 4 explicitly describes the **recorded November 13 purchase**, not the no-funds reenactment: an **11 USDC cap**, **10.105156 USDC deposit**, **10 USDC Base merchant receipt** and **0.095729 USDC Arbitrum refund**. Net USDC spent: **10.105156 − 0.095729 = 10.009427**, plus network gas. Do not assign the remaining difference to a specific fee without evidence.
+
+This is an editorial update, not a new video review or render. The approved MP4 and its original bytes remain unchanged; the older handoff below records its earlier editorial context. The current [readiness update](FINAL_READINESS.md#owner-confirmed-status-update--november-14-2026) records the supplied public X post, all five owner-selected tracks, RouteTill-only submission scope and owner-confirmed hosting through November 25, 2026. Organizer submission status remains unknown without a receipt.
+
 ## Locked opening
 
 RouteTill — Agent-assisted cross-chain checkout with human approval and verified digital delivery.

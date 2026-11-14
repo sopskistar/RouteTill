@@ -48,6 +48,7 @@ Open [the real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9
 - Saved NEAR Intents provider status: **SUCCESS**.
 - [Base merchant receipt](https://basescan.org/tx/0x8cc1225a938538842a42db97b5e3592fb37ede94632872d626dd91d1acafe121): exactly 10 native USDC to the verified merchant.
 - [Separate Arbitrum refund](https://arbiscan.io/tx/0x040de1f0e88378fcabcaa141480c5fa5499c329a8d899e4b4426fa7c8a6965a6): 0.095729 USDC returned to the buyer. ETH gas was additional.
+- Approved source ceiling: 11 USDC, not the deposit. Net USDC spent: **10.105156 − 0.095729 = 10.009427**; network gas additional. No particular fee is inferred from the remaining difference.
 - One attempt, one entitlement, one signed Passport; normal reconciliation reached **FULFILLED**, without a manual database status change.
 - Delivered artifact: 1,613 bytes; SHA-256 `f7ecb13c8d1b1576b17311ad3eb3a18848f44bdac3a742dbc66e0ba726f65643`.
 

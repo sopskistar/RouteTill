@@ -6,6 +6,8 @@ Built with **NEAR Intents 1Click** for Arbitrum USDC → Base USDC settlement.
 
 **[Watch demo](https://routetill.vercel.app/demo#final-video) · [Try the no-funds checkout](https://routetill-demo.vercel.app/checkout/purchase-vectors?mode=demo) · [Inspect the real Purchase Passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live)**
 
+The hosted application and no-funds demo will remain available through November 25, 2026.
+
 Built at **NEAR HACKATHON** · Tracks: **AI Security & Defense · Agent Economy · Real-World Money · Autonomous Business · Open Innovation**
 
 ![RouteTill homepage showing human-controlled checkout and the Purchase Passport for the completed 10 USDC purchase](docs/screenshots/home-hero-desktop.png)

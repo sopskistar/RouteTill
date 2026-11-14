@@ -1,6 +1,6 @@
 # RouteTill — owner submission copy
 
-**Draft for owner review.** The owner-approved video is publicly hosted unchanged. The owner will publish the X post and personally submit the official form. No application payload, personal information or submission request is prepared here.
+**Draft for owner review.** The owner-approved video is publicly hosted unchanged. The owner has provided the [public X demo post](https://x.com/sopskistar/status/2121630057839968439) and will personally manage the official form. Organizer submission status remains unknown without a receipt. No application payload, personal information or submission request is prepared here.
 
 ## Project name
 
@@ -24,15 +24,19 @@ Judges can try a no-funds checkout without registration or an owner code, run fi
 
 The demonstration uses simulated payment evidence in an isolated environment. The example agent is deterministic, not an LLM or unrestricted wallet signer; general public live-payment activation remains disabled.
 
-## Recommended tracks
+## Owner-selected tracks — confirmed November 14, 2026
 
-| Recommendation | Official ID | Why it fits |
+The owner selected all five tracks for **one RouteTill project submission**: `security`, `agents`, `realworld`, `business`, `open`.
+
+| Selected track | Official ID | Implemented basis and boundaries |
 | --- | --- | --- |
-| **Primary: Real-World Money** | `realworld` | A genuine merchant payment across chains, exact stablecoin receipt and digital product delivery. This is the strongest demonstrated result. |
-| Secondary: AI Security & Defense | `security` | Human authorization, immutable policy, spending limits, fail-closed execution and executable adversarial checks. This protects agent-assisted commerce without giving the agent wallet authority. |
-| Secondary: Agent Economy | `agents` | The deterministic agent discovers/proposes a paid developer resource and retrieves/verifies it after human approval. Do not claim LLM reasoning, negotiation or autonomous signing. |
+| AI Security & Defense | `security` | Human authorization, immutable purchase terms, spending limits, fail-closed execution and controlled backend security checks. |
+| Agent Economy | `agents` | A deterministic client proposes a paid resource and retrieves/verifies it after fulfillment; no LLM reasoning or autonomous wallet signing is claimed. |
+| Real-World Money | `realworld` | One recorded cross-chain merchant payment, exact stablecoin receipt and matching digital-product delivery. |
+| Autonomous Business | `business` | Merchant listing, hosted checkout and verified digital fulfillment demonstrate a bounded commerce workflow, not a fully autonomous business. |
+| Open Innovation | `open` | Purchase-policy enforcement, independent receipt checks, durable entitlement and an inspectable signed Passport form one connected prototype. |
 
-Autonomous Business is weaker because RouteTill does not autonomously operate a business. DeFi is broader than the product’s merchant-payment purpose. Choose the tracks above that you wish to enter; there is one project submission with an array of track IDs.
+RouteTill is the owner's **only project submission**. This owner confirmation establishes project scope and selected tracks; it is not an organizer submission receipt.
 
 [Canonical positioning and evidence boundaries](POSITIONING.md). The agent proposes. You authorize. RouteTill verifies payment and delivery. John is illustrative; the merchant and buyer are two sides of one purchase.
 
@@ -61,7 +65,13 @@ The focus is the connected chain of evidence: a human-controlled purchase → in
 3. **DO** run five Lab checks. **SEE** unsafe changes and approval reuse rejected, 20 notifications producing one stored entitlement, and tampering detected.
 4. **DO** inspect the separate genuine mainnet Passport and explorer links. **SEE** actual Arbitrum funding, NEAR Intents SUCCESS, exactly 10 Base USDC, a buyer refund, one delivery and independent verification.
 
-## X post draft — attach the owner-approved narrated MP4
+## Public X post — supplied by the owner November 14, 2026
+
+https://x.com/sopskistar/status/2121630057839968439
+
+Use this public post for the form’s Demo post link. Its publication does not establish that the hackathon application was submitted.
+
+### Earlier X draft — retained for reference
 
 Your agent can find a dataset without controlling your wallet.
 
@@ -72,22 +82,26 @@ https://github.com/sopskistar/RouteTill
 
 @NEARProtocol #NEARHackathon
 
-Attach the approved video directly; the site links to the public demo, source and payment evidence. The form’s `demoUrl` expects your public X post URL, not the website or local MP4. The original approved MP4 is available above; no public X post URL has been provided or invented.
+The form’s `demoUrl` expects the public X post above, not the application, video-hosting URL or local MP4. The earlier draft is historical guidance, not a request to publish a second post. The approved MP4 remains unchanged.
 
 ## Non-personal form values
 
 - Project name: **RouteTill**
 - Project URL: **https://github.com/sopskistar/RouteTill**
 - Description / idea: paste the description above (1,728 characters including paragraph breaks; limit 2,000).
-- Tracks: recommended `realworld`, `security`, `agents`; choose your final selection.
-- Demo post URL: enter your own public X post URL after approving and attaching the narrated video. The website and local MP4 are not substitutes for that field.
+- Tracks: owner-selected `security`, `agents`, `realworld`, `business`, `open`.
+- Demo post URL: **https://x.com/sopskistar/status/2121630057839968439**.
 - Tagline: use the optional tagline wherever the form or post supports it; do not invent additional official API fields.
 
 ## Owner-entered fields and final checks
 
-Use the [official form and current rules](https://nearhackathon.com/HACKATHON.md). The official `idea` limit is 20–2,000 characters; the description above is designed to fit. Enter your own lead name, email, team size, NEAR mainnet payout account and contact consent. The Arbitrum/Base EVM wallets are not substitutes for the requested NEAR prize account. If independently submitting another project, make the required reciprocal README disclosure; at most two independent projects per person are allowed.
+Use the [official form and current rules](https://nearhackathon.com/HACKATHON.md). The official `idea` limit is 20–2,000 characters; the description above is designed to fit. Enter your own lead name, email, team size, NEAR mainnet payout account and contact consent. The Arbitrum/Base EVM wallets are not substitutes for the requested NEAR prize account. The owner confirms RouteTill is the only project submission; no second-project disclosure is applicable.
 
-Repository must remain public through judging. Check your submission history before sending anything. Local records do not establish whether the project has already been submitted. If not submitted, publish your X demo with @NEARProtocol and #NEARHackathon and use its URL in the form. If already submitted and a correction is needed, use [Request changes](https://nearhackathon.com/request-changes), not another application. Deadline: November 14, 2026, 23:59 UTC. This document neither submits the form nor authorizes anyone else to do so.
+Repository must remain public through judging. The owner confirms that the hosted application and no-funds demo will remain available through November 25, 2026. Check your submission history before sending anything. Local records do not establish whether the project has already been submitted. If not submitted, use the supplied public X demo URL in the form. If already submitted and a correction is needed, use [Request changes](https://nearhackathon.com/request-changes), not another application. Deadline: November 14, 2026, 23:59 UTC. This document neither submits the form nor authorizes anyone else to do so.
+
+## Recorded purchase amount clarification — November 14, 2026
+
+The 11 USDC source cap was not the deposit. Deposit **10.105156 USDC** minus the **0.095729 USDC** refund gives **10.009427 USDC net spend**. The merchant received **10 USDC on Base**. Network gas was additional. Do not attribute the remaining difference to a specific fee without supporting evidence.
 
 ## Limitations to disclose
 
