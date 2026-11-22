@@ -177,3 +177,15 @@ Exact dependency versions are pinned by the root and video lockfiles; upstream l
 </details>
 
 [Technical references and related work](docs/REFERENCES.md) · [License](LICENSE)
+
+---
+
+## Engineering portfolio: cloud, security and release validation
+
+**Architecture:** Next.js checkout and verification service, Neon/PostgreSQL persistence, NEAR Intents 1Click SDK integration, chain settlement checks, signed evidence and controlled digital-delivery entitlement. GitHub-hosted source with Vercel application deployment.
+
+**Engineering tools:** TypeScript, Next.js, PostgreSQL/Neon, Vercel, NEAR Intents SDK, WalletConnect, viem, GitHub Actions/testing workflows where recorded, Vitest, Playwright, API integration, environment configuration and release checks.
+
+**Evidence:** [Real mainnet transaction and verification](docs/NEAR_PROOF.md) · [Deployment](docs/DEPLOYMENT.md) · [Recorded mainnet passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live).
+
+**Scope:** separate simulated no-funds demo from the recorded real settlement; neither Docker/Kubernetes/Terraform infrastructure nor a commercial production traffic history is claimed.
