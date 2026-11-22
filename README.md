@@ -180,12 +180,41 @@ Exact dependency versions are pinned by the root and video lockfiles; upstream l
 
 ---
 
-## Engineering portfolio: cloud, security and release validation
+## Cloud Engineering & DevOps
 
-**Architecture:** Next.js checkout and verification service, Neon/PostgreSQL persistence, NEAR Intents 1Click SDK integration, chain settlement checks, signed evidence and controlled digital-delivery entitlement. GitHub-hosted source with Vercel application deployment.
+*Project-specific implementation record for technical interviews and portfolio review. Items below distinguish completed work from unverified or planned infrastructure.*
 
-**Engineering tools:** TypeScript, Next.js, PostgreSQL/Neon, Vercel, NEAR Intents SDK, WalletConnect, viem, GitHub Actions/testing workflows where recorded, Vitest, Playwright, API integration, environment configuration and release checks.
+### Cloud platforms
+- Full-stack Next.js application hosted on Vercel, backed by Neon/PostgreSQL for checkout, entitlements and audit records.
+- Separates human approval, signed source-spending constraints and independently inspected cross-chain settlement evidence.
 
-**Evidence:** [Real mainnet transaction and verification](docs/NEAR_PROOF.md) · [Deployment](docs/DEPLOYMENT.md) · [Recorded mainnet passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live).
+### DevOps & CI/CD
+- Repository build, typecheck, security checks and automated unit/browser test suite are documented.
+- Release artifacts and a public transaction-proof dossier support repeatable validation; no Terraform/Kubernetes/containerized production stack is claimed.
 
-**Scope:** separate simulated no-funds demo from the recorded real settlement; neither Docker/Kubernetes/Terraform infrastructure nor a commercial production traffic history is claimed.
+### Networking & API engineering
+- Integrates NEAR Intents 1Click, Arbitrum and Base chain receipts, signed quote verification and transaction status APIs.
+- Application API, identity/authorization boundaries, error/duplicate notification handling and externally checkable payment evidence.
+
+### Monitoring & reliability
+- Idempotent entitlement issuance and duplicate-notification regression tests support reliable fulfillment.
+- Recorded real settlement is distinguished from explicitly simulated no-funds demo; no commercial availability, backup/restore drill or production scaling claims.
+
+### Architecture & infrastructure diagram
+
+```mermaid
+flowchart LR
+  U[Buyer approval] --> V[Next.js checkout on Vercel]
+  V --> N[(PostgreSQL on Neon)]
+  V --> I[NEAR Intents 1Click]
+  I --> S[Arbitrum to Base settlement]
+  S --> C[Independent receipt checks]
+  C --> N
+  N --> E[Delivery entitlement and Purchase Passport]
+```
+
+**Deployment:** https://routetill.vercel.app
+
+**Technical documentation and proof:** [Deployment](docs/DEPLOYMENT.md) · [Mainnet proof](docs/NEAR_PROOF.md) · [Judge walkthrough](docs/JUDGE_WALKTHROUGH.md) · [Live verified passport](https://routetill.vercel.app/passport/655d4cc9-0eaf-41b7-a7bf-05fc73286eea?mode=live).
+
+**Evidence boundary:** One documented mainnet purchase is real; seeded judge demonstrations are simulated and labeled. Do not infer paid customer scale, Terraform or Kubernetes.
